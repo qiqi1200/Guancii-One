@@ -1,0 +1,49 @@
+---
+import site from '../site.json';
+const SITE = site;
+const year = new Date().getFullYear();
+---
+<footer class="mt-24 border-t border-cream-200 dark:border-ink-600 bg-cream-100/50 dark:bg-ink-700/50 transition-colors">
+  <div class="max-w-6xl mx-auto px-6 py-10">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-sm">
+      <div>
+        <div class="font-semibold text-ink-700 dark:text-cream-50 mb-2">
+          {SITE.title}
+        </div>
+        <p class="text-ink-400 dark:text-cream-300 leading-relaxed">
+          {SITE.description}
+        </p>
+      </div>
+
+      <div>
+        <div class="font-semibold text-ink-700 dark:text-cream-50 mb-2">链接</div>
+        <ul class="space-y-1.5 text-ink-500 dark:text-cream-300">
+          <li><a href="/about" class="hover:text-accent-sky transition-colors">关于我</a></li>
+          <li><a href="/archive" class="hover:text-accent-sky transition-colors">归档</a></li>
+          <li><a href="/rss.xml" class="hover:text-accent-sky transition-colors">RSS</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <div class="font-semibold text-ink-700 dark:text-cream-50 mb-2">联系</div>
+        <ul class="space-y-1.5 text-ink-500 dark:text-cream-300">
+          <li>
+            <a href={SITE.links.github} class="hover:text-accent-sky transition-colors" target="_blank" rel="noopener">
+              GitHub
+            </a>
+          </li>
+          <li>
+            <a href={SITE.links.email} class="hover:text-accent-sky transition-colors">
+              邮箱
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="mt-8 pt-6 border-t border-cream-200 dark:border-ink-600 text-xs text-ink-400 dark:text-cream-300 flex flex-col sm:flex-row justify-between gap-2">
+      <div>© {year} {SITE.author}. All rights reserved.</div>
+      <div>Built with <span class="text-accent-sky">Astro</span> · <span class="text-accent-mint">Tailwind</span></div>
+    </div>
+  </div>
+</footer>

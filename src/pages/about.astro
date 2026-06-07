@@ -1,0 +1,83 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import site from '../site.json';
+const SITE = site;
+
+const skills = {
+  '熟悉': ['TypeScript', 'React', 'Node.js', 'Python', 'Tailwind CSS'],
+  '在学': ['Next.js', 'Rust', 'PostgreSQL', 'Docker'],
+  '兴趣': ['AI/ML', '设计系统', '独立开发', '写作']
+};
+
+const timeline = [
+  { year: '2024 - 现在', title: '某某大学 · 计算机相关专业 · 大三', desc: '折腾各种项目，开始认真做笔记' },
+  { year: '2023', title: '第一次写自己的小项目', desc: '一个 Todo App，丑但有成就感' },
+  { year: '2022', title: '进入大学', desc: '接触编程，发现这事儿可以一直学下去' }
+];
+---
+<BaseLayout title="关于" current="/about">
+  <article class="max-w-3xl mx-auto px-6 py-12 md:py-20">
+    <header class="mb-12 animate-fade-in">
+      <div class="text-sm text-ink-400 dark:text-cream-300 mb-2">关于</div>
+      <h1 class="text-4xl md:text-5xl font-semibold tracking-tight text-ink-700 dark:text-cream-50">
+        关于我
+      </h1>
+      <p class="mt-4 text-lg text-ink-500 dark:text-cream-300 leading-relaxed">
+        一个在路上的大学生，写代码、读书、想事情。
+      </p>
+    </header>
+
+    <div class="prose prose-lg dark:prose-invert max-w-none">
+      <p>
+        你好，我叫 <strong>guancii</strong>，一个普通的大三学生。
+      </p>
+      <p>
+        这个角落原本是为了记录我学编程的过程，慢慢地变成了存放生活里各种
+        小事的地方——读过的书、看过的电影、走过的路、想过的问题。
+        没什么主题，唯一的标准是「自己真心觉得值得写下来」。
+      </p>
+      <p>
+        写东西不是为了被看见（虽然被人看见总归是开心的），更多是为了理清自己。
+        如果我的某些思考刚好和你产生了一点共鸣，那是额外的奖赏。
+      </p>
+
+      <h2>📚 在做什么</h2>
+      <ul>
+        <li>本科 · 计算机相关专业</li>
+        <li>课余时间写写前端、做点小工具</li>
+        <li>尝试建立自己的写作节奏</li>
+      </ul>
+
+      <h2>🛠️ 技术栈</h2>
+      {Object.entries(skills).map(([level, items]) => (
+        <div>
+          <p><strong>{level}</strong></p>
+          <ul>
+            {items.map(s => <li>{s}</li>)}
+          </ul>
+        </div>
+      ))}
+
+      <h2>🕐 时间线</h2>
+      <ul>
+        {timeline.map(t => (
+          <li>
+            <strong>{t.year}</strong> · {t.title}<br />
+            <span style="opacity:0.7">{t.desc}</span>
+          </li>
+        ))}
+      </ul>
+
+      <h2>✉️ 找到我</h2>
+      <p>
+        不怎么活跃，但欢迎你来聊：<br />
+        GitHub：<a href={SITE.links.github} target="_blank" rel="noopener">@{SITE.author}</a><br />
+        邮箱：<a href={SITE.links.email}>{SITE.links.email.replace('mailto:', '')}</a>
+      </p>
+
+      <blockquote>
+        「慢慢来，比较快。」
+      </blockquote>
+    </div>
+  </article>
+</BaseLayout>

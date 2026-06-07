@@ -1,0 +1,37 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const posts = await getCollection('posts');
+const tagMap = new Map<string, number>();
+posts.forEach(p => {
+  p.data.tags?.forEach(t => tagMap.set(t, (tagMap.get(t) || 0) + 1));
+});
+const tags = [...tagMap.entries()].sort((a, b) => b[1] - a[1]);
+---
+<BaseLayout title="标签" current="/tags">
+  <article class="max-w-3xl mx-auto px-6 py-12 md:py-20">
+    <header class="mb-12 animate-fade-in">
+      <div class="text-sm text-ink-400 dark:text-cream-300 mb-2">标签</div>
+      <h1 class="text-4xl md:text-5xl font-semibold tracking-tight text-ink-700 dark:text-cream-50">
+        全部标签
+      </h1>
+      <p class="mt-4 text-ink-500 dark:text-cream-300">
+        共 {tags.length} 个标签
+      </p>
+    </header>
+
+    <div class="flex flex-wrap gap-2">
+      {tags.map(([tag, count]) => (
+        <a
+          href={`/tags/${tag}`}
+          class="tag-chip"
+          style="font-size: 0.875rem; padding: 0.4rem 0.8rem;"
+        >
+          #{tag}
+          <span class="opacity-50 ml-1">{count}</span>
+        </a>
+      ))}
+    </div>
+  </article>
+</BaseLayout>

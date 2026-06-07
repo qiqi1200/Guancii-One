@@ -1,0 +1,38 @@
+---
+// Twikoo 评论组件
+// 用法：<TwikooComments /> 放在任何想要展示评论的地方
+
+interface Props {
+  class?: string;
+}
+
+const { class: className = '' } = Astro.props;
+---
+<div id="tcomment" class={className}></div>
+
+<script src="https://cdn.jsdelivr.net/npm/twikoo@1.6.42/dist/twikoo.min.js" is:inline></script>
+
+<script is:inline>
+  (function () {
+    function initTwikoo() {
+      if (typeof twikoo === 'undefined') {
+        setTimeout(initTwikoo, 100);
+        return;
+      }
+      // 优先读取 window 上的配置（构建时注入），否则走默认值
+      const config = window.__TWIKOO_CONFIG__ || {
+        envId: 'https://your-twikoo.vercel.app',
+        lang: 'zh-CN',
+        sort: 'desc',
+        emoticon: [
+          'https://cdn.jsdelivr.net/gh/qcm/qq_emoji@master/dist/qq_emoji/all.gif'
+        ]
+      };
+      twikoo.init({
+        el: '#tcomment',
+        ...config
+      });
+    }
+    initTwikoo();
+  })();
+</script>

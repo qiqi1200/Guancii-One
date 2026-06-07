@@ -1,0 +1,126 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PostCard from '../components/PostCard.astro';
+import Sidebar from '../components/Sidebar.astro';
+import { getCollection } from 'astro:content';
+import site from '../site.json';
+const SITE = site;
+
+const posts = (await getCollection('posts'))
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+const featured = posts[0];
+const rest = posts.slice(1);
+
+// 收集所有标签
+const allTags = [...new Set(posts.flatMap(p => p.data.tags || []))];
+---
+<BaseLayout title="首页" current="/">
+  <!-- Hero 区 -->
+  <section class="max-w-6xl mx-auto px-6 pt-16 pb-12 md:pt-24 md:pb-16 animate-fade-in">
+    <div class="grid md:grid-cols-[auto_1fr] gap-8 md:gap-12 items-center">
+      <div class="relative">
+        <div class="w-32 h-32 md:w-40 md:h-40 rounded-full bg-gradient-to-br from-accent-sky via-accent-mint to-accent-sand p-1 shadow-lg">
+          <div class="w-full h-full rounded-full bg-cream-50 dark:bg-ink-700 flex items-center justify-center text-5xl md:text-6xl font-serif text-ink-700 dark:text-cream-50">
+            g
+          </div>
+        </div>
+        <div class="absolute -bottom-1 -right-1 w-6 h-6 bg-accent-mint rounded-full border-4 border-cream-50 dark:border-ink-700"></div>
+      </div>
+
+      <div>
+        <h1 class="text-3xl md:text-5xl font-semibold tracking-tight text-ink-700 dark:text-cream-50">
+          你好，我是 <span class="text-accent-sky">{SITE.author}</span>
+        </h1>
+        <p class="mt-4 text-lg text-ink-500 dark:text-cream-300 leading-relaxed max-w-2xl">
+          一个普通的大三学生，记点生活里的小事、读过的书、学过的东西。
+          这里没什么宏大叙事，就是一些安静的思考和日常。
+        </p>
+        <div class="mt-6 flex flex-wrap gap-2">
+          <a href="/about" class="btn-primary">了解我</a>
+          <a href="/archive" class="btn-ghost">浏览归档 →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 标签筛选 -->
+  {allTags.length > 0 && (
+    <section class="max-w-6xl mx-auto px-6 mb-8">
+      <div class="flex flex-wrap gap-2">
+        <button data-tag="all" class="tag-chip tag-filter active">
+          全部
+        </button>
+        {allTags.map(tag => (
+          <button data-tag={tag} class="tag-chip tag-filter">
+            #{tag}
+          </button>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <!-- 文章网格 + 侧边栏 -->
+  <section class="max-w-6xl mx-auto px-6 pb-16">
+    <div class="grid lg:grid-cols-[1fr_280px] gap-12">
+      <div>
+        <h2 class="text-xl font-semibold text-ink-700 dark:text-cream-50 mb-6 flex items-center gap-2">
+          <span class="w-1 h-6 bg-accent-sky rounded"></span>
+          最新文章
+        </h2>
+
+        {featured && (
+          <div class="mb-8">
+            <PostCard post={featured} featured={true} />
+          </div>
+        )}
+
+        <div class="grid sm:grid-cols-2 gap-6 post-grid">
+          {rest.map(p => (
+            <div data-tags={JSON.stringify(p.data.tags || [])}>
+              <PostCard post={p} />
+            </div>
+          ))}
+        </div>
+
+        {posts.length === 0 && (
+          <div class="text-center py-20 text-ink-400 dark:text-cream-300">
+            还没有文章，先去写下第一篇吧 ✍️
+          </div>
+        )}
+      </div>
+
+      <div class="hidden lg:block">
+        <div class="sticky top-24">
+          <Sidebar posts={posts} />
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script is:inline>
+  // 标签筛选
+  const filterBtns = document.querySelectorAll('.tag-filter');
+  const postCards = document.querySelectorAll('.post-grid > div');
+
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tag = btn.getAttribute('data-tag');
+      filterBtns.forEach(b => b.classList.remove('active', 'bg-accent-sky/30', 'text-accent-sky'));
+      btn.classList.add('active', 'bg-accent-sky/30', 'text-accent-sky');
+
+      postCards.forEach(card => {
+        const tags = JSON.parse(card.getAttribute('data-tags') || '[]');
+        card.style.display = (tag === 'all' || tags.includes(tag)) ? '' : 'none';
+      });
+    });
+  });
+</script>
+
+<style>
+  .tag-filter.active {
+    background-color: rgba(126, 184, 214, 0.25);
+    color: rgb(126, 184, 214);
+  }
+</style>

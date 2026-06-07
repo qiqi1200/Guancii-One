@@ -1,0 +1,104 @@
+---
+import site from '../site.json';
+const SITE = site;
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  ogImage?: string;
+  current?: string;
+}
+
+const {
+  title,
+  description = SITE.description,
+  ogImage = '/og-default.png',
+  current
+} = Astro.props;
+
+const fullTitle = title ? `${title} · ${SITE.title}` : SITE.title;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+---
+<!doctype html>
+<html lang="zh-CN" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="alternate" type="application/rss+xml" title={SITE.title} href="/rss.xml" />
+
+    <!-- 主题预检脚本 -->
+    <script is:inline>
+      (function() {
+        const saved = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (saved === 'dark' || (!saved && prefersDark)) {
+          document.documentElement.classList.add('dark');
+        }
+      })();
+    </script>
+  </head>
+  <body class="min-h-screen flex flex-col">
+    <Header current={current} />
+
+    <main class="flex-1 w-full">
+      <slot />
+    </main>
+
+    <Footer />
+
+    <!-- 返回顶部按钮 -->
+    <button
+      id="back-to-top"
+      aria-label="返回顶部"
+      class="no-print fixed bottom-6 right-6 w-10 h-10 rounded-full bg-ink-700 dark:bg-cream-100 text-cream-50 dark:text-ink-700 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all opacity-0 pointer-events-none z-30"
+    >
+      <svg class="w-5 h-5 mx-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M18 15l-6-6-6 6"/>
+      </svg>
+    </button>
+
+    <script is:inline>
+      // 返回顶部按钮
+      const backBtn = document.getElementById('back-to-top');
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 600) {
+          backBtn?.classList.remove('opacity-0', 'pointer-events-none');
+          backBtn?.classList.add('opacity-100');
+        } else {
+          backBtn?.classList.add('opacity-0', 'pointer-events-none');
+          backBtn?.classList.remove('opacity-100');
+        }
+      });
+      backBtn?.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    </script>
+
+    <!-- 全局注入 twikoo 配置（所有页面都能读取） -->
+    <script is:inline define:vars={{ twikooConfig: SITE.twikoo }}>
+      window.__TWIKOO_CONFIG__ = twikooConfig;
+    </script>
+  </body>
+</html>

@@ -1,0 +1,53 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PostCard from '../components/PostCard.astro';
+import { getCollection } from 'astro:content';
+
+const allPosts = await getCollection('posts');
+const query = Astro.url.searchParams.get('q')?.toLowerCase() || '';
+const results = query
+  ? allPosts.filter(p =>
+      p.data.title.toLowerCase().includes(query) ||
+      p.data.description?.toLowerCase().includes(query) ||
+      p.data.tags?.some(t => t.toLowerCase().includes(query)) ||
+      p.body.toLowerCase().includes(query)
+    )
+  : [];
+---
+<BaseLayout title={query ? `搜索: ${query}` : '搜索'}>
+  <article class="max-w-6xl mx-auto px-6 py-12 md:py-20">
+    <header class="mb-12 animate-fade-in">
+      <h1 class="text-4xl md:text-5xl font-semibold tracking-tight text-ink-700 dark:text-cream-50">
+        搜索
+      </h1>
+      <form action="/search" method="get" class="mt-6">
+        <input
+          type="search"
+          name="q"
+          value={query}
+          placeholder="输入关键词..."
+          autofocus
+          class="w-full max-w-xl px-4 py-3 rounded-lg bg-cream-100 dark:bg-ink-600 border border-cream-200 dark:border-ink-500 text-ink-700 dark:text-cream-50 placeholder:text-ink-400 focus:outline-none focus:border-accent-sky focus:ring-1 focus:ring-accent-sky transition-colors"
+        />
+      </form>
+    </header>
+
+    {query && (
+      <p class="text-ink-500 dark:text-cream-300 mb-8">
+        关于「<span class="text-accent-sky font-medium">{query}</span>」找到 {results.length} 个结果
+      </p>
+    )}
+
+    {results.length > 0 && (
+      <div class="grid sm:grid-cols-2 gap-6">
+        {results.map(p => <PostCard post={p} />)}
+      </div>
+    )}
+
+    {query && results.length === 0 && (
+      <p class="text-ink-400 dark:text-cream-300 text-center py-12">
+        没有找到相关文章
+      </p>
+    )}
+  </article>
+</BaseLayout>

@@ -1,0 +1,60 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const posts = (await getCollection('posts'))
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+// 按年月分组
+const groups = new Map<string, typeof posts>();
+posts.forEach(p => {
+  const key = p.data.date.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long' });
+  if (!groups.has(key)) groups.set(key, []);
+  groups.get(key)!.push(p);
+});
+---
+<BaseLayout title="归档" current="/archive">
+  <article class="max-w-3xl mx-auto px-6 py-12 md:py-20">
+    <header class="mb-12 animate-fade-in">
+      <div class="text-sm text-ink-400 dark:text-cream-300 mb-2">归档</div>
+      <h1 class="text-4xl md:text-5xl font-semibold tracking-tight text-ink-700 dark:text-cream-50">
+        全部文章
+      </h1>
+      <p class="mt-4 text-ink-500 dark:text-cream-300">
+        共 {posts.length} 篇 · 按时间倒序
+      </p>
+    </header>
+
+    <div class="space-y-12">
+      {[...groups.entries()].map(([month, items]) => (
+        <section>
+          <h2 class="text-sm font-semibold text-ink-400 dark:text-cream-300 uppercase tracking-wider mb-4 sticky top-20 bg-cream-50/80 dark:bg-ink-700/80 backdrop-blur py-2 z-10">
+            {month}
+            <span class="ml-2 text-ink-400/60">· {items.length}</span>
+          </h2>
+          <ul class="space-y-1">
+            {items.map(p => (
+              <li>
+                <a
+                  href={`/posts/${p.slug}/`}
+                  class="group flex items-baseline gap-4 py-2 px-3 -mx-3 rounded-lg hover:bg-cream-100 dark:hover:bg-ink-600 transition-colors"
+                >
+                  <time class="text-sm text-ink-400 dark:text-cream-300 shrink-0 w-16 tabular-nums">
+                    {p.data.date.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' })}
+                  </time>
+                  <span class="text-ink-700 dark:text-cream-50 group-hover:text-accent-sky transition-colors">
+                    {p.data.title}
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
+
+      {posts.length === 0 && (
+        <p class="text-ink-400 dark:text-cream-300 text-center py-12">还没有文章</p>
+      )}
+    </div>
+  </article>
+</BaseLayout>

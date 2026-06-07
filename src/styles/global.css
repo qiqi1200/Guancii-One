@@ -1,0 +1,146 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg: 253 252 249;
+    --bg-soft: 250 247 240;
+    --fg: 44 44 44;
+    --fg-soft: 122 122 122;
+    --border: 232 223 201;
+    --accent: 126 184 214;
+  }
+
+  .dark {
+    --bg: 26 26 26;
+    --bg-soft: 38 38 38;
+    --fg: 232 232 232;
+    --fg-soft: 160 160 160;
+    --border: 58 58 58;
+    --accent: 126 184 214;
+  }
+
+  html {
+    @apply scroll-smooth;
+    font-feature-settings: 'cv11', 'ss01';
+  }
+
+  body {
+    @apply bg-cream-50 text-ink-600 antialiased transition-colors duration-300;
+    background-color: rgb(var(--bg));
+    color: rgb(var(--fg));
+  }
+
+  .dark body {
+    @apply bg-ink-700 text-cream-100;
+  }
+
+  ::selection {
+    @apply bg-accent-sky/30 text-ink-700;
+  }
+
+  /* 暗色模式下 prose 适配 */
+  .dark .prose {
+    --tw-prose-body: theme('colors.cream.200');
+    --tw-prose-headings: theme('colors.cream.50');
+    --tw-prose-lead: theme('colors.cream.300');
+    --tw-prose-links: theme('colors.accent.sky');
+    --tw-prose-bold: theme('colors.cream.50');
+    --tw-prose-counters: theme('colors.ink.400');
+    --tw-prose-bullets: theme('colors.ink.500');
+    --tw-prose-hr: theme('colors.ink.500');
+    --tw-prose-quotes: theme('colors.cream.300');
+    --tw-prose-captions: theme('colors.ink.400');
+    --tw-prose-code: theme('colors.cream.100');
+    --tw-prose-pre-code: theme('colors.cream.100');
+    --tw-prose-pre-bg: theme('colors.ink.600');
+    --tw-prose-th-borders: theme('colors.ink.500');
+    --tw-prose-td-borders: theme('colors.ink.600');
+  }
+}
+
+@layer components {
+  /* 阅读进度条 */
+  .reading-progress {
+    @apply fixed top-0 left-0 h-0.5 bg-accent-sky z-50 transition-all duration-150;
+    width: 0%;
+  }
+
+  /* 卡片悬浮 */
+  .card-hover {
+    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-lg;
+  }
+
+  /* 标签 chip */
+  .tag-chip {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+           bg-cream-100 text-ink-500 hover:bg-accent-sky/20 hover:text-accent-sky
+           transition-colors cursor-pointer;
+  }
+
+  .dark .tag-chip {
+    @apply bg-ink-600 text-cream-300;
+  }
+
+  /* 按钮 */
+  .btn {
+    @apply inline-flex items-center gap-2 px-4 py-2 rounded-lg
+           text-sm font-medium transition-all duration-200
+           hover:-translate-y-0.5 active:translate-y-0;
+  }
+
+  .btn-primary {
+    @apply btn bg-ink-700 text-cream-50 hover:bg-ink-800 hover:shadow-md;
+  }
+
+  .dark .btn-primary {
+    @apply bg-cream-100 text-ink-700 hover:bg-cream-50;
+  }
+
+  .btn-ghost {
+    @apply btn text-ink-500 hover:text-ink-700 hover:bg-cream-100;
+  }
+
+  .dark .btn-ghost {
+    @apply text-cream-300 hover:text-cream-50 hover:bg-ink-600;
+  }
+
+  /* 骨架屏 */
+  .skeleton {
+    @apply bg-gradient-to-r from-cream-100 via-cream-200 to-cream-100
+           bg-[length:200%_100%] animate-[shimmer_1.5s_infinite] rounded;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  /* 滚动条 */
+  ::-webkit-scrollbar {
+    @apply w-2;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-cream-100;
+  }
+  .dark ::-webkit-scrollbar-track {
+    @apply bg-ink-700;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-cream-300 rounded-full;
+  }
+  .dark ::-webkit-scrollbar-thumb {
+    @apply bg-ink-500 rounded-full;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-ink-400;
+  }
+
+  /* 打印样式 */
+  @media print {
+    .no-print { display: none !important; }
+    body { background: white !important; color: black !important; }
+    .prose { max-width: 100% !important; }
+  }
+}

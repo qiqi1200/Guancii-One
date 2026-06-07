@@ -1,0 +1,17 @@
+{
+  "name": "twikoo-server",
+  "version": "1.6.42",
+  "description": "Twikoo 评论系统后端 - 部署到 Vercel",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel deploy --prod"
+  },
+  "dependencies": {
+    "@vercel/node": "^3.0.0",
+    "twikoo": "1.6.42"
+  },
+  "devDependencies": {
+    "vercel": "^32.0.0"
+  }
+}
