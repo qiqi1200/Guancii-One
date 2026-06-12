@@ -10,8 +10,8 @@
     "rss": "/rss.xml"
   },
   "twikoo": {
-    "enabled": false,
-    "envId": "",
+    "enabled": true,
+    "envId": "https://twikoo-vercel-beryl.vercel.app",
     "lang": "zh-CN"
   }
 }

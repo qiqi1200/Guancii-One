@@ -209,34 +209,80 @@ const toc = headings.filter(h => h.depth === 2 || h.depth === 3);
   </article>
 
   <script is:inline define:vars={{ slug }}>
-    // 点赞功能 (localStorage)
-    const STORAGE_KEY = `likes_${slug}`;
-    const stored = localStorage.getItem(STORAGE_KEY);
+    // 点赞功能 (持久化 via Twikoo like API)
+    const LIKE_API = window.__TWIKOO_CONFIG__?.envId 
+      ? window.__TWIKOO_CONFIG__.envId.replace(/\/+$/, '') + '/like'
+      : null;
+    const STORAGE_KEY = `liked_${slug}`;
+    const alreadyLiked = localStorage.getItem(STORAGE_KEY) === 'true';
     const countEl = document.getElementById('like-count');
     const btn = document.getElementById('like-btn');
     const heartIcon = document.getElementById('like-heart');
 
-    if (countEl) {
-      const baseCount = parseInt(stored || '0', 10);
-      countEl.textContent = baseCount;
-      if (baseCount > 0) {
-        heartIcon?.classList.add('text-[rgb(var(--primary))]');
-        heartIcon.style.fontVariationSettings = "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24";
+    // 从服务器读取当前点赞数
+    async function fetchCount() {
+      if (!LIKE_API) return;
+      try {
+        const res = await fetch(LIKE_API, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: slug, action: 'get' })
+        });
+        const data = await res.json();
+        if (countEl) countEl.textContent = data.count;
+        if (data.count > 0 && !alreadyLiked) {
+          // 有赞但不来自当前用户，不填心
+        }
+        if (alreadyLiked) {
+          heartIcon?.classList.add('text-[rgb(var(--primary))]');
+          heartIcon.style.fontVariationSettings = "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24";
+        }
+      } catch (e) {
+        console.warn('Failed to fetch likes:', e);
       }
     }
+    fetchCount();
 
-    btn?.addEventListener('click', () => {
-      const current = parseInt(localStorage.getItem(STORAGE_KEY) || '0', 10);
-      const next = current + 1;
-      localStorage.setItem(STORAGE_KEY, String(next));
-      if (countEl) {
-        countEl.textContent = next;
-        btn.classList.add('scale-110');
-        setTimeout(() => btn.classList.remove('scale-110'), 200);
-      }
+    // 加载完成后立即检查是否已赞过
+    if (alreadyLiked && heartIcon) {
+      heartIcon.style.fontVariationSettings = "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24";
+      heartIcon.classList.add('text-[rgb(var(--primary))]');
+    }
+
+    btn?.addEventListener('click', async () => {
+      if (alreadyLiked) return; // 每人只能赞一次
+
+      // 乐观更新 UI
+      const current = parseInt(countEl?.textContent || '0', 10);
+      if (countEl) countEl.textContent = current + 1;
       if (heartIcon) {
         heartIcon.style.fontVariationSettings = "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24";
         heartIcon.classList.add('text-[rgb(var(--primary))]');
+      }
+      btn.classList.add('scale-110');
+      setTimeout(() => btn.classList.remove('scale-110'), 200);
+
+      // 持久化到服务器
+      if (LIKE_API) {
+        try {
+          await fetch(LIKE_API, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url: slug, action: 'increment' })
+          });
+          localStorage.setItem(STORAGE_KEY, 'true');
+        } catch (e) {
+          console.warn('Failed to save like:', e);
+          // 失败时回滚
+          if (countEl) countEl.textContent = current;
+          if (heartIcon) {
+            heartIcon.style.fontVariationSettings = "'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24";
+            heartIcon.classList.remove('text-[rgb(var(--primary))]');
+          }
+        }
+      } else {
+        // 降级：仅本地
+        localStorage.setItem(STORAGE_KEY, 'true');
       }
     });
 
