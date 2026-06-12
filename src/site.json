@@ -3,20 +3,10 @@
   "shortTitle": "小角落",
   "description": "一个大学生的个人博客 · 关于生活、学习、读书、思考",
   "author": "guancii",
-  "site": "https://guancii.github.io",
+  "site": "https://blog.260607.best",
   "links": {
     "github": "https://github.com/guancii",
-    "email": "mailto:guancii@example.com",
+    "email": "mailto:vivia-qiqi@outlook.com",
     "rss": "/rss.xml"
-  },
-  "twikoo": {
-    "enabled": true,
-    "envId": "https://your-twikoo.vercel.app",
-    "region": "",
-    "lang": "zh-CN",
-    "sort": "desc",
-    "emoticon": [
-      "https://cdn.jsdelivr.net/gh/qcm/qq_emoji@master/dist/qq_emoji/all.gif"
-    ]
   }
 }
