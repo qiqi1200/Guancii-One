@@ -8,5 +8,10 @@
     "github": "https://github.com/guancii",
     "email": "mailto:vivia-qiqi@outlook.com",
     "rss": "/rss.xml"
+  },
+  "twikoo": {
+    "enabled": false,
+    "envId": "",
+    "lang": "zh-CN"
   }
 }
