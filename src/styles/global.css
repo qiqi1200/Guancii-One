@@ -3,22 +3,98 @@
 @tailwind utilities;
 
 @layer base {
+  /* ─────────────────────────────────────────
+     浅色模式（默认）— Material 3 Light + 暖橙
+     ───────────────────────────────────────── */
   :root {
-    --bg: 253 252 249;
-    --bg-soft: 250 247 240;
-    --fg: 44 44 44;
-    --fg-soft: 122 122 122;
-    --border: 232 223 201;
-    --accent: 126 184 214;
+    /* 主背景与表面 */
+    --bg: 255 248 241;               /* #fff8f1 暖米白 */
+    --bg-soft: 255 241 227;          /* #fff1e3 */
+    --surface: 255 255 255;          /* 纯白卡片 */
+    --surface-variant: 244 212 190;  /* #f4d4be */
+
+    /* 文字色 */
+    --fg: 35 25 21;                  /* #231915 深棕黑 */
+    --fg-soft: 83 67 60;             /* #53433c */
+    --fg-on-primary: 255 255 255;    /* 主色按钮上的文字 */
+
+    /* 主色调（primary）— 焦糖/暖橙 */
+    --primary: 156 63 0;             /* #9c3f00 深焦糖 */
+    --primary-container: 255 220 200;/* #ffdcc8 暖粉容器 */
+    --primary-light: 255 107 0;      /* #ff6b00 强调亮橙 */
+
+    /* 次色调 — 蓝 */
+    --secondary: 0 26 65;            /* #001a41 */
+    --secondary-container: 221 225 255;/* #dde1ff */
+
+    /* 第三色 — 绿 */
+    --tertiary: 29 54 26;            /* #1d361a */
+    --tertiary-container: 204 235 194;/* #ccebc2 */
+    --sage: 58 107 53;               /* #3a6b35 */
+
+    /* 描边与分割线 */
+    --border: 215 195 184;           /* #d7c3b8 */
+    --outline: 133 115 107;          /* #85736b */
+
+    /* 液态玻璃 (浅色) */
+    --glass-bg: 255 255 255;
+    --glass-border: 215 195 184;
+    --glass-shadow: 0 8px 32px 0 rgba(156, 63, 0, 0.08);
+
+    /* 鼠标光晕色 (浅色：暖橙) */
+    --blob-color: 255 182 147;
+
+    /* doodle 下划线色（与 primary-light 一致）*/
+    --doodle-color: 255 107 0;
+
+    /* prose 主题 */
+    --prose-fg: 35 25 21;
+    --prose-soft: 83 67 60;
+    --prose-pre-bg: 255 241 227;
+    --prose-code-bg: 255 230 209;
+    --prose-border: 244 212 190;
   }
 
+  /* ─────────────────────────────────────────
+     暗色模式 — UniVibe Material 3 Dark
+     ───────────────────────────────────────── */
   .dark {
-    --bg: 26 26 26;
-    --bg-soft: 38 38 38;
-    --fg: 232 232 232;
-    --fg-soft: 160 160 160;
-    --border: 58 58 58;
-    --accent: 126 184 214;
+    --bg: 17 19 28;                  /* #11131c */
+    --bg-soft: 29 31 41;             /* #1d1f29 */
+    --surface: 29 31 41;
+    --surface-variant: 50 52 62;     /* #32343e */
+
+    --fg: 225 225 239;               /* #e1e1ef */
+    --fg-soft: 226 191 176;          /* #e2bfb0 */
+    --fg-on-primary: 86 31 0;        /* #561f00 */
+
+    --primary: 255 182 147;          /* #ffb693 */
+    --primary-container: 87 32 0;    /* #572000 */
+    --primary-light: 255 182 147;
+
+    --secondary: 184 195 255;        /* #b8c3ff */
+    --secondary-container: 0 67 235; /* #0043eb */
+
+    --tertiary: 177 207 167;         /* #b1cfa7 */
+    --tertiary-container: 132 161 124;/* #84a17c */
+    --sage: 177 207 167;
+
+    --border: 90 65 54;              /* #5a4136 */
+    --outline: 169 138 125;          /* #a98a7d */
+
+    --glass-bg: 29 31 41;
+    --glass-border: 90 65 54;
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+
+    --blob-color: 255 182 147;
+
+    --doodle-color: 255 182 147;
+
+    --prose-fg: 225 225 239;
+    --prose-soft: 226 191 176;
+    --prose-pre-bg: 29 31 41;
+    --prose-code-bg: 50 52 62;
+    --prose-border: 50 52 62;
   }
 
   html {
@@ -27,86 +103,232 @@
   }
 
   body {
-    @apply bg-cream-50 text-ink-600 antialiased transition-colors duration-300;
+    @apply antialiased transition-colors duration-500;
     background-color: rgb(var(--bg));
     color: rgb(var(--fg));
   }
 
-  .dark body {
-    @apply bg-ink-700 text-cream-100;
-  }
-
   ::selection {
-    @apply bg-accent-sky/30 text-ink-700;
+    background-color: rgba(var(--primary-light), 0.35);
+    color: rgb(var(--fg-on-primary));
   }
 
-  /* 暗色模式下 prose 适配 */
-  .dark .prose {
-    --tw-prose-body: theme('colors.cream.200');
-    --tw-prose-headings: theme('colors.cream.50');
-    --tw-prose-lead: theme('colors.cream.300');
-    --tw-prose-links: theme('colors.accent.sky');
-    --tw-prose-bold: theme('colors.cream.50');
-    --tw-prose-counters: theme('colors.ink.400');
-    --tw-prose-bullets: theme('colors.ink.500');
-    --tw-prose-hr: theme('colors.ink.500');
-    --tw-prose-quotes: theme('colors.cream.300');
-    --tw-prose-captions: theme('colors.ink.400');
-    --tw-prose-code: theme('colors.cream.100');
-    --tw-prose-pre-code: theme('colors.cream.100');
-    --tw-prose-pre-bg: theme('colors.ink.600');
-    --tw-prose-th-borders: theme('colors.ink.500');
-    --tw-prose-td-borders: theme('colors.ink.600');
+  /* Material Symbols 图标 */
+  .material-symbols-outlined {
+    font-family: 'Material Symbols Outlined';
+    font-weight: normal;
+    font-style: normal;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    -webkit-font-feature-settings: 'liga';
+    -webkit-font-smoothing: antialiased;
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
   }
 }
 
 @layer components {
-  /* 阅读进度条 */
+  /* ============= 液态玻璃（浅/深双套） ============= */
+  .liquid-glass {
+    background: rgba(var(--glass-bg), 0.55);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(var(--glass-border), 0.4);
+    box-shadow: var(--glass-shadow);
+    transition: box-shadow 0.3s ease;
+  }
+  .liquid-glass:hover {
+    box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.4);
+  }
+
+  /* ============= UniVibe 增强版液态玻璃（更圆润） ============= */
+  .liquid-glass-vibe {
+    background: rgba(var(--glass-bg), 0.4);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(var(--glass-border), 0.2);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  .liquid-glass-vibe:hover {
+    box-shadow: 0 16px 48px 0 rgba(0, 0, 0, 0.4);
+  }
+
+  /* ============= 涂鸦下划线 ============= */
+  .doodle-underline {
+    position: relative;
+    display: inline-block;
+  }
+  .doodle-underline::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 100%;
+    height: 8px;
+    background-image: url("data:image/svg+xml,%3Csvg width='100' height='8' viewBox='0 0 100 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M2 6C20 3 40 7 60 4C80 1 98 5 98 5' stroke='%23ff6b00' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+  }
+  .dark .doodle-underline::after {
+    background-image: url("data:image/svg+xml,%3Csvg width='100' height='8' viewBox='0 0 100 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M2 6C20 3 40 7 60 4C80 1 98 5 98 5' stroke='%23ffb693' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+  }
+
+  /* ============= 磁吸悬浮 ============= */
+  .magnetic-hover {
+    transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  .magnetic-hover:hover {
+    transform: scale(1.02) rotate(1deg);
+  }
+
+  /* ============= 涂鸦风格卡片（scrapbook 卡片） ============= */
+  .scrapbook-card {
+    background: rgba(var(--glass-bg), 0.4);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(var(--glass-border), 0.15);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.25);
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    position: relative;
+    overflow: hidden;
+  }
+  .scrapbook-card::before {
+    content: '';
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    width: 40px;
+    height: 40px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .scrapbook-card:hover {
+    transform: translateY(-4px) scale(1.01) rotate(0.3deg);
+    box-shadow: 0 20px 48px 0 rgba(0, 0, 0, 0.4);
+  }
+  .scrapbook-card:hover::before {
+    opacity: 1;
+  }
+
+  /* ============= 后贴标签 ============= */
+  .postit-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 12px;
+    font-family: 'Architects Daughter', cursive;
+    font-size: 14px;
+    line-height: 20px;
+    border-radius: 8px;
+    transform: rotate(2deg);
+    transition: transform 0.2s ease;
+  }
+  .postit-tag:hover {
+    transform: rotate(-2deg) scale(1.05);
+  }
+
+  /* ============= 涂鸦动画 ============= */
+  .scribble-anim {
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 1000;
+    animation: dash 3s linear forwards;
+  }
+
+  @keyframes dash {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  /* ============= 鼠标光晕 ============= */
+  .cursor-blob {
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(var(--blob-color), 0.2) 0%, rgba(var(--blob-color), 0) 70%);
+    pointer-events: none;
+    position: fixed;
+    z-index: 0;
+    transform: translate(-50%, -50%);
+    transition: width 0.3s, height 0.3s;
+  }
+
+  /* ============= 阅读进度条 ============= */
   .reading-progress {
-    @apply fixed top-0 left-0 h-0.5 bg-accent-sky z-50 transition-all duration-150;
+    @apply fixed top-0 left-0 h-0.5 z-50 transition-all duration-150;
     width: 0%;
+    background: linear-gradient(90deg, rgb(var(--primary)), rgb(var(--secondary)));
   }
 
-  /* 卡片悬浮 */
+  /* ============= 卡片悬浮（scrapbook 风格） ============= */
   .card-hover {
-    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-lg;
+    @apply transition-all duration-300;
+    transform-style: preserve-3d;
+  }
+  .card-hover:hover {
+    transform: translateY(-4px) rotate(0.5deg) scale(1.01);
+    box-shadow: 0 20px 40px -10px rgba(156, 63, 0, 0.18);
+  }
+  .dark .card-hover:hover {
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
   }
 
-  /* 标签 chip */
+  /* ============= 标签 chip ============= */
   .tag-chip {
     @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-           bg-cream-100 text-ink-500 hover:bg-accent-sky/20 hover:text-accent-sky
            transition-colors cursor-pointer;
+    font-family: 'Montserrat', sans-serif;
+    background-color: rgba(var(--surface-variant), 0.5);
+    color: rgb(var(--fg-soft));
+  }
+  .tag-chip:hover {
+    background-color: rgba(var(--primary-light), 0.18);
+    color: rgb(var(--primary));
   }
 
-  .dark .tag-chip {
-    @apply bg-ink-600 text-cream-300;
+  /* 标签筛选激活态 */
+  .tag-filter.active {
+    background-color: rgba(var(--primary), 0.15);
+    color: rgb(var(--primary));
+  }
+  .dark .tag-filter.active {
+    background-color: rgba(var(--primary), 0.25);
   }
 
-  /* 按钮 */
+  /* ============= 按钮 ============= */
   .btn {
-    @apply inline-flex items-center gap-2 px-4 py-2 rounded-lg
-           text-sm font-medium transition-all duration-200
+    @apply inline-flex items-center gap-2 px-4 py-2 rounded-xl
+           text-sm transition-all duration-200
            hover:-translate-y-0.5 active:translate-y-0;
+    font-family: 'Montserrat', sans-serif;
   }
 
   .btn-primary {
-    @apply btn bg-ink-700 text-cream-50 hover:bg-ink-800 hover:shadow-md;
+    @apply btn;
+    background: rgb(var(--primary-light));
+    color: rgb(var(--fg-on-primary));
+    font-weight: 600;
+    box-shadow: 0 4px 14px rgba(var(--primary-light), 0.3);
   }
-
-  .dark .btn-primary {
-    @apply bg-cream-100 text-ink-700 hover:bg-cream-50;
+  .btn-primary:hover {
+    background: rgb(var(--primary));
+    color: rgb(var(--fg-on-primary));
+    box-shadow: 0 6px 20px rgba(var(--primary-light), 0.5);
   }
 
   .btn-ghost {
-    @apply btn text-ink-500 hover:text-ink-700 hover:bg-cream-100;
+    @apply btn;
+    color: rgb(var(--fg-soft));
+  }
+  .btn-ghost:hover {
+    color: rgb(var(--primary));
+    background: rgba(var(--primary-light), 0.1);
   }
 
-  .dark .btn-ghost {
-    @apply text-cream-300 hover:text-cream-50 hover:bg-ink-600;
-  }
-
-  /* 骨架屏 */
+  /* ============= 骨架屏 ============= */
   .skeleton {
     @apply bg-gradient-to-r from-cream-100 via-cream-200 to-cream-100
            bg-[length:200%_100%] animate-[shimmer_1.5s_infinite] rounded;
@@ -117,30 +339,34 @@
     100% { background-position: -200% 0; }
   }
 
-  /* 滚动条 */
+  /* ============= 滚动条 ============= */
   ::-webkit-scrollbar {
     @apply w-2;
   }
   ::-webkit-scrollbar-track {
-    @apply bg-cream-100;
-  }
-  .dark ::-webkit-scrollbar-track {
-    @apply bg-ink-700;
+    background: rgb(var(--bg-soft));
   }
   ::-webkit-scrollbar-thumb {
-    @apply bg-cream-300 rounded-full;
-  }
-  .dark ::-webkit-scrollbar-thumb {
-    @apply bg-ink-500 rounded-full;
+    background: rgb(var(--surface-variant));
+    border-radius: 9999px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-ink-400;
+    background: rgb(var(--outline));
   }
 
-  /* 打印样式 */
+  /* ============= 打印样式 ============= */
   @media print {
     .no-print { display: none !important; }
     body { background: white !important; color: black !important; }
     .prose { max-width: 100% !important; }
+  }
+
+  /* ============= 主题切换图标按钮 ============= */
+  .theme-toggle {
+    @apply ml-2 p-2 rounded-full transition-all hover:scale-110 active:scale-95;
+    color: rgb(var(--primary));
+  }
+  .theme-toggle:hover {
+    background: rgba(var(--primary-light), 0.15);
   }
 }

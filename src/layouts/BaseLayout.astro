@@ -48,7 +48,15 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="alternate" type="application/rss+xml" title={SITE.title} href="/rss.xml" />
 
-    <!-- 主题预检脚本 -->
+    <!-- 字体注入：Montserrat + 手写体 Architects Daughter + Material Symbols -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&family=Architects+Daughter&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- 主题预检脚本（避免闪烁） -->
     <script is:inline>
       (function() {
         const saved = localStorage.getItem('theme');
@@ -59,10 +67,13 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
       })();
     </script>
   </head>
-  <body class="min-h-screen flex flex-col">
+  <body class="min-h-screen flex flex-col bg-[rgb(var(--bg))] text-[rgb(var(--fg))] transition-colors">
+    <!-- 鼠标光晕 -->
+    <div class="cursor-blob" id="cursor-blob"></div>
+
     <Header current={current} />
 
-    <main class="flex-1 w-full">
+    <main class="flex-1 w-full relative z-10">
       <slot />
     </main>
 
@@ -72,11 +83,9 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <button
       id="back-to-top"
       aria-label="返回顶部"
-      class="no-print fixed bottom-6 right-6 w-10 h-10 rounded-full bg-ink-700 dark:bg-cream-100 text-cream-50 dark:text-ink-700 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all opacity-0 pointer-events-none z-30"
+      class="no-print fixed bottom-6 right-6 w-12 h-12 rounded-full bg-[rgb(var(--primary-light))] text-[rgb(var(--fg-on-primary))] shadow-lg hover:shadow-[0_0_20px_rgba(255,182,147,0.5)] hover:-translate-y-0.5 transition-all opacity-0 pointer-events-none z-30 flex items-center justify-center"
     >
-      <svg class="w-5 h-5 mx-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M18 15l-6-6-6 6"/>
-      </svg>
+      <span class="material-symbols-outlined text-lg">arrow_upward</span>
     </button>
 
     <script is:inline>
@@ -94,11 +103,32 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
       backBtn?.addEventListener('click', () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
       });
-    </script>
 
-    <!-- 全局注入 twikoo 配置（所有页面都能读取） -->
-    <script is:inline define:vars={{ twikooConfig: SITE.twikoo }}>
-      window.__TWIKOO_CONFIG__ = twikooConfig;
+      // 鼠标光晕（仅在非触控设备上启用）
+      const blob = document.getElementById('cursor-blob');
+      const isTouch = window.matchMedia('(hover: none)').matches;
+      if (blob && !isTouch) {
+        document.addEventListener('mousemove', (e) => {
+          blob.style.left = `${e.clientX}px`;
+          blob.style.top = `${e.clientY}px`;
+        });
+      } else if (blob) {
+        blob.style.display = 'none';
+      }
+
+      // UniVibe 磁吸效果（3D tilt）
+      document.querySelectorAll('.magnetic-hover').forEach(item => {
+        item.addEventListener('mousemove', (e) => {
+          const rect = item.getBoundingClientRect();
+          const x = e.clientX - rect.left - rect.width / 2;
+          const y = e.clientY - rect.top - rect.height / 2;
+          const rotateVal = x * 0.02;
+          item.style.transform = `scale(1.03) translate(${x * 0.08}px, ${y * 0.08}px) rotate(${rotateVal}deg)`;
+        });
+        item.addEventListener('mouseleave', () => {
+          item.style.transform = '';
+        });
+      });
     </script>
   </body>
 </html>

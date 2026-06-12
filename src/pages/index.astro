@@ -16,46 +16,76 @@ const rest = posts.slice(1);
 const allTags = [...new Set(posts.flatMap(p => p.data.tags || []))];
 ---
 <BaseLayout title="首页" current="/">
-  <!-- Hero 区 -->
-  <section class="max-w-6xl mx-auto px-6 pt-16 pb-12 md:pt-24 md:pb-16 animate-fade-in">
-    <div class="grid md:grid-cols-[auto_1fr] gap-8 md:gap-12 items-center">
-      <div class="relative">
-        <div class="w-32 h-32 md:w-40 md:h-40 rounded-full bg-gradient-to-br from-accent-sky via-accent-mint to-accent-sand p-1 shadow-lg">
-          <div class="w-full h-full rounded-full bg-cream-50 dark:bg-ink-700 flex items-center justify-center text-5xl md:text-6xl font-serif text-ink-700 dark:text-cream-50">
-            g
-          </div>
-        </div>
-        <div class="absolute -bottom-1 -right-1 w-6 h-6 bg-accent-mint rounded-full border-4 border-cream-50 dark:border-ink-700"></div>
-      </div>
+  <!-- Hero 区（UniVibe 涂鸦风格） -->
+  <section class="relative pt-24 pb-12 md:pt-32 md:pb-16 px-6 max-w-6xl mx-auto animate-fade-in overflow-hidden">
+    <!-- 装饰光晕 -->
+    <div class="absolute -top-20 -right-20 w-80 h-80 opacity-30 rounded-full blur-3xl pointer-events-none"
+         style="background: radial-gradient(circle, rgba(var(--primary-light), 0.2), transparent 70%);"></div>
+    <div class="absolute -bottom-20 -left-20 w-60 h-60 opacity-20 rounded-full blur-3xl pointer-events-none"
+         style="background: radial-gradient(circle, rgba(var(--secondary), 0.15), transparent 70%);"></div>
 
-      <div>
-        <h1 class="text-3xl md:text-5xl font-semibold tracking-tight text-ink-700 dark:text-cream-50">
-          你好，我是 <span class="text-accent-sky">{SITE.author}</span>
-        </h1>
-        <p class="mt-4 text-lg text-ink-500 dark:text-cream-300 leading-relaxed max-w-2xl">
-          一个普通的大三学生，记点生活里的小事、读过的书、学过的东西。
-          这里没什么宏大叙事，就是一些安静的思考和日常。
-        </p>
-        <div class="mt-6 flex flex-wrap gap-2">
-          <a href="/about" class="btn-primary">了解我</a>
-          <a href="/archive" class="btn-ghost">浏览归档 →</a>
+    <div class="relative z-10">
+      <div class="flex flex-col md:flex-row md:items-center gap-8 md:gap-12">
+        <!-- 头像（涂鸦装饰） -->
+        <div class="relative group flex-shrink-0 mx-auto md:mx-0">
+          <div class="absolute inset-0 rounded-full bg-[rgb(var(--primary-light))] opacity-20 blur-2xl group-hover:opacity-40 transition-opacity"></div>
+          <div class="relative w-36 h-36 md:w-44 md:h-44 rounded-full p-1 shadow-lg hover:scale-105 hover:rotate-6 transition-all duration-500"
+               style="background: linear-gradient(135deg, rgb(var(--primary-light)), rgb(var(--secondary)), rgb(var(--tertiary)));">
+            <div class="w-full h-full rounded-full bg-[rgb(var(--bg))] flex items-center justify-center text-5xl md:text-6xl font-headline font-bold text-[rgb(var(--primary))]">
+              g
+            </div>
+          </div>
+          <!-- 涂鸦装饰：小圆点 -->
+          <div class="absolute -bottom-1 -right-1 w-7 h-7 rounded-full border-4 border-[rgb(var(--bg))]"
+               style="background: rgb(var(--tertiary));"></div>
+          <span class="absolute -top-3 -right-4 font-handwritten text-[rgb(var(--primary))] text-base rotate-12 hidden md:block hover:rotate-[-6deg] transition-transform">
+            hi~ ✨
+          </span>
+          <!-- 额外涂鸦装饰 -->
+          <span class="absolute -bottom-2 -left-6 font-handwritten text-[rgb(var(--secondary))] text-sm -rotate-6 hidden md:block opacity-60">
+            ✦
+          </span>
+        </div>
+
+        <div class="text-center md:text-left">
+          <h1 class="text-3xl md:text-5xl lg:text-6xl font-headline font-bold tracking-tight text-[rgb(var(--fg))] leading-tight">
+            你好，我是 <span class="doodle-underline text-[rgb(var(--primary))]">{SITE.author}</span>
+          </h1>
+          <p class="mt-4 text-base md:text-lg text-[rgb(var(--fg-soft))] leading-relaxed max-w-2xl font-handwritten">
+            来自吉林四平，在天津的中国民航大学读交通工程，大一。
+            记点生活里的小事、读过的书、学过的东西。
+            这里没什么宏大叙事，就是一些安静的思考和日常。
+          </p>
+          <div class="mt-8 flex flex-wrap gap-3 justify-center md:justify-start">
+            <a href="/about" class="px-6 py-2.5 rounded-full bg-[rgb(var(--primary-light))] text-[rgb(var(--fg-on-primary))] font-label text-sm font-bold rotate-[-1deg] hover:rotate-[1deg] transition-all hover:shadow-[0_0_15px_rgba(var(--primary-light),0.4)] hover:-translate-y-0.5">
+              <span class="material-symbols-outlined text-base align-middle mr-1">person</span>
+              了解我
+            </a>
+            <a href="/archive" class="px-6 py-2.5 rounded-full border border-[rgb(var(--outline-variant))] hover:bg-[rgb(var(--surface-variant))]/30 font-label text-sm hover:rotate-[-1deg] transition-all font-handwritten text-[rgb(var(--secondary))]">
+              <span class="material-symbols-outlined text-base align-middle mr-1">auto_stories</span>
+              浏览归档
+            </a>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- 标签筛选 -->
+  <!-- 标签筛选（液态玻璃） -->
   {allTags.length > 0 && (
     <section class="max-w-6xl mx-auto px-6 mb-8">
-      <div class="flex flex-wrap gap-2">
-        <button data-tag="all" class="tag-chip tag-filter active">
-          全部
-        </button>
-        {allTags.map(tag => (
-          <button data-tag={tag} class="tag-chip tag-filter">
-            #{tag}
+      <div class="liquid-glass rounded-2xl p-4">
+        <div class="flex flex-wrap gap-2">
+          <button data-tag="all" class="tag-chip tag-filter active font-label">
+            <span class="material-symbols-outlined text-xs mr-1">apps</span>
+            全部
           </button>
-        ))}
+          {allTags.map(tag => (
+            <button data-tag={tag} class="tag-chip tag-filter font-label">
+              #{tag}
+            </button>
+          ))}
+        </div>
       </div>
     </section>
   )}
@@ -64,9 +94,11 @@ const allTags = [...new Set(posts.flatMap(p => p.data.tags || []))];
   <section class="max-w-6xl mx-auto px-6 pb-16">
     <div class="grid lg:grid-cols-[1fr_280px] gap-12">
       <div>
-        <h2 class="text-xl font-semibold text-ink-700 dark:text-cream-50 mb-6 flex items-center gap-2">
-          <span class="w-1 h-6 bg-accent-sky rounded"></span>
+        <h2 class="text-2xl md:text-headline-md font-headline font-semibold text-[rgb(var(--fg))] mb-8 flex items-center gap-2">
+          <span class="w-1.5 h-6 rounded-full"
+                style="background: linear-gradient(to bottom, rgb(var(--primary)), rgb(var(--secondary)));"></span>
           最新文章
+          <span class="font-handwritten text-[rgb(var(--fg-soft))] text-sm ml-2 rotate-2">✍️</span>
         </h2>
 
         {featured && (
@@ -84,7 +116,8 @@ const allTags = [...new Set(posts.flatMap(p => p.data.tags || []))];
         </div>
 
         {posts.length === 0 && (
-          <div class="text-center py-20 text-ink-400 dark:text-cream-300">
+          <div class="text-center py-20 text-[rgb(var(--fg-soft))] font-body">
+            <span class="material-symbols-outlined text-6xl mb-4 block opacity-40">edit_note</span>
             还没有文章，先去写下第一篇吧 ✍️
           </div>
         )}
@@ -107,8 +140,8 @@ const allTags = [...new Set(posts.flatMap(p => p.data.tags || []))];
   filterBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       const tag = btn.getAttribute('data-tag');
-      filterBtns.forEach(b => b.classList.remove('active', 'bg-accent-sky/30', 'text-accent-sky'));
-      btn.classList.add('active', 'bg-accent-sky/30', 'text-accent-sky');
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
 
       postCards.forEach(card => {
         const tags = JSON.parse(card.getAttribute('data-tags') || '[]');
@@ -117,10 +150,3 @@ const allTags = [...new Set(posts.flatMap(p => p.data.tags || []))];
     });
   });
 </script>
-
-<style>
-  .tag-filter.active {
-    background-color: rgba(126, 184, 214, 0.25);
-    color: rgb(126, 184, 214);
-  }
-</style>

@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>UniVibe - Projects Showcase</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&amp;family=Architects+Daughter&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-primary-fixed-variant": "#7a3000",
+                    "secondary-container": "#0043eb",
+                    "primary-container": "#ff6b00",
+                    "primary-light": "#ffb693",
+                    "sage": "#b1cfa7",
+                    "on-secondary-container": "#c6ceff",
+                    "post-it-yellow": "#ffecb3",
+                    "surface-dim": "#11131c",
+                    "on-surface-variant": "#e2bfb0",
+                    "surface-card": "#1d1f29",
+                    "on-primary-container": "#572000",
+                    "tertiary": "#b1cfa7",
+                    "surface-variant": "#32343e",
+                    "on-tertiary-fixed-variant": "#334d2f",
+                    "on-tertiary-fixed": "#082007",
+                    "surface-bright": "#373943",
+                    "error-container": "#93000a",
+                    "on-secondary-fixed-variant": "#0035be",
+                    "surface-container-low": "#191b24",
+                    "primary-fixed": "#ffdbcc",
+                    "tertiary-container": "#84a17c",
+                    "on-primary-fixed": "#351000",
+                    "background": "#11131c",
+                    "on-surface": "#e1e1ef",
+                    "on-secondary-fixed": "#001356",
+                    "inverse-surface": "#e1e1ef",
+                    "primary": "#ffb693",
+                    "error": "#ffb4ab",
+                    "surface-main": "#11131c",
+                    "secondary": "#b8c3ff",
+                    "outline-variant": "#5a4136",
+                    "surface-container-high": "#282933",
+                    "surface": "#11131c",
+                    "primary-fixed-dim": "#ffb693",
+                    "on-error": "#690005",
+                    "surface-container-highest": "#32343e",
+                    "secondary-fixed-dim": "#b8c3ff",
+                    "post-it-text": "#561f00",
+                    "on-background": "#e1e1ef",
+                    "on-secondary": "#002388",
+                    "tertiary-fixed": "#ccebc2",
+                    "outline": "#a98a7d",
+                    "surface-tint": "#ffb693",
+                    "inverse-on-surface": "#2e303a",
+                    "on-tertiary": "#1d361a",
+                    "on-error-container": "#ffdad6",
+                    "on-tertiary-container": "#1e371b",
+                    "on-primary": "#561f00",
+                    "surface-container": "#1d1f29",
+                    "tertiary-fixed-dim": "#b1cfa7",
+                    "surface-container-lowest": "#0c0e17",
+                    "secondary-fixed": "#dde1ff",
+                    "inverse-primary": "#a04100"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "margin-mobile": "16px",
+                    "base": "8px",
+                    "gutter": "24px",
+                    "margin-desktop": "64px",
+                    "container-max": "1200px"
+            },
+            "fontFamily": {
+                    "headline-lg": ["Montserrat"],
+                    "headline-xl": ["Montserrat"],
+                    "label-lg": ["Montserrat"],
+                    "headline-md": ["Montserrat"],
+                    "handwritten": ["Architects Daughter"],
+                    "body-md": ["Montserrat"],
+                    "body-lg": ["Montserrat"]
+            },
+            "fontSize": {
+                    "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+                    "headline-xl": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                    "label-lg": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "handwritten": ["20px", {"lineHeight": "1.2", "fontWeight": "400"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        .liquid-glass {
+            background: rgba(29, 31, 41, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        .doodle-underline {
+            position: relative;
+            display: inline-block;
+        }
+        .doodle-underline::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='8' viewBox='0 0 100 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M2 6C20 3 40 7 60 4C80 1 98 5 98 5' stroke='%23ffb693' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-size: 100% 100%;
+        }
+
+        .magnetic-hover {
+            transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        .magnetic-hover:hover {
+            transform: scale(1.02) rotate(1deg);
+        }
+
+        .scribble-anim {
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: dash 3s linear forwards;
+        }
+
+        @keyframes dash {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        .cursor-blob {
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255, 182, 147, 0.15) 0%, rgba(255, 182, 147, 0) 70%);
+            pointer-events: none;
+            position: fixed;
+            z-index: 0;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s, height 0.3s;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface selection:bg-primary selection:text-on-primary">
+<div class="cursor-blob" id="cursor-blob"></div>
+
+<header class="fixed top-0 w-full z-50 bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-xl border-b border-white/5 shadow-sm">
+<div class="flex justify-between items-center px-margin-desktop py-4 max-w-container-max mx-auto">
+<a class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-light tracking-tight hover:scale-105 hover:rotate-1 transition-transform duration-300 active:scale-95" href="#">UniVibe</a>
+<nav class="hidden md:flex gap-gutter items-center">
+<a class="font-body-md text-body-md text-on-surface-variant dark:text-on-surface-variant/70 hover:scale-105 hover:rotate-1 transition-transform duration-300" href="#">Home</a>
+<a class="font-body-md text-body-md text-primary dark:text-primary-light font-bold border-b-2 border-primary-container hover:scale-105 hover:rotate-1 transition-transform duration-300" href="#">Projects</a>
+<a class="font-body-md text-body-md text-on-surface-variant dark:text-on-surface-variant/70 hover:scale-105 hover:rotate-1 transition-transform duration-300" href="#">Life</a>
+<a class="font-body-md text-body-md text-on-surface-variant dark:text-on-surface-variant/70 hover:scale-105 hover:rotate-1 transition-transform duration-300" href="#">About</a>
+<button class="ml-4 p-2 rounded-full hover:bg-surface-variant/20 transition-colors">
+<span class="material-symbols-outlined text-primary">dark_mode</span>
+</button>
+</nav>
+<div class="md:hidden flex items-center gap-4">
+<span class="material-symbols-outlined text-primary">menu</span>
+</div>
+</div>
+</header>
+<main class="relative pt-32 pb-24 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto z-10">
+<section class="mb-16 relative">
+<div class="absolute -top-12 -left-12 opacity-50 hidden lg:block">
+
+</div>
+<h1 class="font-headline-xl text-headline-xl mb-4 relative z-10">
+<span class="doodle-underline">Projects</span> Showcase
+            </h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl font-handwritten">
+                A digital garden where I plant my ideas, cultivate code, and sketch out the future. Most of these are hand-crafted late at night with way too much coffee.
+            </p>
+<div class="mt-8 flex flex-wrap gap-3">
+<button class="px-6 py-2 rounded-full bg-primary text-on-primary font-label-lg text-label-lg rotate-[-1deg] hover:rotate-[1deg] transition-all hover:shadow-[0_0_15px_rgba(255,182,147,0.4)]">All Works</button>
+<button class="px-6 py-2 rounded-full border border-outline-variant hover:bg-surface-variant/30 font-label-lg text-label-lg rotate-[1deg] hover:rotate-[-1deg] transition-all font-handwritten text-sage">UI/UX</button>
+<button class="px-6 py-2 rounded-full border border-outline-variant hover:bg-surface-variant/30 font-label-lg text-label-lg rotate-[-1deg] hover:rotate-[1deg] transition-all font-handwritten text-secondary">Dev</button>
+<button class="px-6 py-2 rounded-full border border-outline-variant hover:bg-surface-variant/30 font-label-lg text-label-lg rotate-[2deg] hover:rotate-[-2deg] transition-all font-handwritten text-primary-light">Art</button>
+</div>
+</section>
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+<div class="liquid-glass p-6 rounded-[2rem] magnetic-hover group relative overflow-hidden rotate-[-1.5deg]">
+<div class="absolute -top-4 -right-4 w-16 h-16 opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-primary text-4xl">star</span>
+</div>
+<div class="aspect-video mb-6 rounded-2xl overflow-hidden">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="A professional UI design mockup of a creative mobile application displayed on a high-resolution smartphone screen. The design uses a sophisticated dark theme with glowing orange and soft blue accents, featuring a bento-grid layout for its dashboard. The background is softly blurred, highlighting the sleek aesthetics of the digital product in a modern studio environment." src="https://lh3.googleusercontent.com/aida/AP1WRLt_QP_eqU3bDIYhsibtdJ7PvT-0XOmGOn1M8a_sSJoul-8qJBqs09cOkZdXumIQaZcHPlWHztQgg8nD4LTdyzxSzzoFMcb6leOb1uzqNnakYjjLjL_6fRSX5Cwx6uoGeHQbenXdBnwZfkyFgU2IL7w2yYamUhFihcIyG0PQolTC1feXao7KOWQMcnTpSLDNh3c6KXJEFpTWCLD7-n4tqY8ssToxQGIpiTA0uYNLBrW1uhyWPYKn_9JDRGK-"/>
+</div>
+<div class="flex justify-between items-start mb-3">
+<span class="font-handwritten text-label-lg px-3 py-1 bg-post-it-yellow text-post-it-text rounded-lg rotate-[2deg]">UI/UX</span>
+<span class="font-body-md text-on-surface-variant/50">2024</span>
+</div>
+<h3 class="font-headline-md text-headline-md mb-2 group-hover:text-primary transition-colors">VibeNode Dashboard</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6">A modular task management system built for neurodivergent creators.</p>
+<a class="inline-flex items-center gap-2 font-label-lg text-label-lg text-primary group/link" href="#">
+                    View Details
+                    <span class="material-symbols-outlined text-sm group-hover/link:translate-x-1 transition-transform">arrow_forward</span>
+</a>
+</div>
+<div class="liquid-glass p-6 rounded-[2rem] magnetic-hover group relative overflow-hidden rotate-[1deg]">
+<div class="absolute top-2 right-6 opacity-40 group-hover:opacity-100 transition-opacity rotate-12">
+<span class="material-symbols-outlined text-secondary text-5xl">auto_fix</span>
+</div>
+<div class="aspect-video mb-6 rounded-2xl overflow-hidden bg-surface-container-high relative">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="A macro photograph of a computer monitor displaying vibrant, colorful lines of code in a professional IDE. The code snippet is illuminated by neon blue and magenta syntax highlighting, reflecting a high-tech developer aesthetic. The surrounding desk space is dimly lit, with soft bokeh from small indicator lights creating an atmosphere of deep focus and creative engineering." src="https://lh3.googleusercontent.com/aida/AP1WRLtYWtwTI6j-MI6QoJrpTmi48Iqj_5Qcrvn5ywCJQbeBnO2b7-qURKOaJeMi9rMM08vZrpdk1CDKRHLkHOejjd9zQakeFZRYnj2kTsBaUNuC3J3eIGUk479-52uTtMCMuZs2K6W2eirDp1qSaLYU_yndIKgBix_TQZXH6TSLyWXpxg3rP8HsKqW1f98FUE98U_LhQKhYgXUvicfcStBmAxZZbqdEydW3sB4I2O6EkXMzFOQpq2RQ5GuPRin3"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-dim/60 to-transparent"></div>
+</div>
+<div class="flex justify-between items-start mb-3">
+<span class="font-handwritten text-label-lg px-3 py-1 bg-secondary text-on-secondary rounded-lg rotate-[-3deg]">Dev</span>
+<span class="font-body-md text-on-surface-variant/50">2023</span>
+</div>
+<h3 class="font-headline-md text-headline-md mb-2 group-hover:text-secondary transition-colors">Pencil.js Core</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6">A lightweight physics engine specifically designed for doodle-based animations.</p>
+<a class="inline-flex items-center gap-2 font-label-lg text-label-lg text-secondary group/link" href="#">
+                    Explore Repo
+                    <span class="material-symbols-outlined text-sm group-hover/link:translate-x-1 transition-transform">code</span>
+</a>
+</div>
+<div class="liquid-glass p-6 rounded-[2rem] magnetic-hover group relative overflow-hidden rotate-[-0.5deg]">
+<div class="aspect-video mb-6 rounded-2xl overflow-hidden">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="A contemporary abstract digital painting featuring layered textures of muted sage green, charcoal grey, and vibrant pops of burnt orange. The artwork depicts a series of organic, hand-drawn shapes and scribbles that create a sense of movement and organized chaos. The overall style is reminiscent of a mixed-media scrapbook, blending fine art with casual digital doodles in a sophisticated, high-contrast composition." src="https://lh3.googleusercontent.com/aida/AP1WRLuOdkcSmr_1JUur6jJINVsl2Uj36TxZn5QvLnHwLFA7lgH-LzcCPiGhFpRv5QQhdT6yLu8wB3QUCj5b-fibE-sqA0XEIOgQQ45op_Dh22VOqD54KMaOg1IKdpQqshb5ZSUuLf3dh2XIXonFc65E4zKsM2GmTFjpMBnLqv0QaSUpoJ2uPwtPTOwpQaryNqdbCu5l49_XLH3s9gQxYQxeM-1uCPSk50M_BSiKfVCpX-7jo5ZNTj5s5sePEk1Q"/>
+</div>
+<div class="flex justify-between items-start mb-3">
+<span class="font-handwritten text-label-lg px-3 py-1 bg-sage text-on-tertiary-fixed rounded-lg rotate-[1deg]">Art</span>
+<span class="font-body-md text-on-surface-variant/50">2024</span>
+</div>
+<h3 class="font-headline-md text-headline-md mb-2 group-hover:text-sage transition-colors">Digital Scribble Vol. 1</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6">A collection of generative art pieces inspired by physical notebook margins.</p>
+<a class="inline-flex items-center gap-2 font-label-lg text-label-lg text-sage group/link" href="#">
+                    View Gallery
+                    <span class="material-symbols-outlined text-sm group-hover/link:translate-x-1 transition-transform">palette</span>
+</a>
+</div>
+<div class="lg:col-span-2 liquid-glass p-8 rounded-[3rem] group relative overflow-hidden flex flex-col md:flex-row gap-8 items-center rotate-[0.5deg]">
+<div class="md:w-1/2 aspect-square rounded-3xl overflow-hidden shadow-2xl relative">
+<img class="w-full h-full object-cover" data-alt="A wide-angle conceptual architectural render of a futuristic studio space with floor-to-ceiling glass windows overlooking a soft, sunset-lit landscape. The interior features minimalist furniture, floating interactive displays, and warm wood textures. The atmosphere is calm and inspiring, reflecting a high-end workspace designed for deep creativity and technical innovation, with soft light-mode color palettes." src="https://lh3.googleusercontent.com/aida/AP1WRLsiNU9VXDy2SWwwgLIw3plHdQ7HhzAtSVnW_AuK08O13kYUtaK1WL_hX4sM5ieZZMRrqZCAJgA-uHmP64xAHD0f20Lm4Zr-12jKZ0Zlcg_ygo8fPXeF4mEWIG_fqMjwYFRrhs0N2WYZcLbfmMdncmgc_2Wo9l7EBuD4UU751S3rsnAU4juGwAvwtFhrzhuNlcpZkpZFhjLiI-aFtUxAl0CFy_gUB4aZBmnkwc2O499mxxXxGcvBJhePMe4"/>
+<div class="absolute inset-0 bg-primary/10 mix-blend-overlay"></div>
+</div>
+<div class="md:w-1/2">
+<div class="flex items-center gap-3 mb-4">
+<span class="font-handwritten text-label-lg px-4 py-1 bg-primary-container text-on-primary-container rounded-full">Featured</span>
+<div class="flex -space-x-2">
+<img alt="Collaborator 1" class="w-8 h-8 rounded-full border-2 border-surface-card" src="https://lh3.googleusercontent.com/aida/AP1WRLtQX6xW1ONT6rxvG4zQwFzvpvqIM382-zo2W646oWrGWd4_n87LfLSIGEsRzvqfZgI06GN3hiIXfMeuPoNxObl7ktHgIfr1mYTrCu_DN9rykIigTQjhOi-IqfH-Lte-GnKnKl0_eWk8fVXaU_42WfbxDY5NPoF1udwgZHn1mAgHfNCqoakrrr-jg2yjVZ0_EaFzdQl5UMCwB9tj1IxEFGBC9JqgW3iZaB7MLsBE9eH9cJIWpUgAGJ8OxHcX"/>
+<img alt="Collaborator 2" class="w-8 h-8 rounded-full border-2 border-surface-card" src="https://lh3.googleusercontent.com/aida/AP1WRLs9sK9-YD_65Ze8x7JTVCxQBgy7AKIehcIu4V6e9YpLlHQIssdJiZXthuf7WO8LlFnGl9HLnvIrpm0d8-qNqfSf1H1HXixwXWOc0aAHaC_ArvRTembvyTDwxQR4KBdfTgtR4L09eW0fw1nWKCgx29lpxpdPgxaVQluI5uJ6T--0sLW_WK0vOjtNXIAlsh62vz44H2EapzQG18-VpSwoBvNsiPm73zwRIYsdDUQ2koNkSgw358WMnFakSDk"/>
+</div>
+</div>
+<h2 class="font-headline-lg text-headline-lg mb-4 group-hover:text-primary transition-colors">The Scrapbook Framework</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-8 font-handwritten leading-relaxed">
+                        A comprehensive UI kit for building layouts that feel human. Includes 50+ custom doodle components and a magnetic physics engine for web interfaces.
+                    </p>
+<div class="flex gap-4">
+<button class="flex-1 py-3 bg-on-surface text-surface rounded-2xl font-bold hover:scale-105 active:scale-95 transition-all">Case Study</button>
+<button class="p-3 border border-outline-variant rounded-2xl hover:bg-surface-variant/40 transition-colors">
+<span class="material-symbols-outlined">share</span>
+</button>
+</div>
+</div>
+<div class="absolute bottom-4 right-8 opacity-20 pointer-events-none">
+
+</div>
+</div>
+<div class="liquid-glass p-6 rounded-[2.5rem] flex flex-col justify-center items-center text-center bg-post-it-yellow/10 border-dashed border-2 border-primary/30 rotate-[-2deg]">
+<span class="material-symbols-outlined text-primary text-6xl mb-4">add_circle</span>
+<h3 class="font-headline-md text-headline-md mb-2">Have an idea?</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6 font-handwritten">I'm always open to new collaborations and weird experiments.</p>
+<button class="px-8 py-3 bg-primary text-on-primary rounded-xl font-bold shadow-lg hover:shadow-primary/40 transition-all hover:-translate-y-1">Let's Talk</button>
+</div>
+</section>
+<section class="mt-24 liquid-glass p-12 rounded-[3rem] relative overflow-hidden">
+<div class="absolute inset-0 z-0 opacity-10">
+
+</div>
+<div class="relative z-10 text-center max-w-2xl mx-auto">
+<h2 class="font-headline-lg text-headline-lg mb-6">Project <span class="text-primary italic">Process</span></h2>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<div class="group">
+<div class="w-12 h-12 bg-surface-variant rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:rotate-12 transition-transform">
+<span class="material-symbols-outlined text-primary">edit_note</span>
+</div>
+<h4 class="font-label-lg text-label-lg mb-1">Sketch</h4>
+<p class="text-sm text-on-surface-variant">Messy ideas on digital paper.</p>
+</div>
+<div class="group">
+<div class="w-12 h-12 bg-surface-variant rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:-rotate-12 transition-transform">
+<span class="material-symbols-outlined text-secondary">terminal</span>
+</div>
+<h4 class="font-label-lg text-label-lg mb-1">Code</h4>
+<p class="text-sm text-on-surface-variant">Turning doodles into functions.</p>
+</div>
+<div class="group">
+<div class="w-12 h-12 bg-surface-variant rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:rotate-12 transition-transform">
+<span class="material-symbols-outlined text-sage">rocket_launch</span>
+</div>
+<h4 class="font-label-lg text-label-lg mb-1">Vibe</h4>
+<p class="text-sm text-on-surface-variant">Adding that final human touch.</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<footer class="w-full py-12 border-t border-dashed border-outline-variant mt-12">
+<div class="flex flex-col md:flex-row justify-between items-center px-margin-desktop gap-gutter max-w-container-max mx-auto">
+<div class="flex flex-col items-center md:items-start">
+<span class="font-handwritten text-handwritten text-secondary">UniVibe</span>
+<p class="text-on-surface-variant text-sm mt-2">© 2024 UniVibe - Hand-crafted by Alex</p>
+</div>
+<nav class="flex gap-8">
+<a class="font-handwritten text-on-surface-variant hover:text-primary transition-colors active:rotate-[-2deg]" href="#">Privacy</a>
+<a class="font-handwritten text-on-surface-variant hover:text-primary transition-colors active:rotate-[-2deg]" href="#">Contact</a>
+<a class="font-handwritten text-on-surface-variant hover:text-primary transition-colors active:rotate-[-2deg]" href="#">RSS</a>
+</nav>
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-primary cursor-pointer hover:scale-110 transition-transform">alternate_email</span>
+<span class="material-symbols-outlined text-primary cursor-pointer hover:scale-110 transition-transform">share</span>
+</div>
+</div>
+</footer>
+<script>
+        const blob = document.getElementById('cursor-blob');
+        document.addEventListener('mousemove', (e) => {
+            const x = e.clientX;
+            const y = e.clientY;
+            blob.style.left = `${x}px`;
+            blob.style.top = `${y}px`;
+        });
+
+        document.querySelectorAll('.magnetic-hover').forEach(item => {
+            item.addEventListener('mousemove', (e) => {
+                const rect = item.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                item.style.transform = `scale(1.05) translate(${x * 0.1}px, ${y * 0.1}px) rotate(${x * 0.01}deg)`;
+            });
+            item.addEventListener('mouseleave', () => {
+                item.style.transform = '';
+            });
+        });
+    </script>
+</body></html>
