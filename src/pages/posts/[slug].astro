@@ -162,11 +162,21 @@ const toc = headings.filter(h => h.depth === 2 || h.depth === 3);
           {SITE.twikoo && SITE.twikoo.enabled ? (
             <div class="liquid-glass rounded-[2rem] p-6">
               <TwikooComments />
-              <p class="text-xs text-[rgb(var(--fg-soft))] mt-3 font-handwritten">
-                💬 评论由
-                <a href="https://twikoo.js.org/" target="_blank" rel="noopener" class="text-[rgb(var(--primary))] hover:underline">Twikoo</a>
-                驱动
-              </p>
+              <div class="flex items-center justify-between mt-3 flex-wrap gap-2">
+                <p class="text-xs text-[rgb(var(--fg-soft))] font-handwritten">
+                  💬 评论由
+                  <a href="https://twikoo.js.org/" target="_blank" rel="noopener" class="text-[rgb(var(--primary))] hover:underline">Twikoo</a>
+                  驱动
+                </p>
+                <button
+                  id="copy-link-btn"
+                  class="text-xs text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] transition-colors inline-flex items-center gap-1 cursor-pointer"
+                  title="复制本页链接"
+                >
+                  <span class="material-symbols-outlined text-sm">link</span>
+                  <span id="copy-link-label">复制链接</span>
+                </button>
+              </div>
             </div>
           ) : (
             <div class="liquid-glass rounded-[2rem] p-8 text-center">
@@ -316,6 +326,19 @@ const toc = headings.filter(h => h.depth === 2 || h.depth === 3);
     }
     document.getElementById('theme-toggle')?.addEventListener('click', () => {
       setTimeout(updateTwikooTheme, 100);
+    });
+
+    // 复制链接
+    const copyBtn = document.getElementById('copy-link-btn');
+    const copyLabel = document.getElementById('copy-link-label');
+    copyBtn?.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        copyLabel.textContent = '已复制';
+        setTimeout(() => { copyLabel.textContent = '复制链接'; }, 2000);
+      } catch {
+        copyLabel.textContent = '复制失败';
+      }
     });
   </script>
 

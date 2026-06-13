@@ -109,11 +109,11 @@
   }
 
   ::selection {
-    background-color: rgba(var(--primary), 0.3);
-    color: rgb(var(--bg));
+    background: rgb(var(--primary-light));
+    color: rgb(var(--fg-on-primary));
   }
   .dark ::selection {
-    background-color: rgba(var(--primary), 0.35);
+    background: rgb(var(--primary));
     color: rgb(var(--bg));
   }
 

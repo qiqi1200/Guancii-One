@@ -44,9 +44,36 @@ const year = new Date().getFullYear();
       </div>
     </div>
 
-    <div class="mt-8 pt-6 border-t border-dashed border-[rgb(var(--border))]/40 text-xs text-[rgb(var(--fg-soft))] flex flex-col sm:flex-row justify-between gap-2 font-body">
+    <div class="mt-8 pt-6 border-t border-dashed border-[rgb(var(--border))]/40 text-xs text-[rgb(var(--fg-soft))] flex flex-col sm:flex-row justify-between gap-2 font-body items-center">
       <div>© {year} {SITE.author}</div>
+      <div id="site-runtime" class="font-mono text-[rgb(var(--primary))]"></div>
       <div>Built with <span class="text-[rgb(var(--primary))]">Astro</span> · <span class="text-[rgb(var(--secondary))]">Tailwind</span></div>
     </div>
   </div>
 </footer>
+
+<script is:inline>
+(function() {
+  // 网站运行时间 —— 从 2026 年 6 月 12 日 00:00:00 (UTC+8) 开始计
+  const start = new Date('2026-06-12T00:00:00+08:00');
+  const el = document.getElementById('site-runtime');
+
+  function pad(n) { return String(n).padStart(2, '0'); }
+
+  function update() {
+    const diff = Math.floor((Date.now() - start.getTime()) / 1000);
+    if (diff < 0) { el.textContent = '还没开始运行'; return; }
+
+    const days = Math.floor(diff / 86400);
+    const rem = diff % 86400;
+    const hours = Math.floor(rem / 3600);
+    const mins = Math.floor((rem % 3600) / 60);
+    const secs = rem % 60;
+
+    el.textContent = `✱ 已运行 ${days} 天 ${pad(hours)}:${pad(mins)}:${pad(secs)}`;
+  }
+
+  update();
+  setInterval(update, 1000);
+})();
+</script>
