@@ -16,11 +16,11 @@ posts.forEach(p => {
 <BaseLayout title="归档" current="/archive">
   <article class="max-w-3xl mx-auto px-6 py-12 md:py-20">
     <header class="mb-12 animate-fade-in">
-      <div class="text-sm text-ink-400 dark:text-cream-300 mb-2">归档</div>
-      <h1 class="text-4xl md:text-5xl font-semibold tracking-tight text-ink-700 dark:text-cream-50">
+      <div class="text-sm text-[rgb(var(--fg-soft))] mb-2">归档</div>
+      <h1 class="text-4xl md:text-5xl font-semibold tracking-tight text-[rgb(var(--fg))]">
         全部文章
       </h1>
-      <p class="mt-4 text-ink-500 dark:text-cream-300">
+      <p class="mt-4 text-[rgb(var(--fg-soft))]">
         共 {posts.length} 篇 · 按时间倒序
       </p>
     </header>
@@ -28,21 +28,21 @@ posts.forEach(p => {
     <div class="space-y-12">
       {[...groups.entries()].map(([month, items]) => (
         <section>
-          <h2 class="text-sm font-semibold text-ink-400 dark:text-cream-300 uppercase tracking-wider mb-4 sticky top-20 bg-cream-50/80 dark:bg-ink-700/80 backdrop-blur py-2 z-10">
+          <h2 class="text-lg font-bold text-[rgb(var(--fg))] mb-4 flex items-center gap-2">
+            <span class="w-1 h-5 rounded-full bg-[rgb(var(--primary))] inline-block"></span>
             {month}
-            <span class="ml-2 text-ink-400/60">· {items.length}</span>
           </h2>
-          <ul class="space-y-1">
+          <ul class="space-y-3 ml-4 border-l-2 border-[rgb(var(--border))]/30 pl-4">
             {items.map(p => (
               <li>
                 <a
                   href={`/posts/${p.slug}/`}
-                  class="group flex items-baseline gap-4 py-2 px-3 -mx-3 rounded-lg hover:bg-cream-100 dark:hover:bg-ink-600 transition-colors"
+                  class="group flex items-baseline gap-3"
                 >
-                  <time class="text-sm text-ink-400 dark:text-cream-300 shrink-0 w-16 tabular-nums">
-                    {p.data.date.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' })}
-                  </time>
-                  <span class="text-ink-700 dark:text-cream-50 group-hover:text-accent-sky transition-colors">
+                  <span class="text-xs text-[rgb(var(--fg-soft))] shrink-0 font-body">
+                    {String(p.data.date.getDate()).padStart(2, '0')}日
+                  </span>
+                  <span class="text-[rgb(var(--fg))] group-hover:text-[rgb(var(--primary))] transition-colors font-body">
                     {p.data.title}
                   </span>
                 </a>
@@ -51,10 +51,12 @@ posts.forEach(p => {
           </ul>
         </section>
       ))}
-
-      {posts.length === 0 && (
-        <p class="text-ink-400 dark:text-cream-300 text-center py-12">还没有文章</p>
-      )}
     </div>
+
+    {posts.length === 0 && (
+      <div class="text-center py-20 text-[rgb(var(--fg-soft))]">
+        还没有文章。
+      </div>
+    )}
   </article>
 </BaseLayout>

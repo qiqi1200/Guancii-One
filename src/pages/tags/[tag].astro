@@ -18,13 +18,13 @@ const { posts } = Astro.props;
 <BaseLayout title={`#${tag}`} description={`关于 ${tag} 的所有文章`}>
   <article class="max-w-6xl mx-auto px-6 py-12 md:py-20">
     <header class="mb-12 animate-fade-in">
-      <a href="/tags" class="text-sm text-ink-400 dark:text-cream-300 hover:text-accent-sky transition-colors">
+      <a href="/tags" class="text-sm text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] transition-colors">
         ← 返回所有标签
       </a>
-      <h1 class="text-4xl md:text-5xl font-semibold tracking-tight text-ink-700 dark:text-cream-50 mt-4">
-        #<span class="text-accent-sky">{tag}</span>
+      <h1 class="text-4xl md:text-5xl font-semibold tracking-tight text-[rgb(var(--fg))] mt-4">
+        #<span class="text-[rgb(var(--primary))]">{tag}</span>
       </h1>
-      <p class="mt-4 text-ink-500 dark:text-cream-300">
+      <p class="mt-4 text-[rgb(var(--fg-soft))]">
         共 {posts.length} 篇
       </p>
     </header>

@@ -12,11 +12,11 @@ const tags = [...tagMap.entries()].sort((a, b) => b[1] - a[1]);
 <BaseLayout title="标签" current="/tags">
   <article class="max-w-3xl mx-auto px-6 py-12 md:py-20">
     <header class="mb-12 animate-fade-in">
-      <div class="text-sm text-ink-400 dark:text-cream-300 mb-2">标签</div>
-      <h1 class="text-4xl md:text-5xl font-semibold tracking-tight text-ink-700 dark:text-cream-50">
+      <div class="text-sm text-[rgb(var(--fg-soft))] mb-2">标签</div>
+      <h1 class="text-4xl md:text-5xl font-semibold tracking-tight text-[rgb(var(--fg))]">
         全部标签
       </h1>
-      <p class="mt-4 text-ink-500 dark:text-cream-300">
+      <p class="mt-4 text-[rgb(var(--fg-soft))]">
         共 {tags.length} 个标签
       </p>
     </header>

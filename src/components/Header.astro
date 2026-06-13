@@ -13,11 +13,11 @@ const path = current || Astro.url.pathname;
 <header class="fixed top-0 w-full z-50 bg-[rgb(var(--glass-bg))]/80 dark:bg-surface-dim/80 backdrop-blur-xl border-b border-[rgb(var(--glass-border))]/10 shadow-sm transition-colors">
   <div class="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
     <a href="/" class="flex items-center gap-2 group">
-      <div class="w-9 h-9 rounded-full flex items-center justify-center font-bold shadow-md group-hover:shadow-lg group-hover:scale-110 group-hover:rotate-12 transition-all duration-300"
+      <div class="w-9 h-9 rounded-full flex items-center justify-center font-bold shadow-sm transition-shadow duration-200"
            style="background: linear-gradient(135deg, rgb(var(--primary-light)), rgb(var(--secondary)), rgb(var(--tertiary)));">
         <span class="text-[rgb(var(--fg-on-primary))] text-sm">g</span>
       </div>
-      <span class="font-headline font-bold tracking-tight text-lg text-[rgb(var(--fg))] group-hover:scale-105 transition-transform">
+      <span class="font-headline font-bold tracking-tight text-lg text-[rgb(var(--fg))]">
         {SITE.shortTitle}
       </span>
     </a>
@@ -28,7 +28,7 @@ const path = current || Astro.url.pathname;
         return (
           <a
             href={item.href}
-            class={`px-3 py-1.5 rounded-lg text-sm font-body transition-all duration-300 hover:scale-105 hover:rotate-1 ${
+            class={`px-3 py-1.5 rounded-lg text-sm font-body transition-colors ${
               active
                 ? 'text-[rgb(var(--primary))] font-bold doodle-underline'
                 : 'text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))]'

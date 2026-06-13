@@ -109,8 +109,12 @@
   }
 
   ::selection {
-    background-color: rgba(var(--primary-light), 0.35);
-    color: rgb(var(--fg-on-primary));
+    background-color: rgba(var(--primary), 0.3);
+    color: rgb(var(--bg));
+  }
+  .dark ::selection {
+    background-color: rgba(var(--primary), 0.35);
+    color: rgb(var(--bg));
   }
 
   /* Material Symbols 图标 */
@@ -180,10 +184,10 @@
 
   /* ============= 磁吸悬浮 ============= */
   .magnetic-hover {
-    transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+    transition: transform 0.2s cubic-bezier(0.23, 1, 0.32, 1);
   }
   .magnetic-hover:hover {
-    transform: scale(1.02) rotate(1deg);
+    transform: scale(1.005);
   }
 
   /* ============= 涂鸦风格卡片（scrapbook 卡片） ============= */
@@ -192,8 +196,8 @@
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid rgba(var(--glass-border), 0.15);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.25);
-    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.15);
+    transition: box-shadow 0.3s ease;
     position: relative;
     overflow: hidden;
   }
@@ -208,8 +212,8 @@
     transition: opacity 0.3s ease;
   }
   .scrapbook-card:hover {
-    transform: translateY(-4px) scale(1.01) rotate(0.3deg);
-    box-shadow: 0 20px 48px 0 rgba(0, 0, 0, 0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px 0 rgba(0, 0, 0, 0.25);
   }
   .scrapbook-card:hover::before {
     opacity: 1;
@@ -224,11 +228,10 @@
     font-size: 14px;
     line-height: 20px;
     border-radius: 8px;
-    transform: rotate(2deg);
-    transition: transform 0.2s ease;
+    transition: background-color 0.2s ease;
   }
   .postit-tag:hover {
-    transform: rotate(-2deg) scale(1.05);
+    background-color: rgba(var(--primary-light), 0.12);
   }
 
   /* ============= 涂鸦动画 ============= */
@@ -265,12 +268,11 @@
 
   /* ============= 卡片悬浮（scrapbook 风格） ============= */
   .card-hover {
-    @apply transition-all duration-300;
-    transform-style: preserve-3d;
+    @apply transition-all duration-200;
   }
   .card-hover:hover {
-    transform: translateY(-4px) rotate(0.5deg) scale(1.01);
-    box-shadow: 0 20px 40px -10px rgba(156, 63, 0, 0.18);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px -8px rgba(156, 63, 0, 0.15);
   }
   .dark .card-hover:hover {
     box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
@@ -363,7 +365,7 @@
 
   /* ============= 主题切换图标按钮 ============= */
   .theme-toggle {
-    @apply ml-2 p-2 rounded-full transition-all hover:scale-110 active:scale-95;
+    @apply ml-2 p-2 rounded-full transition-all hover:scale-105;
     color: rgb(var(--primary));
   }
   .theme-toggle:hover {

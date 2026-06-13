@@ -10,7 +10,7 @@ const year = new Date().getFullYear();
         <div class="font-handwritten text-lg text-[rgb(var(--secondary))] mb-2">
           {SITE.title}
         </div>
-        <p class="text-[rgb(var(--fg-soft))] leading-relaxed font-handwritten text-base">
+        <p class="text-[rgb(var(--fg-soft))] leading-relaxed font-body">
           {SITE.description}
         </p>
       </div>
@@ -18,10 +18,10 @@ const year = new Date().getFullYear();
       <div>
         <div class="font-label text-xs uppercase tracking-widest text-[rgb(var(--fg-soft))] mb-3">链接</div>
         <ul class="space-y-1.5 text-[rgb(var(--fg))]">
-          <li><a href="/about" class="hover:text-[rgb(var(--primary))] transition-colors hover:rotate-1 inline-block">关于我</a></li>
-          <li><a href="/archive" class="hover:text-[rgb(var(--primary))] transition-colors hover:rotate-1 inline-block">归档</a></li>
-          <li><a href="/tags" class="hover:text-[rgb(var(--primary))] transition-colors hover:rotate-1 inline-block">标签</a></li>
-          <li><a href="/rss.xml" class="hover:text-[rgb(var(--primary))] transition-colors hover:rotate-1 inline-block">RSS</a></li>
+          <li><a href="/about" class="hover:text-[rgb(var(--primary))] transition-colors inline-block">关于我</a></li>
+          <li><a href="/archive" class="hover:text-[rgb(var(--primary))] transition-colors inline-block">归档</a></li>
+          <li><a href="/tags" class="hover:text-[rgb(var(--primary))] transition-colors inline-block">标签</a></li>
+          <li><a href="/rss.xml" class="hover:text-[rgb(var(--primary))] transition-colors inline-block">RSS</a></li>
         </ul>
       </div>
 
@@ -29,13 +29,13 @@ const year = new Date().getFullYear();
         <div class="font-label text-xs uppercase tracking-widest text-[rgb(var(--fg-soft))] mb-3">联系</div>
         <ul class="space-y-1.5 text-[rgb(var(--fg))]">
           <li>
-            <a href={SITE.links.github} class="hover:text-[rgb(var(--primary))] transition-colors inline-flex items-center gap-1.5 hover:rotate-1" target="_blank" rel="noopener">
+            <a href={SITE.links.github} class="hover:text-[rgb(var(--primary))] transition-colors inline-flex items-center gap-1.5" target="_blank" rel="noopener">
               <span class="material-symbols-outlined text-base">code</span>
               GitHub
             </a>
           </li>
           <li>
-            <a href={SITE.links.email} class="hover:text-[rgb(var(--primary))] transition-colors inline-flex items-center gap-1.5 hover:rotate-1">
+            <a href={SITE.links.email} class="hover:text-[rgb(var(--primary))] transition-colors inline-flex items-center gap-1.5">
               <span class="material-symbols-outlined text-base">mail</span>
               邮箱
             </a>
@@ -44,8 +44,8 @@ const year = new Date().getFullYear();
       </div>
     </div>
 
-    <div class="mt-8 pt-6 border-t border-dashed border-[rgb(var(--border))]/40 text-xs text-[rgb(var(--fg-soft))] flex flex-col sm:flex-row justify-between gap-2 font-handwritten">
-      <div>© {year} {SITE.author} · 手写·涂鸦·安静角落</div>
+    <div class="mt-8 pt-6 border-t border-dashed border-[rgb(var(--border))]/40 text-xs text-[rgb(var(--fg-soft))] flex flex-col sm:flex-row justify-between gap-2 font-body">
+      <div>© {year} {SITE.author}</div>
       <div>Built with <span class="text-[rgb(var(--primary))]">Astro</span> · <span class="text-[rgb(var(--secondary))]">Tailwind</span></div>
     </div>
   </div>
