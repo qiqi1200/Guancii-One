@@ -319,8 +319,5 @@ const toc = headings.filter(h => h.depth === 2 || h.depth === 3);
     });
   </script>
 
-  <!-- 把 site.json 的 twikoo 配置注入到 window -->
-  <script is:inline define:vars={{ twikooConfig: SITE.twikoo }}>
-    window.__TWIKOO_CONFIG__ = twikooConfig;
-  </script>
+  <!-- 配置注入已交由 TwikooComments 组件处理 -->
 </BaseLayout>

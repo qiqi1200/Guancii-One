@@ -8,6 +8,16 @@ interface Props {
 
 const { class: className = '' } = Astro.props;
 ---
+
+<!-- 配置必须在 init 之前注入 -->
+<script is:inline>
+  window.__TWIKOO_CONFIG__ = {
+    "enabled": true,
+    "envId": "https://twikoo.260607.best",
+    "lang": "zh-CN"
+  };
+</script>
+
 <div id="tcomment" class={className}></div>
 
 <script src="https://cdn.jsdelivr.net/npm/twikoo@1.6.42/dist/twikoo.min.js" is:inline></script>
@@ -19,7 +29,6 @@ const { class: className = '' } = Astro.props;
         setTimeout(initTwikoo, 100);
         return;
       }
-      // 优先读取 window 上的配置（构建时注入），否则走默认值
       const config = window.__TWIKOO_CONFIG__ || {
         envId: 'https://your-twikoo.vercel.app',
         lang: 'zh-CN',
