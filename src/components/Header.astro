@@ -56,9 +56,8 @@ const path = current || Astro.url.pathname;
 <script is:inline>
   // 主题切换
   const themeToggle = document.getElementById('theme-toggle');
-  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
   const savedTheme = localStorage.getItem('theme');
-  if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+  if (savedTheme === 'dark') {
     document.documentElement.classList.add('dark');
   }
   themeToggle?.addEventListener('click', () => {
