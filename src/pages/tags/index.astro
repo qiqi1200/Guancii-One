@@ -8,6 +8,22 @@ posts.forEach(p => {
   p.data.tags?.forEach(t => tagMap.set(t, (tagMap.get(t) || 0) + 1));
 });
 const tags = [...tagMap.entries()].sort((a, b) => b[1] - a[1]);
+const maxCount = tags.length > 0 ? tags[0][1] : 1;
+
+// 根据文章数计算字体大小（最小 0.8rem，最大 2rem）
+function tagSize(count: number): string {
+  const min = 0.8;
+  const max = 2.0;
+  const ratio = count / maxCount;
+  const size = min + (max - min) * ratio;
+  return `${size.toFixed(2)}rem`;
+}
+function tagWeight(count: number): string {
+  const ratio = count / maxCount;
+  if (ratio > 0.8) return '700';
+  if (ratio > 0.5) return '600';
+  return '400';
+}
 ---
 <BaseLayout title="标签" current="/tags">
   <article class="max-w-3xl mx-auto px-6 py-12 md:py-20">
@@ -21,15 +37,15 @@ const tags = [...tagMap.entries()].sort((a, b) => b[1] - a[1]);
       </p>
     </header>
 
-    <div class="flex flex-wrap gap-2">
+    <div class="flex flex-wrap gap-3 items-center justify-center px-4">
       {tags.map(([tag, count]) => (
         <a
           href={`/tags/${tag}`}
-          class="tag-chip"
-          style="font-size: 0.875rem; padding: 0.4rem 0.8rem;"
+          class="tag-chip transition-all hover:scale-105 hover:shadow-[0_0_12px_rgba(var(--primary-light),0.2)]"
+          style={`font-size: ${tagSize(count)}; font-weight: ${tagWeight(count)}; padding: 0.3em 0.7em;`}
         >
           #{tag}
-          <span class="opacity-50 ml-1">{count}</span>
+          <span class="opacity-50 ml-1.5 text-xs">{count}</span>
         </a>
       ))}
     </div>

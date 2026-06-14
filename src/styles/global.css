@@ -363,6 +363,23 @@
     .prose { max-width: 100% !important; }
   }
 
+  /* ============= 隐藏滚动条（标签筛选溢出滚动） ============= */
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* ============= Featured 卡片专属样式 ============= */
+  .featured-card {
+    padding: 1.5rem;
+  }
+  .featured-card:hover {
+    transform: translateY(-2px) !important;
+  }
+
   /* ============= 主题切换图标按钮 ============= */
   .theme-toggle {
     @apply ml-2 p-2 rounded-full transition-all hover:scale-105;

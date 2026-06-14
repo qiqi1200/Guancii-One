@@ -85,8 +85,15 @@ const archives = [...archiveMap.entries()].slice(0, 8);
               <div class="text-[rgb(var(--fg))] group-hover:text-[rgb(var(--primary))] transition-colors font-medium line-clamp-2 leading-snug">
                 {p.data.title}
               </div>
-              <div class="text-xs text-[rgb(var(--fg-soft))] mt-0.5">
-                {p.data.date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' })}
+              <div class="flex items-center gap-2 mt-0.5 text-xs text-[rgb(var(--fg-soft))]">
+                <span>{p.data.date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' })}</span>
+                {p.data.tags && p.data.tags.length > 0 && (
+                  <span class="flex gap-1 flex-wrap">
+                    {p.data.tags.slice(0, 2).map(t => (
+                      <span class="opacity-60">#{t}</span>
+                    ))}
+                  </span>
+                )}
               </div>
             </a>
           </li>

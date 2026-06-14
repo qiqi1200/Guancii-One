@@ -24,9 +24,13 @@ const dateStr = data.date.toLocaleDateString('zh-CN', {
   month: 'long',
   day: 'numeric'
 });
+
+const dayStr = String(data.date.getDate()).padStart(2, '0');
+const monthStr = String(data.date.getMonth() + 1).padStart(2, '0');
+const yearStr = String(data.date.getFullYear());
 ---
 <article
-  class={`group scrapbook-card rounded-[2rem] p-6 magnetic-hover relative ${featured ? '' : ''}`}
+  class={`group scrapbook-card rounded-[2rem] magnetic-hover relative ${featured ? 'featured-card' : ''}`}
   style={`transform: rotate(${rotateVal});`}
 >
   {featured && (
@@ -34,69 +38,121 @@ const dateStr = data.date.toLocaleDateString('zh-CN', {
       <span class="material-symbols-outlined text-[rgb(var(--primary))] text-3xl">auto_awesome</span>
     </div>
   )}
-  <a href={url} class="block h-full">
-    {data.cover && (
-      <div class="overflow-hidden rounded-xl mb-5 aspect-[16/9] bg-[rgb(var(--bg-soft))] relative">
-        <img
-          src={data.cover}
-          alt={data.title}
-          loading="lazy"
-          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-        />
-        <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-      </div>
-    )}
 
-    <div class="space-y-3">
-      <!-- 日期 + 阅读时间 + 标签 -->
-      <div class="flex items-center gap-2 flex-wrap text-xs text-[rgb(var(--fg-soft))] font-body">
-        <time datetime={data.date.toISOString()} class="flex items-center gap-1">
-          <span class="material-symbols-outlined text-sm">calendar_today</span>
-          {dateStr}
-        </time>
-        <span>·</span>
-        <span class="flex items-center gap-1">
-          <span class="material-symbols-outlined text-sm">schedule</span>
-          {readTime} 分钟
-        </span>
-      </div>
+  {featured && !data.cover ? (
+    /* Featured 无封面：左右分栏布局，左侧日期 + 标签装饰 */
+    <a href={url} class="block h-full">
+      <div class="flex gap-6">
+        <div class="hidden sm:flex flex-col items-center justify-center shrink-0 w-20 border-r border-dashed border-[rgb(var(--border))]/30 pr-5 py-4">
+          <span class="text-3xl font-bold text-[rgb(var(--primary))] leading-none font-headline">{dayStr}</span>
+          <span class="text-xs text-[rgb(var(--fg-soft))] mt-1 font-handwritten">{yearStr}/{monthStr}</span>
+          <div class="mt-4 flex flex-col gap-1.5 items-center">
+            {data.tags && data.tags.slice(0, 3).map(t => (
+              <span class="text-[10px] px-2 py-0.5 rounded-full bg-[rgb(var(--primary-light))]/10 text-[rgb(var(--primary))] whitespace-nowrap font-handwritten">
+                #{t}
+              </span>
+            ))}
+          </div>
+        </div>
+        <div class="flex-1 py-2 min-w-0">
+          <div class="space-y-3">
+            <div class="flex items-center gap-2 flex-wrap text-xs text-[rgb(var(--fg-soft))] font-body sm:hidden">
+              <time datetime={data.date.toISOString()} class="flex items-center gap-1">
+                <span class="material-symbols-outlined text-sm">calendar_today</span>
+                {dateStr}
+              </time>
+              <span>·</span>
+              <span class="flex items-center gap-1">
+                <span class="material-symbols-outlined text-sm">schedule</span>
+                {readTime} 分钟
+              </span>
+            </div>
 
-      <!-- 标签：后贴风格 -->
-      {data.tags && data.tags.length > 0 && (
-        <div class="flex flex-wrap gap-2">
-          {data.tags.slice(0, 3).map((t, i) => (
-            <span
-              class="postit-tag"
-              style={`${
-                i === 0
-                  ? 'background: rgb(var(--post-it-yellow, 255, 236, 179)); color: rgb(var(--post-it-text, 86, 31, 0));'
-                  : i === 1
-                  ? 'background: rgba(var(--secondary), 0.15); color: rgb(var(--secondary));'
-                  : 'background: rgba(var(--sage, 177, 207, 167), 0.15); color: rgb(var(--tertiary));'
-              }`}
-            >
-              #{t}
-            </span>
-          ))}
+            <h3 class="font-headline font-semibold tracking-tight text-[rgb(var(--fg))] group-hover:text-[rgb(var(--primary))] transition-colors text-2xl md:text-3xl">
+              {data.title}
+            </h3>
+
+            {data.description && (
+              <p class="text-[rgb(var(--fg-soft))] line-clamp-2 leading-relaxed text-sm font-body">
+                {data.description}
+              </p>
+            )}
+
+            <div class="flex items-center text-[rgb(var(--primary))] text-sm font-label font-semibold">
+              阅读全文
+              <span class="material-symbols-outlined text-base ml-1">arrow_forward</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </a>
+  ) : (
+    <a href={url} class="block h-full">
+      {data.cover && (
+        <div class="overflow-hidden rounded-xl mb-5 aspect-[16/9] bg-[rgb(var(--bg-soft))] relative">
+          <img
+            src={data.cover}
+            alt={data.title}
+            loading="lazy"
+            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          />
+          <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
         </div>
       )}
 
-      <h3 class={`font-headline font-semibold tracking-tight text-[rgb(var(--fg))] group-hover:text-[rgb(var(--primary))] transition-colors ${
-        featured ? 'text-2xl md:text-3xl' : 'text-lg md:text-xl'
-      }`}>
-        {data.title}
-      </h3>
+      <div class={`space-y-3 ${featured && !data.cover ? 'p-4' : ''}`}>
+        <!-- 日期 + 阅读时间 + 标签 -->
+        <div class="flex items-center gap-2 flex-wrap text-xs text-[rgb(var(--fg-soft))] font-body">
+          <time datetime={data.date.toISOString()} class="flex items-center gap-1">
+            <span class="material-symbols-outlined text-sm">calendar_today</span>
+            {dateStr}
+          </time>
+          <span>·</span>
+          <span class="flex items-center gap-1">
+            <span class="material-symbols-outlined text-sm">schedule</span>
+            {readTime} 分钟
+          </span>
+        </div>
 
-      {data.description && (
-        <p class="text-[rgb(var(--fg-soft))] line-clamp-2 leading-relaxed text-sm font-body">
-          {data.description}
-        </p>
-      )}
+        <!-- 标签：后贴风格 -->
+        {data.tags && data.tags.length > 0 && (
+          <div class="flex flex-wrap gap-2">
+            {data.tags.map((t, i) => (
+              <span
+                class="postit-tag"
+                style={`${
+                  i === 0
+                    ? 'background: rgb(var(--post-it-yellow, 255, 236, 179)); color: rgb(var(--post-it-text, 86, 31, 0));'
+                    : i === 1
+                    ? 'background: rgba(var(--secondary), 0.15); color: rgb(var(--secondary));'
+                    : i === 2
+                    ? 'background: rgba(var(--sage, 177, 207, 167), 0.15); color: rgb(var(--tertiary));'
+                    : 'background: rgba(var(--surface-variant), 0.3); color: rgb(var(--fg-soft));'
+                }`}
+              >
+                #{t}
+              </span>
+            ))}
+          </div>
+        )}
 
-      <div class="flex items-center text-[rgb(var(--primary))] text-sm font-label font-semibold">
-        阅读全文
-        <span class="material-symbols-outlined text-base ml-1">arrow_forward</span>
+        <h3 class={`font-headline font-semibold tracking-tight text-[rgb(var(--fg))] group-hover:text-[rgb(var(--primary))] transition-colors ${
+          featured ? 'text-2xl md:text-3xl' : 'text-lg md:text-xl'
+        }`}>
+          {data.title}
+        </h3>
+
+        {data.description && (
+          <p class="text-[rgb(var(--fg-soft))] line-clamp-2 leading-relaxed text-sm font-body">
+            {data.description}
+          </p>
+        )}
+
+        <div class="flex items-center text-[rgb(var(--primary))] text-sm font-label font-semibold">
+          阅读全文
+          <span class="material-symbols-outlined text-base ml-1">arrow_forward</span>
+        </div>
       </div>
-    </div>
-  </a>
+    </a>
+  )}
 </article>
