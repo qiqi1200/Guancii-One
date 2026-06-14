@@ -30,9 +30,11 @@ const allTags = [...new Set(posts.flatMap(p => p.data.tags || []))];
         <div class="relative group flex-shrink-0 mx-auto md:mx-0">
           <div class="relative w-28 h-28 md:w-36 md:h-36 rounded-full p-0.5 shadow-md transition-shadow duration-300"
                style="background: linear-gradient(135deg, rgb(var(--primary-light)), rgb(var(--secondary)), rgb(var(--tertiary)));">
-            <div class="w-full h-full rounded-full bg-[rgb(var(--bg))] flex items-center justify-center text-4xl md:text-5xl font-headline font-bold text-[rgb(var(--primary))]">
-              g
-            </div>
+            <img
+              src={SITE.avatar}
+              alt={SITE.author}
+              class="w-full h-full rounded-full object-cover bg-[rgb(var(--bg))]"
+            />
           </div>
         </div>
 
