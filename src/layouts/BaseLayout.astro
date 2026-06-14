@@ -45,12 +45,19 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta name="twitter:title" content={fullTitle} />
     <meta name="twitter:description" content={description} />
 
-    <link rel="icon" type="image/jpeg" href="/favicon.jpg" />
+    <!-- Favicon（多尺寸适配） -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="alternate" type="application/rss+xml" title={SITE.title} href="/rss.xml" />
 
-    <!-- 字体注入：Montserrat + 手写体 Architects Daughter + Material Symbols -->
+    <!-- 资源预连接（加速第三方资源加载） -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
+    <link rel="dns-prefetch" href="https://pic.224418.xyz" />
+
+    <!-- 字体：Montserrat + 手写体 Architects Daughter + Material Symbols -->
     <link
       href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&family=Architects+Daughter&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap"
       rel="stylesheet"
