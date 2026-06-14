@@ -13,10 +13,11 @@ const path = current || Astro.url.pathname;
 <header class="fixed top-0 w-full z-50 bg-[rgb(var(--glass-bg))]/80 dark:bg-surface-dim/80 backdrop-blur-xl border-b border-[rgb(var(--glass-border))]/10 shadow-sm transition-colors">
   <div class="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
     <a href="/" class="flex items-center gap-2 group">
-      <div class="w-9 h-9 rounded-full flex items-center justify-center font-bold shadow-sm transition-shadow duration-200"
-           style="background: linear-gradient(135deg, rgb(var(--primary-light)), rgb(var(--secondary)), rgb(var(--tertiary)));">
-        <span class="text-[rgb(var(--fg-on-primary))] text-sm">g</span>
-      </div>
+      <img
+        src={SITE.avatar}
+        alt={SITE.author}
+        class="w-9 h-9 rounded-full object-cover shadow-sm"
+      />
       <span class="font-headline font-bold tracking-tight text-lg text-[rgb(var(--fg))]">
         {SITE.shortTitle}
       </span>
