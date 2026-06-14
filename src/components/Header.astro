@@ -55,12 +55,11 @@ const path = current || Astro.url.pathname;
 </header>
 
 <script is:inline>
-  // 主题切换
+  // 主题切换（默认浅色）
   const themeToggle = document.getElementById('theme-toggle');
-  const savedTheme = localStorage.getItem('theme');
-  if (savedTheme === 'dark') {
-    document.documentElement.classList.add('dark');
-  }
+  // 强制设为浅色
+  localStorage.setItem('theme', 'light');
+  document.documentElement.classList.remove('dark');
   themeToggle?.addEventListener('click', () => {
     document.documentElement.classList.toggle('dark');
     localStorage.setItem(
