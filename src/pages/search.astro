@@ -46,9 +46,11 @@ const index = allPosts.map(p => ({
   </article>
 </BaseLayout>
 
-<!-- 搜索索引（JSON，供客户端 JS 使用） -->
+<!-- 搜索索引：通过 data 属性注入（Astro 对 HTML 属性求值 {Expression}） -->
+<div id="search-data" data-index={JSON.stringify(index)} hidden></div>
+
 <script is:inline>
-  window.__SEARCH_INDEX__ = {JSON.stringify(index)};
+  window.__SEARCH_INDEX__ = JSON.parse(document.getElementById('search-data').dataset.index || '[]');
 </script>
 
 <script is:inline>
