@@ -3,6 +3,7 @@ import type { GetStaticPaths } from 'astro';
 import { getCollection, type CollectionEntry } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import TwikooComments from '../../components/TwikooComments.astro';
+import { getReadingTime } from '../../utils/readingTime';
 import site from '../../site.json';
 const SITE = site;
 
@@ -31,15 +32,21 @@ const { post, prev, next } = Astro.props;
 const { Content, headings } = await post.render();
 const { data, slug } = post;
 
-// 估算阅读时间
-const wordCount = post.body.length;
-const readTime = Math.max(1, Math.ceil(wordCount / 400));
+// 按中文字数+英文词数精确估算阅读时间
+const readTime = getReadingTime(post.body);
 
 const dateStr = data.date.toLocaleDateString('zh-CN', {
   year: 'numeric',
   month: 'long',
   day: 'numeric'
 });
+
+// 更新日期（当存在且不同于发布日期时显示）
+const hasUpdate = data.updated
+  && data.updated.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' }) !== dateStr;
+const updatedStr = data.updated
+  ? data.updated.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' })
+  : null;
 
 // 取 h2/h3 作为目录
 const toc = headings.filter(h => h.depth === 2 || h.depth === 3);
@@ -70,6 +77,15 @@ const toc = headings.filter(h => h.depth === 2 || h.depth === 3);
               <span class="material-symbols-outlined text-sm">schedule</span>
               {readTime} 分钟阅读
             </span>
+            {hasUpdate && (
+              <>
+                <span>·</span>
+                <span class="flex items-center gap-1 text-[rgb(var(--secondary))]">
+                  <span class="material-symbols-outlined text-sm">edit</span>
+                  更新于 {updatedStr}
+                </span>
+              </>
+            )}
             {data.tags && data.tags.length > 0 && (
               <>
                 <span>·</span>

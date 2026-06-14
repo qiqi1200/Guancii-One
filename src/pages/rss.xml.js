@@ -10,13 +10,17 @@ export async function GET(context) {
     description: SITE.description,
     site: context.site,
     items: posts
+      .filter(p => !p.data.draft)
       .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
       .map(post => ({
         title: post.data.title,
         description: post.data.description,
         pubDate: post.data.date,
         link: `/posts/${post.slug}/`,
-        categories: post.data.tags
+        categories: post.data.tags,
+        ...(post.data.updated && {
+          customData: `<atom:updated>${post.data.updated.toISOString()}</atom:updated>`
+        })
       }))
   });
 }

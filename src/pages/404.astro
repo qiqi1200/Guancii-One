@@ -1,0 +1,27 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="页面未找到">
+  <article class="max-w-3xl mx-auto px-6 py-20 md:py-32 text-center animate-fade-in">
+    <span class="material-symbols-outlined text-8xl text-[rgb(var(--primary))] opacity-50 mb-6 block">explore_off</span>
+    <h1 class="text-4xl md:text-6xl font-headline font-bold text-[rgb(var(--fg))] mb-4">404</h1>
+    <p class="text-lg text-[rgb(var(--fg-soft))] mb-8 font-body">
+      你要找的页面不存在或已被移动。
+    </p>
+    <div class="flex flex-wrap gap-4 justify-center">
+      <a href="/" class="px-6 py-2.5 rounded-full bg-[rgb(var(--primary-light))] text-[rgb(var(--fg-on-primary))] font-label text-sm font-bold transition-all hover:shadow-[0_0_12px_rgba(var(--primary-light),0.3)]">
+        <span class="material-symbols-outlined text-base align-middle mr-1">home</span>
+        回到首页
+      </a>
+      <a href="/archive" class="px-6 py-2.5 rounded-full border border-[rgb(var(--outline-variant))] hover:bg-[rgb(var(--surface-variant))]/30 font-label text-sm transition-all text-[rgb(var(--secondary))]">
+        <span class="material-symbols-outlined text-base align-middle mr-1">auto_stories</span>
+        浏览归档
+      </a>
+      <a href="/tags" class="px-6 py-2.5 rounded-full border border-[rgb(var(--outline-variant))] hover:bg-[rgb(var(--surface-variant))]/30 font-label text-sm transition-all text-[rgb(var(--secondary))]">
+        <span class="material-symbols-outlined text-base align-middle mr-1">label</span>
+        查看标签
+      </a>
+    </div>
+  </article>
+</BaseLayout>

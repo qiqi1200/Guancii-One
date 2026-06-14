@@ -55,11 +55,8 @@ const path = current || Astro.url.pathname;
 </header>
 
 <script is:inline>
-  // 主题切换（默认浅色）
+  // 主题切换（BaseLayout 已在 <head> 中初始化默认浅色，此处只负责切换交互）
   const themeToggle = document.getElementById('theme-toggle');
-  // 强制设为浅色
-  localStorage.setItem('theme', 'light');
-  document.documentElement.classList.remove('dark');
   themeToggle?.addEventListener('click', () => {
     document.documentElement.classList.toggle('dark');
     localStorage.setItem(

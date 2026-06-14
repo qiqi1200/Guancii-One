@@ -9,13 +9,15 @@ interface Props {
 const { class: className = '' } = Astro.props;
 ---
 
-<!-- 配置必须在 init 之前注入 -->
+<!-- 配置仅在首次注入时设置，防止 SPA 导航重复定义 -->
 <script is:inline>
-  window.__TWIKOO_CONFIG__ = {
-    "enabled": true,
-    "envId": "https://twikoo.260607.best",
-    "lang": "zh-CN"
-  };
+  if (!window.__TWIKOO_CONFIG__) {
+    window.__TWIKOO_CONFIG__ = {
+      "enabled": true,
+      "envId": "https://twikoo.260607.best",
+      "lang": "zh-CN"
+    };
+  }
 </script>
 
 <div id="tcomment" class={className}></div>
@@ -24,6 +26,9 @@ const { class: className = '' } = Astro.props;
 
 <script is:inline>
   (function () {
+    // 防止重复初始化（SPA 导航或多处渲染）
+    if (window.__twikoo_loaded__) return;
+
     function initTwikoo() {
       if (typeof twikoo === 'undefined') {
         setTimeout(initTwikoo, 100);
@@ -41,6 +46,7 @@ const { class: className = '' } = Astro.props;
         el: '#tcomment',
         ...config
       });
+      window.__twikoo_loaded__ = true;
     }
     initTwikoo();
   })();

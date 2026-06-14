@@ -1,5 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content';
+import { getReadingTime } from '../utils/readingTime';
 
 interface Props {
   post: CollectionEntry<'posts'>;
@@ -15,9 +16,8 @@ const rotations = ['-0.3deg', '0deg', '0.3deg'];
 const rotIdx = slug.length % rotations.length;
 const rotateVal = rotations[rotIdx];
 
-// 估算阅读时间
-const wordCount = (post.body || '').length;
-const readTime = Math.max(1, Math.ceil(wordCount / 400));
+// 按中文字数+英文词数精确估算阅读时间
+const readTime = getReadingTime(post.body || '');
 
 const dateStr = data.date.toLocaleDateString('zh-CN', {
   year: 'numeric',

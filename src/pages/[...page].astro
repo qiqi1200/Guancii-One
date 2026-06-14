@@ -6,16 +6,27 @@ import { getCollection } from 'astro:content';
 import site from '../site.json';
 const SITE = site;
 
-const posts = (await getCollection('posts'))
-  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+export async function getStaticPaths({ paginate }) {
+  const all = (await getCollection('posts'))
+    .filter(p => !p.data.draft)
+    .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+  return paginate(all, { pageSize: 6 });
+}
 
-const featured = posts[0];
-const rest = posts.slice(1);
+const { page } = Astro.props;
+const posts = page.data;
 
-// 收集所有标签
-const allTags = [...new Set(posts.flatMap(p => p.data.tags || []))];
+// Featured 文章仅在第 1 页显示
+const featured = page.currentPage === 1 ? posts[0] : null;
+const rest = page.currentPage === 1 ? posts.slice(1) : posts;
+
+// 收集所有标签（从全部文章，非仅当前页）
+const allPosts = (await getCollection('posts')).filter(p => !p.data.draft);
+const allTags = [...new Set(allPosts.flatMap(p => p.data.tags || []))];
+
+const pageTitle = page.currentPage > 1 ? `首页 · 第 ${page.currentPage} 页` : '首页';
 ---
-<BaseLayout title="首页" current="/">
+<BaseLayout title={pageTitle} current="/">
   <!-- Hero 区（UniVibe 涂鸦风格） -->
   <section class="relative pt-24 pb-12 md:pt-32 md:pb-16 px-6 max-w-6xl mx-auto animate-fade-in overflow-hidden">
     <!-- 装饰光晕 -->
@@ -92,7 +103,7 @@ const allTags = [...new Set(posts.flatMap(p => p.data.tags || []))];
         </h2>
 
         {featured && (
-          <div class="mb-8">
+          <div class="mb-8" data-tags={JSON.stringify(featured.data.tags || [])}>
             <PostCard post={featured} featured={true} />
           </div>
         )}
@@ -111,11 +122,44 @@ const allTags = [...new Set(posts.flatMap(p => p.data.tags || []))];
             还没有文章，先去写下第一篇吧 ✍️
           </div>
         )}
+
+        <!-- 分页导航 -->
+        {page.lastPage > 1 && (
+          <nav class="mt-12 flex items-center justify-center gap-4 font-body">
+            {page.currentPage > 1 ? (
+              <a href={page.currentPage === 2 ? '/' : `/${page.currentPage - 1}`}
+                 class="btn-ghost text-sm inline-flex items-center gap-1">
+                <span class="material-symbols-outlined text-sm">arrow_back</span>
+                上一页
+              </a>
+            ) : (
+              <span class="btn-ghost text-sm inline-flex items-center gap-1 opacity-30 pointer-events-none">
+                <span class="material-symbols-outlined text-sm">arrow_back</span>
+                上一页
+              </span>
+            )}
+            <span class="text-sm text-[rgb(var(--fg-soft))]">
+              {page.currentPage} / {page.lastPage}
+            </span>
+            {page.currentPage < page.lastPage ? (
+              <a href={`/${page.currentPage + 1}`}
+                 class="btn-ghost text-sm inline-flex items-center gap-1">
+                下一页
+                <span class="material-symbols-outlined text-sm">arrow_forward</span>
+              </a>
+            ) : (
+              <span class="btn-ghost text-sm inline-flex items-center gap-1 opacity-30 pointer-events-none">
+                下一页
+                <span class="material-symbols-outlined text-sm">arrow_forward</span>
+              </span>
+            )}
+          </nav>
+        )}
       </div>
 
       <div class="hidden lg:block">
         <div class="sticky top-24">
-          <Sidebar posts={posts} />
+          <Sidebar posts={allPosts} />
         </div>
       </div>
     </div>
@@ -125,7 +169,7 @@ const allTags = [...new Set(posts.flatMap(p => p.data.tags || []))];
 <script is:inline>
   // 标签筛选
   const filterBtns = document.querySelectorAll('.tag-filter');
-  const postCards = document.querySelectorAll('.post-grid > div');
+  const postCards = document.querySelectorAll('[data-tags]');
 
   filterBtns.forEach(btn => {
     btn.addEventListener('click', () => {
