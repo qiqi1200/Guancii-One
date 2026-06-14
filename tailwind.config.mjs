@@ -5,7 +5,6 @@ export default {
   theme: {
     extend: {
       colors: {
-        // 浅色调色板
         cream: {
           50: '#fdfcf9',
           100: '#faf7f0',
@@ -20,8 +19,7 @@ export default {
           800: '#0f0f0f'
         },
         accent: {
-          // 淡蓝/淡绿点缀
-          sky: '#7eb8d6',
+          sky: '#2C5F4E',
           mint: '#a8d5b8',
           sand: '#d4b896'
         }
@@ -56,26 +54,28 @@ export default {
             '--tw-prose-body': theme('colors.ink.600'),
             '--tw-prose-headings': theme('colors.ink.700'),
             '--tw-prose-lead': theme('colors.ink.500'),
-            '--tw-prose-links': theme('colors.accent.sky'),
+            '--tw-prose-links': '#2C5F4E',
             '--tw-prose-bold': theme('colors.ink.700'),
             '--tw-prose-counters': theme('colors.ink.400'),
             '--tw-prose-bullets': theme('colors.cream.300'),
             '--tw-prose-hr': theme('colors.cream.200'),
             '--tw-prose-quotes': theme('colors.ink.500'),
-            '--tw-prose-quote-borders': theme('colors.accent.sky'),
+            '--tw-prose-quote-borders': '#2C5F4E',
             '--tw-prose-captions': theme('colors.ink.400'),
-            '--tw-prose-code': theme('colors.ink.700'),
+            '--tw-prose-code': '#2C5F4E',
             '--tw-prose-pre-code': theme('colors.cream.50'),
             '--tw-prose-pre-bg': theme('colors.cream.100'),
             '--tw-prose-th-borders': theme('colors.cream.300'),
             '--tw-prose-td-borders': theme('colors.cream.200'),
             maxWidth: '70ch',
             a: {
+              color: '#2C5F4E',
               textDecoration: 'none',
-              borderBottom: `1px solid ${theme('colors.accent.sky')}`,
+              borderBottom: '1px solid transparent',
               transition: 'all 0.2s',
               '&:hover': {
-                borderBottomColor: 'transparent'
+                color: '#C84A2E',
+                borderBottomColor: '#C84A2E'
               }
             },
             'h1, h2, h3, h4': {

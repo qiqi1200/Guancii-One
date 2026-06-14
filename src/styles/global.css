@@ -7,94 +7,98 @@
      浅色模式（默认）— Material 3 Light + 暖橙
      ───────────────────────────────────────── */
   :root {
+    /* ── 墨绿 + 米白 + 橙红 书卷色板 ── */
+
     /* 主背景与表面 */
-    --bg: 255 248 241;               /* #fff8f1 暖米白 */
-    --bg-soft: 255 241 227;          /* #fff1e3 */
-    --surface: 255 255 255;          /* 纯白卡片 */
-    --surface-variant: 244 212 190;  /* #f4d4be */
+    --bg: 245 241 232;               /* #F5F1E8 米白 */
+    --bg-soft: 237 232 220;          /* #EDE8DC */
+    --surface: 250 248 244;          /* #FAF8F4 卡片 */
+    --surface-variant: 224 218 203;  /* #E0DACB */
 
     /* 文字色 */
-    --fg: 35 25 21;                  /* #231915 深棕黑 */
-    --fg-soft: 83 67 60;             /* #53433c */
+    --fg: 44 44 44;                  /* #2C2C2C 深灰 — 舒适阅读 */
+    --fg-soft: 102 102 102;          /* #666 次要文字 */
     --fg-on-primary: 255 255 255;    /* 主色按钮上的文字 */
 
-    /* 主色调（primary）— 焦糖/暖橙 */
-    --primary: 156 63 0;             /* #9c3f00 深焦糖 */
-    --primary-container: 255 220 200;/* #ffdcc8 暖粉容器 */
-    --primary-light: 255 107 0;      /* #ff6b00 强调亮橙 */
+    /* 主色调 — 墨绿（沉静、文人气） */
+    --primary: 44 95 78;             /* #2C5F4E 墨绿 */
+    --primary-container: 212 232 222;/* #D4E8DE 浅墨绿容器 */
+    --primary-light: 58 122 106;     /* #3A7A64 hover 亮绿 */
 
-    /* 次色调 — 蓝 */
-    --secondary: 0 26 65;            /* #001a41 */
-    --secondary-container: 221 225 255;/* #dde1ff */
+    /* 强调色 — 橙红（hover / 高亮 / 数字） */
+    --secondary: 200 74 46;          /* #C84A2E 橙红 */
+    --secondary-container: 250 221 214;/* #FADDD6 */
 
-    /* 第三色 — 绿 */
-    --tertiary: 29 54 26;            /* #1d361a */
-    --tertiary-container: 204 235 194;/* #ccebc2 */
-    --sage: 58 107 53;               /* #3a6b35 */
+    /* 第三色 — 暖茶/大地 */
+    --tertiary: 112 96 78;           /* #70604E */
+    --tertiary-container: 222 212 198;/* #DED4C6 */
+    --sage: 132 160 120;             /* #84A078 点缀 */
 
     /* 描边与分割线 */
-    --border: 215 195 184;           /* #d7c3b8 */
-    --outline: 133 115 107;          /* #85736b */
+    --border: 232 228 218;           /* #E8E4DA */
+    --outline: 184 178 166;          /* #B8B2A6 */
 
     /* 液态玻璃 (浅色) */
-    --glass-bg: 255 255 255;
-    --glass-border: 215 195 184;
-    --glass-shadow: 0 8px 32px 0 rgba(156, 63, 0, 0.08);
+    --glass-bg: 250 248 244;
+    --glass-border: 232 228 218;
+    --glass-shadow: 0 8px 32px 0 rgba(44, 95, 78, 0.08);
 
-    /* 鼠标光晕色 (浅色：暖橙) */
-    --blob-color: 255 182 147;
+    /* 鼠标光晕色 — 橙红柔光 */
+    --blob-color: 200 74 46;
 
-    /* doodle 下划线色（与 primary-light 一致）*/
-    --doodle-color: 255 107 0;
+    /* doodle 下划线 */
+    --doodle-color: 200 74 46;
 
     /* prose 主题 */
-    --prose-fg: 35 25 21;
-    --prose-soft: 83 67 60;
-    --prose-pre-bg: 255 241 227;
-    --prose-code-bg: 255 230 209;
-    --prose-border: 244 212 190;
+    --prose-fg: 44 44 44;
+    --prose-soft: 102 102 102;
+    --prose-pre-bg: 237 232 220;
+    --prose-code-bg: 224 218 203;
+    --prose-border: 224 218 203;
   }
 
   /* ─────────────────────────────────────────
-     暗色模式 — UniVibe Material 3 Dark
+     暗色模式 — UniVibe 深石青 + 浅墨绿
      ───────────────────────────────────────── */
   .dark {
-    --bg: 17 19 28;                  /* #11131c */
-    --bg-soft: 29 31 41;             /* #1d1f29 */
-    --surface: 29 31 41;
-    --surface-variant: 50 52 62;     /* #32343e */
+    --bg: 26 42 42;                  /* #1A2A2A 深石青 */
+    --bg-soft: 34 52 52;             /* #223434 */
+    --surface: 30 46 46;             /* #1E2E2E */
+    --surface-variant: 42 58 58;     /* #2A3A3A */
 
-    --fg: 225 225 239;               /* #e1e1ef */
-    --fg-soft: 226 191 176;          /* #e2bfb0 */
-    --fg-on-primary: 86 31 0;        /* #561f00 */
+    --fg: 232 228 218;               /* #E8E4DA 米白 */
+    --fg-soft: 168 162 152;          /* #A8A298 浅灰 */
+    --fg-on-primary: 26 42 42;       /* #1A2A2A */
 
-    --primary: 255 182 147;          /* #ffb693 */
-    --primary-container: 87 32 0;    /* #572000 */
-    --primary-light: 255 182 147;
+    /* 主色调 — 浅墨绿 */
+    --primary: 91 168 138;           /* #5BA88A */
+    --primary-container: 44 95 78;   /* #2C5F4E */
+    --primary-light: 109 196 160;    /* #6DC4A0 */
 
-    --secondary: 184 195 255;        /* #b8c3ff */
-    --secondary-container: 0 67 235; /* #0043eb */
+    /* 强调色 — 暖橙 */
+    --secondary: 232 116 62;         /* #E8743E */
+    --secondary-container: 92 42 18; /* #5C2A12 */
 
-    --tertiary: 177 207 167;         /* #b1cfa7 */
-    --tertiary-container: 132 161 124;/* #84a17c */
-    --sage: 177 207 167;
+    --tertiary: 178 168 152;         /* #B2A898 */
+    --tertiary-container: 82 72 62;  /* #52483E */
+    --sage: 132 160 120;             /* #84A078 */
 
-    --border: 90 65 54;              /* #5a4136 */
-    --outline: 169 138 125;          /* #a98a7d */
+    --border: 58 74 74;              /* #3A4A4A */
+    --outline: 106 122 122;          /* #6A7A7A */
 
-    --glass-bg: 29 31 41;
-    --glass-border: 90 65 54;
-    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    --glass-bg: 30 46 46;
+    --glass-border: 58 74 74;
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
 
-    --blob-color: 255 182 147;
+    --blob-color: 232 116 62;
 
-    --doodle-color: 255 182 147;
+    --doodle-color: 232 116 62;
 
-    --prose-fg: 225 225 239;
-    --prose-soft: 226 191 176;
-    --prose-pre-bg: 29 31 41;
-    --prose-code-bg: 50 52 62;
-    --prose-border: 50 52 62;
+    --prose-fg: 232 228 218;
+    --prose-soft: 168 162 152;
+    --prose-pre-bg: 34 52 52;
+    --prose-code-bg: 42 58 58;
+    --prose-border: 42 58 58;
   }
 
   html {
@@ -109,12 +113,24 @@
   }
 
   ::selection {
-    background: rgb(var(--primary-light));
+    background: rgb(var(--primary));
     color: rgb(var(--fg-on-primary));
   }
   .dark ::selection {
     background: rgb(var(--primary));
     color: rgb(var(--bg));
+  }
+
+  /* 链接：默认墨绿，hover 橙红 + 下划线 */
+  a {
+    color: rgb(var(--primary));
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+  a:hover {
+    color: rgb(var(--secondary));
+    text-decoration: underline;
+    text-underline-offset: 3px;
   }
 
   /* Material Symbols 图标 */
@@ -174,12 +190,12 @@
     left: 0;
     width: 100%;
     height: 8px;
-    background-image: url("data:image/svg+xml,%3Csvg width='100' height='8' viewBox='0 0 100 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M2 6C20 3 40 7 60 4C80 1 98 5 98 5' stroke='%23ff6b00' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg width='100' height='8' viewBox='0 0 100 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M2 6C20 3 40 7 60 4C80 1 98 5 98 5' stroke='%23C84A2E' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-size: 100% 100%;
   }
   .dark .doodle-underline::after {
-    background-image: url("data:image/svg+xml,%3Csvg width='100' height='8' viewBox='0 0 100 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M2 6C20 3 40 7 60 4C80 1 98 5 98 5' stroke='%23ffb693' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg width='100' height='8' viewBox='0 0 100 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M2 6C20 3 40 7 60 4C80 1 98 5 98 5' stroke='%23E8743E' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E");
   }
 
   /* ============= 磁吸悬浮 ============= */
@@ -272,7 +288,7 @@
   }
   .card-hover:hover {
     transform: translateY(-2px);
-    box-shadow: 0 12px 24px -8px rgba(156, 63, 0, 0.15);
+    box-shadow: 0 12px 24px -8px rgba(44, 95, 78, 0.12);
   }
   .dark .card-hover:hover {
     box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
@@ -310,15 +326,15 @@
 
   .btn-primary {
     @apply btn;
-    background: rgb(var(--primary-light));
-    color: rgb(var(--fg-on-primary));
-    font-weight: 600;
-    box-shadow: 0 4px 14px rgba(var(--primary-light), 0.3);
-  }
-  .btn-primary:hover {
     background: rgb(var(--primary));
     color: rgb(var(--fg-on-primary));
-    box-shadow: 0 6px 20px rgba(var(--primary-light), 0.5);
+    font-weight: 600;
+    box-shadow: 0 4px 14px rgba(var(--primary), 0.3);
+  }
+  .btn-primary:hover {
+    background: #1F4438;
+    color: rgb(var(--fg-on-primary));
+    box-shadow: 0 6px 20px rgba(var(--primary), 0.5);
   }
 
   .btn-ghost {
