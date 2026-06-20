@@ -450,7 +450,9 @@
       <div class="delete-section" id="delete-section">
         <div class="warning">⚠️ 危险操作：删除后将无法恢复。</div>
         <div class="delete-confirm-row">
-          <button class="btn btn-danger btn-sm" id="btn-delete">🗑️ 删除此文章</button>
+          <input type="checkbox" id="delete-confirm">
+          <label for="delete-confirm">确认删除</label>
+          <button class="btn btn-danger btn-sm" id="btn-delete" disabled>🗑️ 删除此文章</button>
         </div>
       </div>
     </div>
@@ -845,6 +847,8 @@
       $('editor-desc').value = '';
       $('editor-cover').value = '';
       $('editor-draft').checked = false;
+      $('delete-confirm').checked = false;
+      $('btn-delete').disabled = true;
       $('save-status').textContent = '';
       const coverPreview = $('cover-preview');
       coverPreview.classList.remove('show');
@@ -970,6 +974,11 @@
       }
     });
 
+    // ---------- Delete confirmation checkbox ----------
+    $('delete-confirm').addEventListener('change', () => {
+      $('btn-delete').disabled = !$('delete-confirm').checked;
+    });
+
     // ---------- Save ----------
     async function savePost() {
       const title = $('editor-title').value.trim();
@@ -1089,8 +1098,13 @@
 
     // ---------- Delete ----------
     $('btn-delete').addEventListener('click', async () => {
-      const slug = $('btn-delete').dataset.slug;
-      if (!slug) return;
+      const slug = currentSlug || $('btn-delete').dataset.slug;
+      // 诊断：确认点击是否触发、slug 是否有值（定位"点击没反应"问题）
+      toast(`[诊断] 删除点击触发，slug="${slug || '(空)'}"`, 'info');
+      if (!slug) {
+        toast('删除失败：未找到文章 slug，请返回列表重新打开文章', 'error');
+        return;
+      }
 
       const confirmed = await showModal(
         '确认删除',
