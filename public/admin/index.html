@@ -518,7 +518,9 @@
     }
 
     async function apiGet(path) {
-      const resp = await fetch(`${GITHUB_API}/repos/${config.owner}/${config.repo}/${path}`, { headers: apiHeaders() });
+      const baseUrl = `${GITHUB_API}/repos/${config.owner}/${config.repo}`;
+      const url = path ? `${baseUrl}/${path}` : baseUrl;
+      const resp = await fetch(url, { headers: apiHeaders() });
       if (!resp.ok) {
         const err = await resp.json().catch(() => ({}));
         throw new Error(err.message || `HTTP ${resp.status}`);
