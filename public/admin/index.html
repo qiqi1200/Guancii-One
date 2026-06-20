@@ -1109,10 +1109,17 @@
       if (!confirmed) return;
 
       const post = postsCache.find(p => p.slug === slug);
-      const sha = post ? post.sha : null;
+      const filePath = `contents/src/content/posts/${encodeURIComponent(slug)}.md`;
 
       try {
-        await apiDelete(`contents/src/content/posts/${encodeURIComponent(slug)}.md`, {
+        // Fetch a fresh SHA so a stale cached SHA doesn't cause 409/422
+        let sha = post ? post.sha : null;
+        try {
+          const fresh = await apiGet(`${filePath}?ref=${config.branch}`);
+          sha = fresh.sha;
+        } catch { /* file may already be gone — proceed with cached sha */ }
+
+        await apiDelete(filePath, {
           message: `删除文章: ${post?.title || slug}`,
           sha: sha,
           branch: config.branch,
@@ -1122,7 +1129,16 @@
         showView('dashboard');
         await loadPosts();
       } catch (err) {
-        toast(`删除失败: ${err.message}`, 'error');
+        const msg = String(err.message || '');
+        if (/not found|404/i.test(msg)) {
+          toast('删除失败：文件不存在或路径不匹配（404）。可能是 slug 含特殊字符，请刷新列表后重试。', 'error');
+        } else if (/409|conflict|does not match/i.test(msg)) {
+          toast('删除失败：SHA 不匹配（409）。请刷新文章列表后重试。', 'error');
+        } else if (/422|sha/i.test(msg)) {
+          toast('删除失败：缺少 SHA（422）。请刷新文章列表后重试。', 'error');
+        } else {
+          toast(`删除失败: ${msg}`, 'error');
+        }
       }
     });
 
