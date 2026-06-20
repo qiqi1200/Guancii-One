@@ -1071,8 +1071,9 @@
         $('delete-section').style.display = 'block';
         $('save-status').textContent = `已保存: ${title}`;
 
-        // Refresh posts
+        // Refresh posts and return to dashboard
         await loadPosts();
+        showView('dashboard');
       } catch (err) {
         const msg = String(err.message || '');
         if (/not found|404/i.test(msg)) {
