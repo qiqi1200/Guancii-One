@@ -573,9 +573,21 @@
         const kv = line.match(/^(\w+):\s*(.*)$/);
         if (kv) {
           currentKey = kv[1];
-          fm[currentKey] = kv[2].replace(/^'(.*)'$/, '$1').replace(/^"(.*)"$/, '$1');
+          const raw = kv[2];
+          // Parse inline YAML array: ['a', 'b'] or [a, b]
+          const arrMatch = raw.match(/^\[(.*)\]$/);
+          if (arrMatch) {
+            fm[currentKey] = arrMatch[1]
+              .split(',')
+              .map(s => s.trim().replace(/^['"](.*)['"]$/, '$1'))
+              .filter(Boolean);
+          } else if (raw === 'true' || raw === 'false') {
+            fm[currentKey] = raw === 'true';
+          } else {
+            fm[currentKey] = raw.replace(/^'(.*)'$/, '$1').replace(/^"(.*)"$/, '$1');
+          }
         } else if (currentKey && line.trim().startsWith('- ')) {
-          // array continuation
+          // array continuation (multi-line YAML array)
           const val = line.trim().slice(2).replace(/^'(.*)'$/, '$1').replace(/^"(.*)"$/, '$1');
           if (Array.isArray(fm[currentKey])) {
             fm[currentKey].push(val);
