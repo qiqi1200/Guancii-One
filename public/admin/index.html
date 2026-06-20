@@ -554,12 +554,23 @@
       return resp.json();
     }
 
-    // UTF-8 safe base64 for browser
+    // UTF-8 safe base64 (modern TextEncoder/TextDecoder)
     function utf8ToB64(str) {
-      return btoa(unescape(encodeURIComponent(str)));
+      const encoder = new TextEncoder();
+      const bytes = encoder.encode(str);
+      let binary = '';
+      for (let i = 0; i < bytes.length; i++) {
+        binary += String.fromCharCode(bytes[i]);
+      }
+      return btoa(binary);
     }
     function b64ToUtf8(b64) {
-      return decodeURIComponent(escape(atob(b64.replace(/\n/g, ''))));
+      const binary = atob(b64.replace(/\n/g, ''));
+      const bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) {
+        bytes[i] = binary.charCodeAt(i);
+      }
+      return new TextDecoder().decode(bytes);
     }
 
     // ---------- Frontmatter ----------
@@ -1038,13 +1049,15 @@
       const btn2 = $('btn-save-bottom');
       [btn, btn2].forEach(b => { b.disabled = true; b.textContent = '⏳ 保存中...'; });
 
+      const payload = {
+        message,
+        content: utf8ToB64(fileContent),
+        branch: config.branch,
+      };
+      if (sha) payload.sha = sha;
+
       try {
-        await apiPut(path, {
-          message,
-          content: utf8ToB64(fileContent),
-          sha: sha,
-          branch: config.branch,
-        });
+        await apiPut(path, payload);
 
         toast(`✅ 已保存！${draft ? '(草稿)' : ''} 部署进行中...`, 'success');
         currentSlug = slug;
