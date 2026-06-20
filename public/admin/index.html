@@ -450,9 +450,7 @@
       <div class="delete-section" id="delete-section">
         <div class="warning">⚠️ 危险操作：删除后将无法恢复。</div>
         <div class="delete-confirm-row">
-          <input type="checkbox" id="delete-confirm">
-          <label for="delete-confirm">确认删除</label>
-          <button class="btn btn-danger btn-sm" id="btn-delete" disabled>🗑️ 删除此文章</button>
+          <button class="btn btn-danger btn-sm" id="btn-delete">🗑️ 删除此文章</button>
         </div>
       </div>
     </div>
@@ -847,8 +845,6 @@
       $('editor-desc').value = '';
       $('editor-cover').value = '';
       $('editor-draft').checked = false;
-      $('delete-confirm').checked = false;
-      $('btn-delete').disabled = true;
       $('save-status').textContent = '';
       const coverPreview = $('cover-preview');
       coverPreview.classList.remove('show');
@@ -972,11 +968,6 @@
       } else {
         preview.classList.remove('show');
       }
-    });
-
-    // ---------- Delete confirmation checkbox ----------
-    $('delete-confirm').addEventListener('change', () => {
-      $('btn-delete').disabled = !$('delete-confirm').checked;
     });
 
     // ---------- Save ----------
