@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>博客管理后台 — guancii</title>
+
+  <!-- EasyMDE -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
+  <!-- Highlight.js for code in preview -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+
+  <style>
+    /* ======================= Reset & Variables ======================= */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --green: #2d5a27;
+      --green-light: #3d7a35;
+      --green-dark: #1e3d1a;
+      --cream: #f5f0e8;
+      --cream-dark: #e8e0d4;
+      --orange: #c94f3d;
+      --orange-light: #e05a45;
+      --gray: #6b7280;
+      --gray-light: #9ca3af;
+      --gray-bg: #f9f7f4;
+      --border: #e0d8cc;
+      --radius: 8px;
+      --shadow: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
+      --shadow-lg: 0 4px 16px rgba(0,0,0,.1);
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+      --transition: .2s ease;
+    }
+    html { font-size: 15px; }
+    body {
+      font-family: var(--font);
+      background: var(--gray-bg);
+      color: #2c2c2c;
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+    a { color: var(--green); text-decoration: none; }
+    a:hover { color: var(--orange); }
+
+    /* ======================= Utility ======================= */
+    .hidden { display: none !important; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 18px; border: none; border-radius: var(--radius);
+      font-size: .9rem; font-weight: 500; cursor: pointer;
+      transition: all var(--transition);
+      font-family: inherit;
+    }
+    .btn:disabled { opacity: .5; cursor: not-allowed; }
+    .btn-primary {
+      background: var(--green); color: #fff;
+    }
+    .btn-primary:hover:not(:disabled) { background: var(--green-light); }
+    .btn-danger {
+      background: var(--orange); color: #fff;
+    }
+    .btn-danger:hover:not(:disabled) { background: var(--orange-light); }
+    .btn-ghost {
+      background: transparent; color: var(--gray);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover { background: var(--cream); color: var(--green-dark); border-color: var(--green); }
+    .btn-sm { padding: 5px 12px; font-size: .82rem; }
+
+    .input, .textarea, .select {
+      width: 100%; padding: 9px 12px; border: 1px solid var(--border);
+      border-radius: var(--radius); font-size: .9rem; font-family: inherit;
+      background: #fff; transition: border-color var(--transition);
+    }
+    .input:focus, .textarea:focus { outline: none; border-color: var(--green); box-shadow: 0 0 0 3px rgba(45,90,39,.12); }
+    .textarea { resize: vertical; min-height: 80px; }
+
+    .badge {
+      display: inline-block; padding: 2px 10px; border-radius: 20px;
+      font-size: .75rem; font-weight: 500;
+    }
+    .badge-draft { background: #fef3c7; color: #92400e; }
+    .badge-published { background: #d1fae5; color: #065f46; }
+
+    /* ====================== Toast ======================== */
+    #toast-container {
+      position: fixed; top: 20px; right: 20px; z-index: 9999;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .toast {
+      padding: 12px 20px; border-radius: var(--radius);
+      color: #fff; font-size: .88rem; font-weight: 500;
+      box-shadow: var(--shadow-lg); animation: slideIn .3s ease;
+      max-width: 380px;
+    }
+    .toast-success { background: var(--green); }
+    .toast-error { background: var(--orange); }
+    .toast-info { background: #2563eb; }
+    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+    /* ====================== Views ======================== */
+    .view { display: none; }
+    .view.active { display: block; }
+
+    /* ====================== Login ======================== */
+    #view-login {
+      display: flex; align-items: center; justify-content: center;
+      min-height: 100vh; padding: 20px;
+    }
+    #view-login.active { display: flex; }
+    .login-card {
+      background: #fff; padding: 40px; border-radius: 12px;
+      box-shadow: var(--shadow-lg); width: 100%; max-width: 440px;
+    }
+    .login-card h1 {
+      font-size: 1.6rem; color: var(--green-dark); margin-bottom: 4px;
+    }
+    .login-card p { color: var(--gray); margin-bottom: 24px; font-size: .9rem; }
+    .login-card .form-group { margin-bottom: 16px; }
+    .login-card label { display: block; font-size: .82rem; font-weight: 500; color: #555; margin-bottom: 4px; }
+    .login-card .btn { width: 100%; justify-content: center; padding: 11px; margin-top: 8px; }
+    .login-card .help-link { display: block; text-align: center; margin-top: 12px; font-size: .82rem; color: var(--gray-light); }
+    .login-card .help-link:hover { color: var(--green); }
+    .login-status { margin-top: 12px; padding: 10px 14px; border-radius: var(--radius); font-size: .85rem; display: none; }
+    .login-status.error { display: block; background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+    .login-status.success { display: block; background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
+
+    /* ====================== Dashboard ======================== */
+    .admin-header {
+      background: #fff; border-bottom: 1px solid var(--border);
+      padding: 0 24px; height: 56px; display: flex;
+      align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .admin-header .brand { font-weight: 700; font-size: 1rem; color: var(--green-dark); }
+    .admin-header .brand small { font-weight: 400; color: var(--gray-light); font-size: .82rem; margin-left: 4px; }
+    .admin-header .header-actions { display: flex; align-items: center; gap: 12px; }
+    .admin-header .user-info { font-size: .82rem; color: var(--gray); }
+
+    .dashboard-content { max-width: 1200px; margin: 0 auto; padding: 24px; }
+
+    .stats-row {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 16px; margin-bottom: 24px;
+    }
+    .stat-card {
+      background: #fff; border-radius: var(--radius); padding: 16px 20px;
+      box-shadow: var(--shadow);
+    }
+    .stat-card .num { font-size: 1.6rem; font-weight: 700; color: var(--green-dark); }
+    .stat-card .label { font-size: .8rem; color: var(--gray); margin-top: 2px; }
+
+    .toolbar {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 12px; margin-bottom: 16px;
+    }
+    .toolbar .search-box {
+      flex: 1; min-width: 200px; max-width: 360px; position: relative;
+    }
+    .toolbar .search-box input { padding-left: 32px; }
+    .toolbar .search-box .icon {
+      position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+      color: var(--gray-light); font-style: normal;
+    }
+
+    .posts-table {
+      background: #fff; border-radius: var(--radius); box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .posts-table table { width: 100%; border-collapse: collapse; }
+    .posts-table th {
+      text-align: left; padding: 12px 16px; font-size: .8rem;
+      font-weight: 600; color: var(--gray); text-transform: uppercase;
+      letter-spacing: .5px; border-bottom: 1px solid var(--border);
+      background: var(--cream);
+    }
+    .posts-table td {
+      padding: 14px 16px; border-bottom: 1px solid var(--cream-dark);
+      font-size: .88rem; vertical-align: middle;
+    }
+    .posts-table tr:last-child td { border-bottom: none; }
+    .posts-table tr:hover td { background: #faf8f5; }
+    .posts-table .post-title { font-weight: 600; color: var(--green-dark); cursor: pointer; }
+    .posts-table .post-title:hover { color: var(--orange); }
+    .posts-table .post-date { color: var(--gray); font-size: .82rem; white-space: nowrap; }
+    .posts-table .post-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+    .posts-table .post-tags .tag {
+      padding: 1px 8px; border-radius: 4px; font-size: .72rem;
+      background: var(--gray-bg); color: var(--gray);
+    }
+    .posts-table .actions { display: flex; gap: 6px; }
+    .empty-state {
+      text-align: center; padding: 60px 20px; color: var(--gray-light);
+    }
+    .empty-state .big-icon { font-size: 3rem; margin-bottom: 12px; }
+    .empty-state p { font-size: .95rem; }
+
+    /* ====================== Editor ======================== */
+    .editor-topbar {
+      background: #fff; border-bottom: 1px solid var(--border);
+      padding: 0 24px; height: 52px; display: flex;
+      align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .editor-topbar .left { display: flex; align-items: center; gap: 12px; }
+    .editor-topbar .back-btn {
+      background: none; border: none; cursor: pointer; font-size: .9rem;
+      color: var(--gray); font-family: inherit; display: flex; align-items: center; gap: 4px;
+    }
+    .editor-topbar .back-btn:hover { color: var(--green-dark); }
+    .editor-topbar .save-status { font-size: .8rem; color: var(--gray-light); }
+
+    .editor-body { max-width: 1000px; margin: 0 auto; padding: 24px; }
+
+    .editor-field { margin-bottom: 16px; }
+    .editor-field label {
+      display: block; font-size: .8rem; font-weight: 600; color: #555;
+      margin-bottom: 4px;
+    }
+    .editor-field .slug-row { display: flex; align-items: center; gap: 8px; }
+    .editor-field .slug-row .slug-preview {
+      font-size: .8rem; color: var(--gray-light); white-space: nowrap;
+    }
+    .editor-field .slug-row .input { flex: 1; }
+    .editor-field-hint { font-size: .75rem; color: var(--gray-light); margin-top: 3px; }
+
+    .editor-title-input {
+      font-size: 1.3rem; font-weight: 700; padding: 12px 14px;
+      width: 100%; border: 1px solid var(--border); border-radius: var(--radius);
+      font-family: inherit; transition: border-color var(--transition);
+    }
+    .editor-title-input:focus { outline: none; border-color: var(--green); box-shadow: 0 0 0 3px rgba(45,90,39,.12); }
+
+    .field-row {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+    }
+    @media (max-width: 640px) { .field-row { grid-template-columns: 1fr; } }
+
+    .cover-preview {
+      max-width: 200px; max-height: 100px; border-radius: 4px;
+      border: 1px solid var(--border); margin-top: 6px; display: none;
+    }
+    .cover-preview.show { display: block; }
+
+    .checkbox-row {
+      display: flex; align-items: center; gap: 8px;
+    }
+    .checkbox-row input[type="checkbox"] {
+      width: 18px; height: 18px; accent-color: var(--green); cursor: pointer;
+    }
+    .checkbox-row label { cursor: pointer; }
+
+    /* EasyMDE overrides */
+    .editor-body .EasyMDEContainer { border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+    .editor-body .EasyMDEContainer .editor-toolbar { border-bottom: 1px solid var(--border); background: var(--gray-bg); border-radius: var(--radius) var(--radius) 0 0; }
+    .editor-body .EasyMDEContainer .CodeMirror { border: none; min-height: 400px; }
+    .editor-body .EasyMDEContainer .editor-preview { background: #fff; }
+    .editor-body .EasyMDEContainer .editor-preview h1, .editor-body .EasyMDEContainer .editor-preview h2, .editor-body .EasyMDEContainer .editor-preview h3 { color: var(--green-dark); }
+    .editor-body .EasyMDEContainer .editor-preview code { background: var(--gray-bg); padding: 2px 6px; border-radius: 3px; font-size: .85em; }
+    .editor-body .EasyMDEContainer .editor-preview pre code { background: none; }
+
+    .editor-actions { margin-top: 20px; display: flex; gap: 12px; flex-wrap: wrap; }
+    .delete-section { margin-top: 32px; padding-top: 20px; border-top: 1px solid var(--border); }
+    .delete-section .warning { font-size: .82rem; color: var(--gray); margin-bottom: 8px; }
+    .delete-section .delete-confirm-row { display: flex; align-items: center; gap: 8px; }
+
+    /* ====================== Modal ======================== */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 1000;
+      display: none; align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal-box {
+      background: #fff; border-radius: 12px; padding: 28px; max-width: 440px;
+      width: 100%; box-shadow: var(--shadow-lg);
+    }
+    .modal-box h3 { font-size: 1.1rem; margin-bottom: 8px; }
+    .modal-box p { font-size: .9rem; color: var(--gray); margin-bottom: 20px; }
+    .modal-box .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+
+    /* ====================== Responsive ======================== */
+    @media (max-width: 768px) {
+      .dashboard-content { padding: 16px; }
+      .editor-body { padding: 16px; }
+      .login-card { padding: 28px 20px; }
+      .posts-table th:nth-child(3), .posts-table td:nth-child(3) { display: none; }
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+      .admin-header { padding: 0 16px; }
+      .editor-topbar { padding: 0 16px; }
+      .field-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ====================== Toast Container ======================== -->
+  <div id="toast-container"></div>
+
+  <!-- ====================== Confirm Modal ======================== -->
+  <div class="modal-overlay" id="confirm-modal">
+    <div class="modal-box">
+      <h3 id="modal-title">确认</h3>
+      <p id="modal-message">确定要执行此操作吗？</p>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" id="modal-cancel">取消</button>
+        <button class="btn btn-danger" id="modal-confirm">确认删除</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================== View: Login ======================== -->
+  <div id="view-login" class="view active">
+    <div class="login-card">
+      <h1>📝 博客管理后台</h1>
+      <p>通过 GitHub API 管理你的博客文章</p>
+      <form id="login-form" autocomplete="off">
+        <div class="form-group">
+          <label for="token">GitHub Personal Access Token</label>
+          <input type="password" id="token" class="input" placeholder="ghp_xxxxxxxxxxxx" required>
+        </div>
+        <div class="form-group">
+          <label for="owner">仓库所有者</label>
+          <input type="text" id="owner" class="input" value="qiqi1200" placeholder="GitHub 用户名">
+        </div>
+        <div class="form-group">
+          <label for="repo">仓库名</label>
+          <input type="text" id="repo" class="input" value="Guancii-One" placeholder="仓库名称">
+        </div>
+        <div class="form-group">
+          <label for="branch">分支</label>
+          <input type="text" id="branch" class="input" value="main" placeholder="main">
+        </div>
+        <button type="submit" class="btn btn-primary">🔗 连接 GitHub</button>
+      </form>
+      <div class="login-status" id="login-status"></div>
+      <a class="help-link" href="https://github.com/settings/tokens?description=guancii-blog-admin&scopes=repo" target="_blank" rel="noopener">如何创建 Token？ →</a>
+    </div>
+  </div>
+
+  <!-- ====================== View: Dashboard ======================== -->
+  <div id="view-dashboard" class="view">
+    <header class="admin-header">
+      <div class="brand">📝 guancii 博客 <small>管理后台</small></div>
+      <div class="header-actions">
+        <span class="user-info" id="header-user"></span>
+        <button class="btn btn-ghost btn-sm" id="btn-refresh">🔄 刷新</button>
+        <button class="btn btn-ghost btn-sm" id="btn-logout">退出</button>
+      </div>
+    </header>
+
+    <div class="dashboard-content">
+      <div class="stats-row" id="stats-row">
+        <div class="stat-card"><div class="num" id="stat-total">-</div><div class="label">全部文章</div></div>
+        <div class="stat-card"><div class="num" id="stat-published">-</div><div class="label">已发布</div></div>
+        <div class="stat-card"><div class="num" id="stat-drafts">-</div><div class="label">草稿</div></div>
+      </div>
+
+      <div class="toolbar">
+        <button class="btn btn-primary" id="btn-new-post">✏️ 新建文章</button>
+        <div class="search-box">
+          <i class="icon">🔍</i>
+          <input type="text" class="input" id="search-input" placeholder="搜索文章标题...">
+        </div>
+      </div>
+
+      <div class="posts-table" id="posts-list">
+        <table>
+          <thead>
+            <tr>
+              <th>标题</th>
+              <th>日期</th>
+              <th>标签</th>
+              <th>状态</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="posts-tbody">
+            <!-- populated by JS -->
+          </tbody>
+        </table>
+        <div class="empty-state hidden" id="empty-state">
+          <div class="big-icon">📭</div>
+          <p>还没有文章，点击「新建文章」开始写作吧</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================== View: Editor ======================== -->
+  <div id="view-editor" class="view">
+    <div class="editor-topbar">
+      <div class="left">
+        <button class="back-btn" id="editor-back">← 返回</button>
+        <span class="save-status" id="save-status"></span>
+      </div>
+      <div>
+        <button class="btn btn-primary" id="btn-save">💾 保存到 GitHub</button>
+      </div>
+    </div>
+
+    <div class="editor-body">
+      <input type="text" class="editor-title-input" id="editor-title" placeholder="文章标题">
+
+      <div class="editor-field" style="margin-top:16px;">
+        <div class="slug-row">
+          <label>URL 标识 (slug)</label>
+          <span class="slug-preview" id="slug-preview">blog.260607.best/posts/</span>
+          <input type="text" class="input" id="editor-slug" placeholder="my-article-slug">
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="editor-field">
+          <label for="editor-date">日期</label>
+          <input type="date" class="input" id="editor-date">
+        </div>
+        <div class="editor-field">
+          <label for="editor-tags">标签（逗号分隔）</label>
+          <input type="text" class="input" id="editor-tags" placeholder="随笔, AI, 生活">
+        </div>
+      </div>
+
+      <div class="editor-field">
+        <label for="editor-desc">文章摘要</label>
+        <textarea class="textarea" id="editor-desc" rows="2" placeholder="简短描述文章内容..."></textarea>
+      </div>
+
+      <div class="editor-field">
+        <label for="editor-cover">封面图片 URL</label>
+        <input type="url" class="input" id="editor-cover" placeholder="https://...">
+        <img class="cover-preview" id="cover-preview" alt="封面预览">
+      </div>
+
+      <div class="editor-field">
+        <div class="checkbox-row">
+          <input type="checkbox" id="editor-draft">
+          <label for="editor-draft">存为草稿（不发布）</label>
+        </div>
+      </div>
+
+      <div class="editor-field">
+        <label>文章正文（Markdown）</label>
+        <textarea id="editor-body-text"></textarea>
+      </div>
+
+      <div class="editor-actions">
+        <button class="btn btn-primary" id="btn-save-bottom">💾 保存到 GitHub</button>
+      </div>
+
+      <div class="delete-section">
+        <div class="warning">⚠️ 危险操作：删除后将无法恢复。</div>
+        <div class="delete-confirm-row">
+          <input type="checkbox" id="delete-confirm">
+          <label for="delete-confirm">确认删除</label>
+          <button class="btn btn-danger btn-sm" id="btn-delete" disabled>🗑️ 删除此文章</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================== Scripts ======================== -->
+  <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>
+    /* =================================================================
+       Blog Admin — GitHub API Client
+       ================================================================= */
+
+    // ---------- State ----------
+    let config = { token: '', owner: '', repo: '', branch: '' };
+    let postsCache = [];
+    let currentSlug = null; // slug of the post being edited
+    let originalFrontmatter = null; // for detecting unsaved changes
+    let originalBody = '';
+    let easyMDE = null;
+
+    const GITHUB_API = 'https://api.github.com';
+
+    // ---------- DOM refs ----------
+    const $ = id => document.getElementById(id);
+    const views = {
+      login: $('view-login'),
+      dashboard: $('view-dashboard'),
+      editor: $('view-editor'),
+    };
+
+    // ---------- Toast ----------
+    function toast(msg, type = 'success') {
+      const c = $('toast-container');
+      const el = document.createElement('div');
+      el.className = `toast toast-${type}`;
+      el.textContent = msg;
+      c.appendChild(el);
+      setTimeout(() => { el.style.opacity = '0'; el.style.transition = 'opacity .3s'; setTimeout(() => el.remove(), 300); }, 3000);
+    }
+
+    // ---------- Modal ----------
+    function showModal(title, msg, confirmLabel = '确认') {
+      return new Promise((resolve) => {
+        const modal = $('confirm-modal');
+        $('modal-title').textContent = title;
+        $('modal-message').textContent = msg;
+        $('modal-confirm').textContent = confirmLabel;
+        modal.classList.add('show');
+        const cleanup = () => { modal.classList.remove('show'); };
+        $('modal-cancel').onclick = () => { cleanup(); resolve(false); };
+        $('modal-confirm').onclick = () => { cleanup(); resolve(true); };
+        modal.onclick = (e) => { if (e.target === modal) { cleanup(); resolve(false); } };
+      });
+    }
+
+    // ---------- GitHub API helpers ----------
+    function apiHeaders() {
+      return {
+        'Authorization': `Bearer ${config.token}`,
+        'Accept': 'application/vnd.github.v3+json',
+      };
+    }
+
+    async function apiGet(path) {
+      const resp = await fetch(`${GITHUB_API}/repos/${config.owner}/${config.repo}/${path}`, { headers: apiHeaders() });
+      if (!resp.ok) {
+        const err = await resp.json().catch(() => ({}));
+        throw new Error(err.message || `HTTP ${resp.status}`);
+      }
+      return resp.json();
+    }
+
+    async function apiPut(path, body) {
+      const resp = await fetch(`${GITHUB_API}/repos/${config.owner}/${config.repo}/${path}`, {
+        method: 'PUT',
+        headers: { ...apiHeaders(), 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      if (!resp.ok) {
+        const err = await resp.json().catch(() => ({}));
+        throw new Error(err.message || `HTTP ${resp.status}`);
+      }
+      return resp.json();
+    }
+
+    async function apiDelete(path, body) {
+      const resp = await fetch(`${GITHUB_API}/repos/${config.owner}/${config.repo}/${path}`, {
+        method: 'DELETE',
+        headers: { ...apiHeaders(), 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      if (!resp.ok) {
+        const err = await resp.json().catch(() => ({}));
+        throw new Error(err.message || `HTTP ${resp.status}`);
+      }
+      return resp.json();
+    }
+
+    // UTF-8 safe base64 for browser
+    function utf8ToB64(str) {
+      return btoa(unescape(encodeURIComponent(str)));
+    }
+    function b64ToUtf8(b64) {
+      return decodeURIComponent(escape(atob(b64.replace(/\n/g, ''))));
+    }
+
+    // ---------- Frontmatter ----------
+    function parseFrontmatter(content) {
+      const m = content.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
+      if (!m) return { frontmatter: {}, body: content };
+      const fm = {};
+      const lines = m[1].split('\n');
+      let currentKey = null;
+      for (const line of lines) {
+        const kv = line.match(/^(\w+):\s*(.*)$/);
+        if (kv) {
+          currentKey = kv[1];
+          fm[currentKey] = kv[2].replace(/^'(.*)'$/, '$1').replace(/^"(.*)"$/, '$1');
+        } else if (currentKey && line.trim().startsWith('- ')) {
+          // array continuation
+          const val = line.trim().slice(2).replace(/^'(.*)'$/, '$1').replace(/^"(.*)"$/, '$1');
+          if (Array.isArray(fm[currentKey])) {
+            fm[currentKey].push(val);
+          } else {
+            fm[currentKey] = [val];
+          }
+        }
+      }
+      return { frontmatter: fm, body: m[2].trim() };
+    }
+
+    function buildFrontmatter(fm) {
+      let yaml = '---\n';
+      for (const [k, v] of Object.entries(fm)) {
+        if (v === undefined || v === null || v === '') continue;
+        if (Array.isArray(v)) {
+          if (v.length > 0) {
+            yaml += `${k}: [${v.map(i => `'${i}'`).join(', ')}]\n`;
+          }
+        } else if (k === 'date' || k === 'updated') {
+          yaml += `${k}: ${v}\n`;
+        } else if (typeof v === 'boolean') {
+          yaml += `${k}: ${v}\n`;
+        } else {
+          yaml += `${k}: '${String(v).replace(/'/g, "\\'")}'\n`;
+        }
+      }
+      yaml += '---\n';
+      return yaml;
+    }
+
+    // ---------- View switching ----------
+    function showView(name) {
+      Object.values(views).forEach(v => v.classList.remove('active'));
+      views[name].classList.add('active');
+      if (typeof hljs !== 'undefined') {
+        document.querySelectorAll('.editor-preview pre code').forEach(el => hljs.highlightElement(el));
+      }
+    }
+
+    // ---------- Login ----------
+    $('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const status = $('login-status');
+      status.className = 'login-status';
+      status.style.display = 'none';
+
+      config = {
+        token: $('token').value.trim(),
+        owner: $('owner').value.trim(),
+        repo: $('repo').value.trim(),
+        branch: $('branch').value.trim() || 'main',
+      };
+
+      if (!config.token || !config.owner || !config.repo) {
+        status.textContent = '请填写所有必填项';
+        status.className = 'login-status error';
+        status.style.display = 'block';
+        return;
+      }
+
+      const btn = e.target.querySelector('button[type="submit"]');
+      btn.disabled = true;
+      btn.textContent = '⏳ 验证中...';
+
+      try {
+        // Verify by fetching the repo
+        const repoData = await apiGet('');
+        $('header-user').textContent = `@${config.owner}/${config.repo}`;
+        toast(`已连接到 ${config.owner}/${config.repo}`, 'success');
+        showView('dashboard');
+
+        // Save config to sessionStorage for persistence within tab
+        sessionStorage.setItem('admin_config', JSON.stringify(config));
+
+        await loadPosts();
+      } catch (err) {
+        status.textContent = `连接失败：${err.message}`;
+        status.className = 'login-status error';
+        status.style.display = 'block';
+        toast('GitHub 连接失败，请检查 Token 和仓库信息', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '🔗 连接 GitHub';
+      }
+    });
+
+    // Check for saved session
+    (function initSession() {
+      const saved = sessionStorage.getItem('admin_config');
+      if (saved) {
+        try {
+          const c = JSON.parse(saved);
+          config = c;
+          $('token').value = c.token;
+          $('owner').value = c.owner;
+          $('repo').value = c.repo;
+          $('branch').value = c.branch || 'main';
+          $('header-user').textContent = `@${c.owner}/${c.repo}`;
+          // Verify connection silently
+          apiGet('').then(() => {
+            showView('dashboard');
+            loadPosts();
+          }).catch(() => {
+            // Stay on login if session expired
+            sessionStorage.removeItem('admin_config');
+          });
+        } catch { /* ignore */ }
+      }
+    })();
+
+    // ---------- Logout ----------
+    $('btn-logout').addEventListener('click', () => {
+      sessionStorage.removeItem('admin_config');
+      config = { token: '', owner: '', repo: '', branch: '' };
+      if (easyMDE) { easyMDE.toTextArea(); easyMDE = null; }
+      showView('login');
+      toast('已退出登录', 'info');
+    });
+
+    // ---------- Load posts ----------
+    async function loadPosts() {
+      try {
+        const items = await apiGet(`contents/src/content/posts?ref=${config.branch}`);
+        const files = Array.isArray(items) ? items.filter(f => f.name.endsWith('.md') && f.type === 'file') : [];
+
+        const posts = [];
+        for (const file of files) {
+          const data = await apiGet(`contents/src/content/posts/${file.name}`);
+          const content = b64ToUtf8(data.content);
+          const { frontmatter, body } = parseFrontmatter(content);
+          posts.push({
+            slug: file.name.replace(/\.md$/, ''),
+            sha: data.sha,
+            title: frontmatter.title || file.name,
+            date: frontmatter.date || '',
+            tags: frontmatter.tags || [],
+            draft: frontmatter.draft === true || frontmatter.draft === 'true',
+            description: frontmatter.description || '',
+            cover: frontmatter.cover || '',
+            updated: frontmatter.updated || '',
+            body: body,
+            frontmatter,
+          });
+        }
+
+        // Sort by date descending (fallback to name)
+        posts.sort((a, b) => {
+          if (a.date && b.date) return new Date(b.date) - new Date(a.date);
+          return b.slug.localeCompare(a.slug);
+        });
+
+        postsCache = posts;
+        renderPosts(posts);
+      } catch (err) {
+        toast(`加载文章失败：${err.message}`, 'error');
+      }
+    }
+
+    // ---------- Render posts ----------
+    function renderPosts(posts) {
+      const tbody = $('posts-tbody');
+      const empty = $('empty-state');
+
+      if (posts.length === 0) {
+        tbody.innerHTML = '';
+        empty.classList.remove('hidden');
+        $('stat-total').textContent = '0';
+        $('stat-published').textContent = '0';
+        $('stat-drafts').textContent = '0';
+        return;
+      }
+      empty.classList.add('hidden');
+
+      $('stat-total').textContent = posts.length;
+      $('stat-published').textContent = posts.filter(p => !p.draft).length;
+      $('stat-drafts').textContent = posts.filter(p => p.draft).length;
+
+      tbody.innerHTML = posts.map(p => `
+        <tr data-slug="${p.slug}">
+          <td>
+            <div class="post-title" data-slug="${p.slug}">${escHtml(p.title) || escHtml(p.slug)}</div>
+            ${p.description ? `<div style="font-size:.78rem;color:var(--gray-light);margin-top:2px;">${escHtml(p.description.slice(0, 60))}${p.description.length > 60 ? '…' : ''}</div>` : ''}
+          </td>
+          <td class="post-date">${p.date ? formatDate(p.date) : '-'}</td>
+          <td>
+            <div class="post-tags">
+              ${(p.tags || []).slice(0, 3).map(t => `<span class="tag">${escHtml(t)}</span>`).join('')}
+              ${(p.tags || []).length > 3 ? `<span class="tag">+${p.tags.length - 3}</span>` : ''}
+            </div>
+          </td>
+          <td><span class="badge ${p.draft ? 'badge-draft' : 'badge-published'}">${p.draft ? '草稿' : '已发布'}</span></td>
+          <td>
+            <div class="actions">
+              <button class="btn btn-ghost btn-sm edit-btn" data-slug="${p.slug}">编辑</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+
+      // Click on title or edit button
+      tbody.querySelectorAll('.post-title').forEach(el => {
+        el.addEventListener('click', () => openEditor(el.dataset.slug));
+      });
+      tbody.querySelectorAll('.edit-btn').forEach(el => {
+        el.addEventListener('click', () => openEditor(el.dataset.slug));
+      });
+    }
+
+    // ---------- Search ----------
+    $('search-input').addEventListener('input', (e) => {
+      const q = e.target.value.toLowerCase().trim();
+      if (!q) { renderPosts(postsCache); return; }
+      const filtered = postsCache.filter(p =>
+        p.title.toLowerCase().includes(q) ||
+        (p.tags || []).some(t => t.toLowerCase().includes(q))
+      );
+      renderPosts(filtered);
+    });
+
+    // ---------- Refresh ----------
+    $('btn-refresh').addEventListener('click', () => {
+      loadPosts();
+      toast('已刷新文章列表', 'info');
+    });
+
+    // ---------- New post ----------
+    $('btn-new-post').addEventListener('click', () => openEditor(null));
+
+    // ---------- Editor ----------
+    async function openEditor(slug) {
+      showView('editor');
+      currentSlug = slug;
+
+      // Reset form
+      $('editor-title').value = '';
+      $('editor-slug').value = '';
+      $('editor-date').value = '';
+      $('editor-tags').value = '';
+      $('editor-desc').value = '';
+      $('editor-cover').value = '';
+      $('editor-draft').checked = false;
+      $('delete-confirm').checked = false;
+      $('btn-delete').disabled = true;
+      $('save-status').textContent = '';
+      const coverPreview = $('cover-preview');
+      coverPreview.classList.remove('show');
+
+      // Reset EasyMDE
+      if (easyMDE) {
+        easyMDE.value('');
+      } else {
+        easyMDE = new EasyMDE({
+          element: $('editor-body-text'),
+          autofocus: false,
+          spellChecker: false,
+          status: ['lines', 'words', {
+            className: 'estt-readtime',
+            defaultValue: '0 min read',
+            onUpdate: function (cm) {
+              const words = cm.getValue().split(/\s+/).filter(Boolean).length;
+              const min = Math.max(1, Math.round(words / 400));
+              this.element.textContent = `☕ ${min} min read`;
+            }
+          }],
+          toolbar: ['bold', 'italic', 'heading', '|', 'quote', 'unordered-list', 'ordered-list', '|', 'link', 'image', '|', 'preview', 'side-by-side', 'fullscreen', '|', 'guide'],
+          renderingConfig: { codeSyntaxHighlighting: true },
+        });
+        // Auto-highlight code in preview
+        easyMDE.codemirror.on('blur', () => {
+          setTimeout(() => {
+            document.querySelectorAll('.editor-preview pre code').forEach(el => {
+              if (typeof hljs !== 'undefined') hljs.highlightElement(el);
+            });
+          }, 100);
+        });
+      }
+
+      if (slug) {
+        // Edit existing post
+        const post = postsCache.find(p => p.slug === slug);
+        if (!post) { toast('文章未找到', 'error'); showView('dashboard'); return; }
+
+        $('editor-title').value = post.title || '';
+        $('editor-slug').value = post.slug;
+        $('editor-date').value = post.date ? post.date.substring(0, 10) : '';
+        $('editor-tags').value = (post.tags || []).join(', ');
+        $('editor-desc').value = post.description || '';
+        $('editor-cover').value = post.cover || '';
+        $('editor-draft').checked = post.draft;
+        easyMDE.value(post.body || '');
+
+        // Cover preview
+        if (post.cover) {
+          coverPreview.src = post.cover;
+          coverPreview.classList.add('show');
+        }
+
+        $('save-status').textContent = `编辑: ${post.title || slug}`;
+
+        // Handle delete section
+        $('delete-section').style.display = 'block';
+        $('btn-delete').dataset.slug = slug;
+
+        // Store original for unsaved detection
+        originalFrontmatter = { ...post.frontmatter };
+        originalBody = post.body || '';
+      } else {
+        // New post
+        const today = new Date().toISOString().substring(0, 10);
+        $('editor-date').value = today;
+        $('save-status').textContent = '新建文章';
+
+        $('delete-section').style.display = 'none';
+        originalFrontmatter = null;
+        originalBody = '';
+      }
+
+      // Update slug preview
+      updateSlugPreview();
+    }
+
+    // ---------- Slug auto-generation ----------
+    $('editor-title').addEventListener('input', () => {
+      const slug = $('editor-slug');
+      // Only auto-generate if user hasn't manually edited the slug
+      if (!slug.dataset.userEdited) {
+        slug.value = generateSlug($('editor-title').value);
+        updateSlugPreview();
+      }
+    });
+    $('editor-slug').addEventListener('input', () => {
+      $('editor-slug').dataset.userEdited = 'true';
+      updateSlugPreview();
+    });
+    $('editor-slug').addEventListener('blur', () => {
+      // If slug is empty, re-enable auto-generation
+      if (!$('editor-slug').value.trim()) {
+        delete $('editor-slug').dataset.userEdited;
+      }
+    });
+
+    function generateSlug(title) {
+      return title
+        .toLowerCase()
+        .replace(/[^\w一-鿿\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .substring(0, 80) || 'untitled';
+    }
+
+    function updateSlugPreview() {
+      const slug = $('editor-slug').value || 'untitled';
+      $('slug-preview').textContent = `blog.260607.best/posts/`;
+    }
+
+    // ---------- Cover preview ----------
+    $('editor-cover').addEventListener('input', () => {
+      const url = $('editor-cover').value.trim();
+      const preview = $('cover-preview');
+      if (url) {
+        preview.src = url;
+        preview.classList.add('show');
+      } else {
+        preview.classList.remove('show');
+      }
+    });
+
+    // ---------- Delete confirmation checkbox ----------
+    $('delete-confirm').addEventListener('change', () => {
+      $('btn-delete').disabled = !$('delete-confirm').checked;
+    });
+
+    // ---------- Save ----------
+    async function savePost() {
+      const title = $('editor-title').value.trim();
+      const slug = $('editor-slug').value.trim() || generateSlug(title) || 'untitled';
+      const date = $('editor-date').value || new Date().toISOString().substring(0, 10);
+      const tagsStr = $('editor-tags').value.trim();
+      const tags = tagsStr ? tagsStr.split(/[,，]/).map(t => t.trim()).filter(Boolean) : [];
+      const description = $('editor-desc').value.trim();
+      const cover = $('editor-cover').value.trim() || undefined;
+      const draft = $('editor-draft').checked;
+      const body = easyMDE ? easyMDE.value().trim() : '';
+
+      if (!title) { toast('请输入文章标题', 'error'); return; }
+      if (!body) { toast('文章正文不能为空', 'error'); return; }
+
+      const fm = {
+        title,
+        description,
+        date,
+        tags,
+        cover,
+        draft,
+      };
+      if (fm.cover === undefined) delete fm.cover;
+
+      const fileContent = buildFrontmatter(fm) + body + '\n';
+      const path = `src/content/posts/${slug}.md`;
+      const message = currentSlug ? `更新文章: ${title}` : `新增文章: ${title}`;
+
+      // Check if slug exists for new posts
+      if (!currentSlug) {
+        try {
+          const existing = await apiGet(`contents/${path}?ref=${config.branch}`);
+          if (existing && existing.name) {
+            toast(`slug「${slug}」已存在，请修改`, 'error');
+            return;
+          }
+        } catch (e) {
+          // Not found — good, proceed
+        }
+      }
+
+      // Get SHA if updating
+      let sha = null;
+      if (currentSlug) {
+        const existing = postsCache.find(p => p.slug === currentSlug);
+        if (existing) sha = existing.sha;
+        // If slug changed, we need to delete old file and create new one
+        if (currentSlug !== slug) {
+          // Delete old file
+          try {
+            await apiDelete(`contents/src/content/posts/${currentSlug}.md`, {
+              message: `删除旧文章: ${currentSlug}`,
+              sha: sha,
+              branch: config.branch,
+            });
+          } catch (err) {
+            toast(`删除旧文件失败: ${err.message}`, 'error');
+            return;
+          }
+          sha = null; // New file, no SHA
+        }
+      }
+
+      // If slug changed and was editing, also try to get SHA for new path
+      if (!sha && currentSlug === slug && currentSlug) {
+        try {
+          const existing = await apiGet(`contents/${path}?ref=${config.branch}`);
+          if (existing && existing.sha) sha = existing.sha;
+        } catch { /* new file */ }
+      }
+
+      // Need to get SHA for the new path if slug changed
+      if (!sha && currentSlug && currentSlug !== slug) {
+        // Already handled above by deleting old + setting sha=null
+      }
+
+      // If editing same slug, try to get a fresh SHA
+      if (currentSlug === slug && currentSlug) {
+        try {
+          const existingData = await apiGet(`contents/${path}?ref=${config.branch}`);
+          sha = existingData.sha;
+        } catch { /* new file */ }
+      }
+
+      const btn = $('btn-save');
+      const btn2 = $('btn-save-bottom');
+      [btn, btn2].forEach(b => { b.disabled = true; b.textContent = '⏳ 保存中...'; });
+
+      try {
+        await apiPut(path, {
+          message,
+          content: utf8ToB64(fileContent),
+          sha: sha,
+          branch: config.branch,
+        });
+
+        toast(`✅ 已保存！${draft ? '(草稿)' : ''} 部署进行中...`, 'success');
+        currentSlug = slug;
+        $('save-status').textContent = `已保存: ${title}`;
+
+        // Refresh posts
+        await loadPosts();
+      } catch (err) {
+        toast(`保存失败: ${err.message}`, 'error');
+      } finally {
+        [btn, btn2].forEach(b => { b.disabled = false; b.textContent = '💾 保存到 GitHub'; });
+      }
+    }
+
+    $('btn-save').addEventListener('click', savePost);
+    $('btn-save-bottom').addEventListener('click', savePost);
+    // Ctrl/Cmd + S shortcut
+    document.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        if (views.editor.classList.contains('active')) savePost();
+      }
+    });
+
+    // ---------- Delete ----------
+    $('btn-delete').addEventListener('click', async () => {
+      const slug = $('btn-delete').dataset.slug;
+      if (!slug) return;
+
+      const confirmed = await showModal(
+        '确认删除',
+        `确定要删除「${$('editor-title').value || slug}」吗？\n此操作不可撤销。`,
+        '确认删除'
+      );
+      if (!confirmed) return;
+
+      const post = postsCache.find(p => p.slug === slug);
+      const sha = post ? post.sha : null;
+
+      try {
+        await apiDelete(`contents/src/content/posts/${slug}.md`, {
+          message: `删除文章: ${post?.title || slug}`,
+          sha: sha,
+          branch: config.branch,
+        });
+
+        toast('🗑️ 文章已删除', 'success');
+        showView('dashboard');
+        await loadPosts();
+      } catch (err) {
+        toast(`删除失败: ${err.message}`, 'error');
+      }
+    });
+
+    // ---------- Back to dashboard ----------
+    $('editor-back').addEventListener('click', () => {
+      // Check for unsaved changes
+      if (easyMDE) {
+        const currentBody = easyMDE.value();
+        const currentTitle = $('editor-title').value;
+        if (currentBody !== originalBody || currentTitle !== (originalFrontmatter?.title || '')) {
+          showModal('放弃更改？', '你有未保存的更改，确定要离开吗？', '离开').then(leave => {
+            if (leave) {
+              showView('dashboard');
+              // Don't destroy EasyMDE to keep state if user comes back
+            }
+          });
+          return;
+        }
+      }
+      showView('dashboard');
+    });
+
+    // ---------- Helpers ----------
+    function escHtml(str) {
+      if (!str) return '';
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function formatDate(dateStr) {
+      if (!dateStr) return '-';
+      try {
+        const d = new Date(dateStr);
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      } catch { return dateStr; }
+    }
+
+    // Initial: show login
+    showView('login');
+
+    console.log('📝 Guancii Blog Admin loaded');
+    console.log('💡 使用 Ctrl+S / Cmd+S 快速保存文章');
+  </script>
+</body>
+</html>
