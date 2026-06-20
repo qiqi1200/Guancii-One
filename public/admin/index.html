@@ -447,7 +447,7 @@
         <button class="btn btn-primary" id="btn-save-bottom">💾 保存到 GitHub</button>
       </div>
 
-      <div class="delete-section">
+      <div class="delete-section" id="delete-section">
         <div class="warning">⚠️ 危险操作：删除后将无法恢复。</div>
         <div class="delete-confirm-row">
           <input type="checkbox" id="delete-confirm">
@@ -942,7 +942,7 @@
 
     function updateSlugPreview() {
       const slug = $('editor-slug').value || 'untitled';
-      $('slug-preview').textContent = `blog.260607.best/posts/`;
+      $('slug-preview').textContent = `blog.260607.best/posts/${slug}`;
     }
 
     // ---------- Cover preview ----------
@@ -988,13 +988,13 @@
       if (fm.cover === undefined) delete fm.cover;
 
       const fileContent = buildFrontmatter(fm) + body + '\n';
-      const path = `src/content/posts/${slug}.md`;
+      const path = `contents/src/content/posts/${slug}.md`;
       const message = currentSlug ? `更新文章: ${title}` : `新增文章: ${title}`;
 
       // Check if slug exists for new posts
       if (!currentSlug) {
         try {
-          const existing = await apiGet(`contents/${path}?ref=${config.branch}`);
+          const existing = await apiGet(`${path}?ref=${config.branch}`);
           if (existing && existing.name) {
             toast(`slug「${slug}」已存在，请修改`, 'error');
             return;
@@ -1026,23 +1026,10 @@
         }
       }
 
-      // If slug changed and was editing, also try to get SHA for new path
-      if (!sha && currentSlug === slug && currentSlug) {
-        try {
-          const existing = await apiGet(`contents/${path}?ref=${config.branch}`);
-          if (existing && existing.sha) sha = existing.sha;
-        } catch { /* new file */ }
-      }
-
-      // Need to get SHA for the new path if slug changed
-      if (!sha && currentSlug && currentSlug !== slug) {
-        // Already handled above by deleting old + setting sha=null
-      }
-
-      // If editing same slug, try to get a fresh SHA
+      // Fetch a fresh SHA for the current file being edited
       if (currentSlug === slug && currentSlug) {
         try {
-          const existingData = await apiGet(`contents/${path}?ref=${config.branch}`);
+          const existingData = await apiGet(`${path}?ref=${config.branch}`);
           sha = existingData.sha;
         } catch { /* new file */ }
       }
@@ -1061,6 +1048,8 @@
 
         toast(`✅ 已保存！${draft ? '(草稿)' : ''} 部署进行中...`, 'success');
         currentSlug = slug;
+        $('btn-delete').dataset.slug = slug;
+        $('delete-section').style.display = 'block';
         $('save-status').textContent = `已保存: ${title}`;
 
         // Refresh posts
