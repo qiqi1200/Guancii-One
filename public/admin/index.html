@@ -278,6 +278,17 @@
     .modal-box p { font-size: .9rem; color: var(--gray); margin-bottom: 20px; }
     .modal-box .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
 
+    /* Deploy progress banner */
+    .deploy-banner { display: none; align-items: center; gap: 10px; padding: 10px 14px; border-radius: var(--radius); margin-bottom: 16px; font-size: .88rem; border: 1px solid var(--border); background: var(--cream); }
+    .deploy-banner.running { background: #eef5ed; border-color: var(--green-light); color: var(--green-dark); }
+    .deploy-banner.success { background: #eef5ed; border-color: var(--green); color: var(--green-dark); }
+    .deploy-banner.failure { background: #fbeceb; border-color: var(--orange); color: var(--orange); }
+    .deploy-banner .spinner { width: 14px; height: 14px; border: 2px solid currentColor; border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite; flex-shrink: 0; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .deploy-banner a { color: inherit; text-decoration: underline; margin-left: auto; font-size: .82rem; }
+    tr.row-highlight { animation: rowflash 2.4s ease-out; }
+    @keyframes rowflash { 0% { background: var(--cream-dark); } 100% { background: transparent; } }
+
     /* ====================== Responsive ======================== */
     @media (max-width: 768px) {
       .dashboard-content { padding: 16px; }
@@ -349,6 +360,7 @@
     </header>
 
     <div class="dashboard-content">
+      <div class="deploy-banner" id="deploy-banner"></div>
       <div class="stats-row" id="stats-row">
         <div class="stat-card"><div class="num" id="stat-total">-</div><div class="label">全部文章</div></div>
         <div class="stat-card"><div class="num" id="stat-published">-</div><div class="label">已发布</div></div>
@@ -507,6 +519,51 @@
         $('modal-confirm').onclick = () => { cleanup(); resolve(true); };
         modal.onclick = (e) => { if (e.target === modal) { cleanup(); resolve(false); } };
       });
+    }
+
+    // ---------- Deploy tracking (GitHub Actions) ----------
+    let deployPollTimer = null;
+    function setDeployBanner(state, html) {
+      const b = $('deploy-banner');
+      b.className = 'deploy-banner ' + state;
+      b.innerHTML = html;
+      b.style.display = 'flex';
+    }
+    function stopDeployPoll() {
+      if (deployPollTimer) { clearTimeout(deployPollTimer); deployPollTimer = null; }
+    }
+    // Poll the latest workflow run (optionally matching commitSha) and reflect its status
+    async function trackDeploy(commitSha) {
+      stopDeployPoll();
+      setDeployBanner('running', '<span class="spinner"></span>🚀 部署已触发，等待 GitHub Actions 启动…');
+      let attempts = 0;
+      const tick = async () => {
+        try {
+          const data = await apiGet(`actions/runs?per_page=10`);
+          const runs = data.workflow_runs || [];
+          let run = commitSha ? runs.find(r => r.head_sha === commitSha) : null;
+          if (!run) run = runs[0]; // fallback: latest run
+          if (!run) {
+            if (++attempts > 40) { setDeployBanner('failure', '⚠️ 未找到部署任务（Actions 可能未触发）'); return; }
+            deployPollTimer = setTimeout(tick, 4000); return;
+          }
+          if (run.status === 'completed') {
+            if (run.conclusion === 'success') {
+              setDeployBanner('success', `✅ 部署成功！稍等片刻博客即可更新。 <a href="${run.html_url}" target="_blank" rel="noopener">查看运行</a>`);
+            } else {
+              setDeployBanner('failure', `❌ 部署失败（${run.conclusion}）。 <a href="${run.html_url}" target="_blank" rel="noopener">查看日志</a>`);
+            }
+            return;
+          }
+          const label = run.status === 'queued' ? '排队中' : '构建中';
+          setDeployBanner('running', `<span class="spinner"></span>🚀 部署中…（${label}） <a href="${run.html_url}" target="_blank" rel="noopener">查看运行</a>`);
+          deployPollTimer = setTimeout(tick, 4000);
+        } catch (e) {
+          if (++attempts > 40) { setDeployBanner('failure', '⚠️ 部署状态查询失败：' + (e.message || e)); return; }
+          deployPollTimer = setTimeout(tick, 4000);
+        }
+      };
+      tick();
     }
 
     // ---------- GitHub API helpers ----------
@@ -819,6 +876,18 @@
         </tr>
       `).join('');
 
+      // Highlight and scroll to the just-saved post
+      if (currentSlug) {
+        const row = $(`tr[data-slug="${currentSlug}"]`);
+        if (row) {
+          row.classList.add('row-highlight');
+          setTimeout(() => {
+            row.scrollIntoView({ block: 'center', behavior: 'smooth' });
+          }, 100);
+        }
+      }
+    }
+
       // Click on title or edit button
       tbody.querySelectorAll('.post-title').forEach(el => {
         el.addEventListener('click', () => openEditor(el.dataset.slug));
@@ -988,6 +1057,19 @@
       }
     });
 
+    // Clean up on view change/logout
+    function cleanupOnLeave() {
+      stopDeployPoll();
+    }
+
+    // Track view changes to clean up
+    const originalShowView = showView;
+    showView = function(name) {
+      cleanupOnLeave();
+      return originalShowView(name);
+    };
+    $('btn-logout').addEventListener('click', () => cleanupOnLeave());
+
     // ---------- Delete confirmation checkbox ----------
     $('delete-confirm').addEventListener('change', () => {
       $('btn-delete').disabled = !$('delete-confirm').checked;
@@ -1077,7 +1159,8 @@
       if (sha) payload.sha = sha;
 
       try {
-        await apiPut(path, payload);
+        const result = await apiPut(path, payload);
+        const commitSha = result.commit_sha;
 
         toast(`✅ 已保存！${draft ? '(草稿)' : ''} 部署进行中...`, 'success');
         currentSlug = slug;
@@ -1085,9 +1168,10 @@
         $('delete-section').style.display = 'block';
         $('save-status').textContent = `已保存: ${title}`;
 
-        // Refresh posts and return to dashboard
+        // Refresh posts, return to dashboard, and track deploy
         await loadPosts();
         showView('dashboard');
+        trackDeploy(commitSha); // 开始轮询 Actions 状态
       } catch (err) {
         const msg = String(err.message || '');
         if (/not found|404/i.test(msg)) {
