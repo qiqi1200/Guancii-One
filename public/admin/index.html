@@ -728,27 +728,40 @@
     // ---------- Load posts ----------
     async function loadPosts() {
       try {
-        const items = await apiGet(`contents/src/content/posts?ref=${config.branch}`);
+        let items = [];
+        try {
+          items = await apiGet(`contents/src/content/posts?ref=${config.branch}`);
+        } catch (e) {
+          // 404 = empty/missing directory → treat as no posts, not an error
+          if (!/not found|404/i.test(e.message)) throw e;
+        }
         const files = Array.isArray(items) ? items.filter(f => f.name.endsWith('.md') && f.type === 'file') : [];
 
         const posts = [];
+        let skipped = 0;
         for (const file of files) {
-          const data = await apiGet(`contents/src/content/posts/${file.name}`);
-          const content = b64ToUtf8(data.content);
-          const { frontmatter, body } = parseFrontmatter(content);
-          posts.push({
-            slug: file.name.replace(/\.md$/, ''),
-            sha: data.sha,
-            title: frontmatter.title || file.name,
-            date: frontmatter.date || '',
-            tags: frontmatter.tags || [],
-            draft: frontmatter.draft === true || frontmatter.draft === 'true',
-            description: frontmatter.description || '',
-            cover: frontmatter.cover || '',
-            updated: frontmatter.updated || '',
-            body: body,
-            frontmatter,
-          });
+          // Per-file fetch is isolated so one stale/missing file (e.g. just-deleted)
+          // doesn't break the whole list
+          try {
+            const data = await apiGet(`contents/src/content/posts/${encodeURIComponent(file.name)}`);
+            const content = b64ToUtf8(data.content);
+            const { frontmatter, body } = parseFrontmatter(content);
+            posts.push({
+              slug: file.name.replace(/\.md$/, ''),
+              sha: data.sha,
+              title: frontmatter.title || file.name,
+              date: frontmatter.date || '',
+              tags: frontmatter.tags || [],
+              draft: frontmatter.draft === true || frontmatter.draft === 'true',
+              description: frontmatter.description || '',
+              cover: frontmatter.cover || '',
+              updated: frontmatter.updated || '',
+              body: body,
+              frontmatter,
+            });
+          } catch (e) {
+            skipped++; // file listed but failed to fetch/parse — skip it
+          }
         }
 
         // Sort by date descending (fallback to name)
@@ -759,6 +772,7 @@
 
         postsCache = posts;
         renderPosts(posts);
+        if (skipped > 0) toast(`已跳过 ${skipped} 篇无法读取的文章`, 'info');
       } catch (err) {
         toast(`加载文章失败：${err.message}`, 'error');
       }
@@ -1099,8 +1113,6 @@
     // ---------- Delete ----------
     $('btn-delete').addEventListener('click', async () => {
       const slug = currentSlug || $('btn-delete').dataset.slug;
-      // 诊断：确认点击是否触发、slug 是否有值（定位"点击没反应"问题）
-      toast(`[诊断] 删除点击触发，slug="${slug || '(空)'}"`, 'info');
       if (!slug) {
         toast('删除失败：未找到文章 slug，请返回列表重新打开文章', 'error');
         return;
