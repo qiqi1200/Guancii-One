@@ -667,6 +667,9 @@
       try {
         // Verify by fetching the repo
         const repoData = await apiGet('');
+        if (!repoData.permissions || repoData.permissions.push !== true) {
+          throw new Error('Token 没有写入权限 — 无法保存文章。请重新创建 Token：classic 勾选 repo scope，或 fine-grained 勾选 Contents: Read and Write。');
+        }
         $('header-user').textContent = `@${config.owner}/${config.repo}`;
         toast(`已连接到 ${config.owner}/${config.repo}`, 'success');
         showView('dashboard');
@@ -699,7 +702,10 @@
           $('branch').value = c.branch || 'main';
           $('header-user').textContent = `@${c.owner}/${c.repo}`;
           // Verify connection silently
-          apiGet('').then(() => {
+          apiGet('').then((repoData) => {
+            if (!repoData.permissions || repoData.permissions.push !== true) {
+              toast('当前 Token 没有写入权限，无法保存文章。请退出后用有 repo/Contents:Write 权限的 Token 重新登录。', 'error');
+            }
             showView('dashboard');
             loadPosts();
           }).catch(() => {
@@ -999,7 +1005,7 @@
       if (fm.cover === undefined) delete fm.cover;
 
       const fileContent = buildFrontmatter(fm) + body + '\n';
-      const path = `contents/src/content/posts/${slug}.md`;
+      const path = `contents/src/content/posts/${encodeURIComponent(slug)}.md`;
       const message = currentSlug ? `更新文章: ${title}` : `新增文章: ${title}`;
 
       // Check if slug exists for new posts
@@ -1024,7 +1030,7 @@
         if (currentSlug !== slug) {
           // Delete old file
           try {
-            await apiDelete(`contents/src/content/posts/${currentSlug}.md`, {
+            await apiDelete(`contents/src/content/posts/${encodeURIComponent(currentSlug)}.md`, {
               message: `删除旧文章: ${currentSlug}`,
               sha: sha,
               branch: config.branch,
@@ -1068,7 +1074,12 @@
         // Refresh posts
         await loadPosts();
       } catch (err) {
-        toast(`保存失败: ${err.message}`, 'error');
+        const msg = String(err.message || '');
+        if (/not found|404/i.test(msg)) {
+          toast('保存失败：GitHub 返回 404。多半是 Token 没有写入权限（fine-grained 未勾 Contents:Write，或 classic 未勾 repo scope）。请退出后用有写权限的 Token 重新登录。', 'error');
+        } else {
+          toast(`保存失败: ${msg}`, 'error');
+        }
       } finally {
         [btn, btn2].forEach(b => { b.disabled = false; b.textContent = '💾 保存到 GitHub'; });
       }
@@ -1100,7 +1111,7 @@
       const sha = post ? post.sha : null;
 
       try {
-        await apiDelete(`contents/src/content/posts/${slug}.md`, {
+        await apiDelete(`contents/src/content/posts/${encodeURIComponent(slug)}.md`, {
           message: `删除文章: ${post?.title || slug}`,
           sha: sha,
           branch: config.branch,
