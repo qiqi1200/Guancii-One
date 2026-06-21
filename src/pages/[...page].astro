@@ -123,15 +123,11 @@ function pageUrl(n: number): string {
           </div>
         )}
 
-        <!-- ─── 文章网格：Bento 风格 ─── -->
+        {/* ─── 文章网格：干净 2 列 ─── */}
         <div class="grid gap-5 post-grid sm:grid-cols-2">
           {rest.map((p, i) => (
             <div
-              class:list={[
-                "post-container scroll-reveal",
-                // 每第3张卡片横跨2列（bento 效果），但总共不超过8篇时只用2列
-                i === 0 && rest.length > 2 ? 'sm:col-span-2' : ''
-              ]}
+              class="post-container scroll-reveal"
               data-tags={JSON.stringify(p.data.tags || [])}
               style={`--delay: ${(i + 1) * 80}ms`}
             >

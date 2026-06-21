@@ -430,11 +430,6 @@
     visibility: hidden;
   }
 
-  /* ============= Bento 网格卡片变高 ============= */
-  .post-grid > .sm\:col-span-2 .scrapbook-card {
-    min-height: 200px;
-  }
-
   /* ============= prefers-reduced-motion ============= */
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
