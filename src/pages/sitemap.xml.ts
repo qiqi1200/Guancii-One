@@ -39,7 +39,7 @@ export async function GET({ site: siteUrl }: { site: URL }) {
     const fullUrl = new URL(entry.path, siteUrl).href;
     let el = `  <url>\n    <loc>${fullUrl}</loc>\n    <priority>${entry.priority}</priority>\n    <changefreq>${entry.changefreq}</changefreq>`;
     if ('lastmod' in entry && entry.lastmod) {
-      const d = entry.lastmod as Date;
+      const d: Date = entry.lastmod instanceof Date ? entry.lastmod : new Date(entry.lastmod);
       el += `\n    <lastmod>${d.toISOString().split('T')[0]}</lastmod>`;
     }
     el += '\n  </url>';

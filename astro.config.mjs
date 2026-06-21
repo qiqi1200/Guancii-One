@@ -1,12 +1,8 @@
 import { defineConfig } from 'astro/config';
 import tailwind from '@astrojs/tailwind';
 
-// 部署到 GitHub Pages 时，repo 名是 <user>.github.io/<repo>
-// 如果是 user 站点（<user>.github.io），base 留空
-const SITE_REPO = 'guancii.github.io';
-
 export default defineConfig({
-  site: 'https://guancii.github.io',
+  site: 'https://blog.260607.best',
   base: '/',
   integrations: [
     tailwind({ applyBaseStyles: false })

@@ -66,12 +66,17 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <!-- medium-zoom：文章图片点击放大 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/medium-zoom.min.css" />
 
-    <!-- 主题预检脚本（默认浅色，用户可手动切换） -->
+    <!-- 主题预检脚本（默认浅色，尊重用户已保存的偏好） -->
     <script is:inline>
       (function() {
-        // 始终从浅色开始，忽略 localStorage 中的 dark 偏好
-        localStorage.setItem('theme', 'light');
-        document.documentElement.classList.remove('dark');
+        // 读取用户保存的主题偏好，如无则默认浅色
+        var saved = localStorage.getItem('theme');
+        if (saved === 'dark') {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+          localStorage.setItem('theme', 'light');
+        }
       })();
     </script>
   </head>

@@ -9,7 +9,8 @@
   },
   "dependencies": {
     "@vercel/node": "^3.0.0",
-    "twikoo": "1.6.42"
+    "twikoo": "1.7.11",
+    "mongodb": "^6.3.0"
   },
   "devDependencies": {
     "vercel": "^32.0.0"

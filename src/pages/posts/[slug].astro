@@ -8,11 +8,13 @@ import site from '../../site.json';
 const SITE = site;
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const posts = await getCollection('posts');
-  const sorted = posts.sort(
-    (a, b) => a.data.date.getTime() - b.data.date.getTime()
-  );
-  return posts.map((post, i) => ({
+  const all = await getCollection('posts');
+  // 按日期升序排列，用于确定文章的先后顺序
+  const sorted = all
+    .filter(p => !p.data.draft)
+    .sort((a, b) => a.data.date.getTime() - b.data.date.getTime());
+  // 必须遍历排序后的数组，确保索引 i 与 prev/next 对应正确
+  return sorted.map((post, i) => ({
     params: { slug: post.slug },
     props: {
       post,
@@ -235,9 +237,9 @@ const toc = headings.filter(h => h.depth === 2 || h.depth === 3);
   </article>
 
   <script is:inline define:vars={{ slug }}>
-    // 点赞功能 (持久化 via Twikoo like API)
+    // 点赞功能 (持久化 via Twikoo API + MongoDB)
     const LIKE_API = window.__TWIKOO_CONFIG__?.envId 
-      ? window.__TWIKOO_CONFIG__.envId.replace(/\/+$/, '') + '/like'
+      ? window.__TWIKOO_CONFIG__.envId.replace(/\/+$/, '')
       : null;
     const STORAGE_KEY = `liked_${slug}`;
     const alreadyLiked = localStorage.getItem(STORAGE_KEY) === 'true';
@@ -245,26 +247,33 @@ const toc = headings.filter(h => h.depth === 2 || h.depth === 3);
     const btn = document.getElementById('like-btn');
     const heartIcon = document.getElementById('like-heart');
 
-    // 从服务器读取当前点赞数
-    async function fetchCount() {
-      if (!LIKE_API) return;
+    // 调用 Twikoo 后端 API
+    async function callLikeAPI(event) {
+      if (!LIKE_API) return null;
       try {
         const res = await fetch(LIKE_API, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ url: slug, action: 'get' })
+          body: JSON.stringify({ event, url: slug })
         });
         const data = await res.json();
-        if (countEl) countEl.textContent = data.count;
-        if (data.count > 0 && !alreadyLiked) {
-          // 有赞但不来自当前用户，不填心
-        }
-        if (alreadyLiked) {
-          heartIcon?.classList.add('text-[rgb(var(--primary))]');
-          heartIcon.style.fontVariationSettings = "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24";
-        }
+        if (data.code === 0 && data.data) return data.data;
+        return null;
       } catch (e) {
-        console.warn('Failed to fetch likes:', e);
+        console.warn('Like API error:', e);
+        return null;
+      }
+    }
+
+    // 从服务器读取当前点赞数
+    async function fetchCount() {
+      const result = await callLikeAPI('POST_LIKE_GET');
+      if (result && countEl) {
+        countEl.textContent = result.count ?? 0;
+      }
+      if (alreadyLiked && heartIcon) {
+        heartIcon.style.fontVariationSettings = "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24";
+        heartIcon.classList.add('text-[rgb(var(--primary))]');
       }
     }
     fetchCount();
@@ -291,11 +300,11 @@ const toc = headings.filter(h => h.depth === 2 || h.depth === 3);
       // 持久化到服务器
       if (LIKE_API) {
         try {
-          await fetch(LIKE_API, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ url: slug, action: 'increment' })
-          });
+          const result = await callLikeAPI('POST_LIKE_SET');
+          if (result && countEl) {
+            // 用服务器返回的准确值覆盖
+            countEl.textContent = result.count;
+          }
           localStorage.setItem(STORAGE_KEY, 'true');
         } catch (e) {
           console.warn('Failed to save like:', e);
