@@ -363,9 +363,10 @@
     display: none;
   }
 
-  /* ============= Featured 卡片专属样式 ============= */
+  /* ============= Featured 卡片专属样式（横向大卡） ============= */
   .featured-card {
-    padding: 1.5rem;
+    padding: 0;
+    overflow: hidden;
   }
   .featured-card:hover {
     transform: translateY(-2px) !important;
@@ -407,6 +408,11 @@
     pointer-events: none;
     position: absolute;
     visibility: hidden;
+  }
+
+  /* ============= Bento 网格卡片变高 ============= */
+  .post-grid > .sm\:col-span-2 .scrapbook-card {
+    min-height: 200px;
   }
 
   /* ============= prefers-reduced-motion ============= */
