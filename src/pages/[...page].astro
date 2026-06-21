@@ -123,15 +123,19 @@ function pageUrl(n: number): string {
         </h2>
 
         {featured && (
-          <div class="mb-8 post-container" data-tags={JSON.stringify(featured.data.tags || [])}>
+          <div class="mb-8 post-container scroll-reveal" data-tags={JSON.stringify(featured.data.tags || [])}>
             <PostCard post={featured} featured={true} />
           </div>
         )}
 
         <!-- 文章网格：列数自适应，剩 1 篇时不启用 2 列 -->
         <div class={`grid gap-6 post-grid ${rest.length > 1 ? 'sm:grid-cols-2' : ''}`}>
-          {rest.map(p => (
-            <div class="post-container" data-tags={JSON.stringify(p.data.tags || [])}>
+          {rest.map((p, i) => (
+            <div
+              class="post-container scroll-reveal"
+              data-tags={JSON.stringify(p.data.tags || [])}
+              style={`--delay: ${(i + 1) * 80}ms`}
+            >
               <PostCard post={p} />
             </div>
           ))}
@@ -201,7 +205,7 @@ function pageUrl(n: number): string {
 </BaseLayout>
 
 <script is:inline>
-  // 标签筛选（同时作用于 featured 和普通卡片）
+  // 标签筛选（同时作用于 featured 和普通卡片，带平滑过渡）
   const filterBtns = document.querySelectorAll('.tag-filter');
   const allContainers = document.querySelectorAll('.post-container');
 
@@ -213,7 +217,14 @@ function pageUrl(n: number): string {
 
       allContainers.forEach(el => {
         const tags = JSON.parse(el.getAttribute('data-tags') || '[]');
-        el.style.display = (tag === 'all' || tags.includes(tag)) ? '' : 'none';
+        const match = tag === 'all' || tags.includes(tag);
+        if (match) {
+          el.classList.remove('hidden-filter');
+          el.style.position = '';
+          el.style.visibility = '';
+        } else {
+          el.classList.add('hidden-filter');
+        }
       });
     });
   });

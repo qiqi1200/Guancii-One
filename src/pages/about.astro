@@ -76,8 +76,8 @@ const timeline = [
         时间线
       </h2>
       <div class="space-y-6">
-        {timeline.map(t => (
-          <div class="liquid-glass rounded-xl p-5 hover:translate-x-1 transition-transform">
+        {timeline.map((t, i) => (
+          <div class="liquid-glass rounded-xl p-5 hover:translate-x-1 transition-transform duration-300 scroll-reveal" style={`--delay: ${i * 100}ms`}>
             <div class="text-sm text-[rgb(var(--primary))] font-handwritten">{t.year}</div>
             <div class="font-semibold mt-1">{t.title}</div>
             <div class="text-sm text-[rgb(var(--fg-soft))] mt-1">{t.desc}</div>
@@ -91,8 +91,8 @@ const timeline = [
       </h2>
       <p class="text-[rgb(var(--fg-soft))]">
         不怎么活跃，但欢迎来聊：<br />
-        GitHub：<a href={SITE.links.github} target="_blank" rel="noopener" class="text-[rgb(var(--primary))] hover:underline">@{SITE.author}</a><br />
-        邮箱：<a href={SITE.links.email} class="text-[rgb(var(--primary))] hover:underline">vivia-qiqi@outlook.com</a>
+        GitHub：<a href={SITE.links.github} target="_blank" rel="noopener" class="text-[rgb(var(--primary))] hover:text-[rgb(var(--primary-light))] transition-colors">@{SITE.author}</a><br />
+        邮箱：<a href={SITE.links.email} class="text-[rgb(var(--primary))] hover:text-[rgb(var(--primary-light))] transition-colors">vivia-qiqi@outlook.com</a>
       </p>
 
       <blockquote class="border-l-4 border-[rgb(var(--primary))] pl-4 italic text-[rgb(var(--fg-soft))] font-handwritten mt-8">

@@ -41,7 +41,7 @@ function tagWeight(count: number): string {
       {tags.map(([tag, count]) => (
         <a
           href={`/tags/${tag}`}
-          class="tag-chip transition-all hover:scale-105 hover:shadow-[0_0_12px_rgba(var(--primary-light),0.2)]"
+          class="tag-chip transition-all duration-200 hover:shadow-[0_0_8px_rgba(var(--primary-light),0.15)]"
           style={`font-size: ${tagSize(count)}; font-weight: ${tagWeight(count)}; padding: 0.3em 0.7em;`}
         >
           #{tag}

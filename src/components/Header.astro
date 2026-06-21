@@ -10,13 +10,13 @@ const navItems = [
 ];
 const path = current || Astro.url.pathname;
 ---
-<header class="fixed top-0 w-full z-50 bg-[rgb(var(--glass-bg))]/80 dark:bg-surface-dim/80 backdrop-blur-xl border-b border-[rgb(var(--glass-border))]/10 shadow-sm transition-colors">
+<header class="fixed top-0 w-full z-50 bg-[rgb(var(--glass-bg))]/80 dark:bg-surface-dim/80 backdrop-blur-xl border-b border-[rgb(var(--glass-border))]/10 shadow-sm transition-all duration-300">
   <div class="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
     <a href="/" class="flex items-center gap-2 group">
       <img
         src={SITE.avatar}
         alt={SITE.author}
-        class="w-9 h-9 rounded-full object-cover shadow-sm"
+        class="w-9 h-9 rounded-full object-cover shadow-sm transition-shadow duration-300 group-hover:shadow-md"
       />
       <span class="font-headline font-bold tracking-tight text-lg text-[rgb(var(--fg))]">
         {SITE.shortTitle}
@@ -29,10 +29,10 @@ const path = current || Astro.url.pathname;
         return (
           <a
             href={item.href}
-            class={`px-3 py-1.5 rounded-lg text-sm font-body transition-colors ${
+            class={`px-3 py-1.5 rounded-lg text-sm font-body transition-all duration-200 ${
               active
                 ? 'text-[rgb(var(--primary))] font-bold doodle-underline'
-                : 'text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))]'
+                : 'text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] hover:bg-[rgb(var(--primary-light))]/8'
             }`}
           >
             {item.label}
@@ -47,8 +47,8 @@ const path = current || Astro.url.pathname;
         title="切换主题"
         class="theme-toggle relative w-10 h-10"
       >
-        <span class="material-symbols-outlined absolute inset-0 flex items-center justify-center text-[rgb(var(--primary))] transition-all duration-500 dark:rotate-90 dark:opacity-0 rotate-0 opacity-100">light_mode</span>
-        <span class="material-symbols-outlined absolute inset-0 flex items-center justify-center text-[rgb(var(--primary))] transition-all duration-500 dark:rotate-0 dark:opacity-100 rotate-90 opacity-0">dark_mode</span>
+        <span class="material-symbols-outlined absolute inset-0 flex items-center justify-center text-[rgb(var(--primary))] transition-all duration-400 ease-[cubic-bezier(0.23,1,0.32,1)] dark:rotate-90 dark:opacity-0 rotate-0 opacity-100">light_mode</span>
+        <span class="material-symbols-outlined absolute inset-0 flex items-center justify-center text-[rgb(var(--primary))] transition-all duration-400 ease-[cubic-bezier(0.23,1,0.32,1)] dark:rotate-0 dark:opacity-100 rotate-90 opacity-0">dark_mode</span>
       </button>
     </nav>
   </div>

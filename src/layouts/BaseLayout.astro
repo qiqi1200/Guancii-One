@@ -96,23 +96,30 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <button
       id="back-to-top"
       aria-label="返回顶部"
-      class="no-print fixed bottom-6 right-6 w-12 h-12 rounded-full bg-[rgb(var(--primary-light))] text-[rgb(var(--fg-on-primary))] shadow-lg hover:shadow-[0_0_20px_rgba(255,182,147,0.5)] hover:-translate-y-0.5 transition-all opacity-0 pointer-events-none z-30 flex items-center justify-center"
+      class="no-print fixed bottom-6 right-6 w-12 h-12 rounded-full bg-[rgb(var(--primary-light))] text-[rgb(var(--fg-on-primary))] shadow-lg hover:shadow-[0_0_20px_rgba(255,182,147,0.5)] hover:-translate-y-0.5 transition-all duration-300 opacity-0 pointer-events-none z-30 flex items-center justify-center"
     >
       <span class="material-symbols-outlined text-lg">arrow_upward</span>
     </button>
 
     <script is:inline>
-      // 返回顶部按钮
+      // 返回顶部按钮（带节流）
       const backBtn = document.getElementById('back-to-top');
+      let ticking = false;
       window.addEventListener('scroll', () => {
-        if (window.scrollY > 600) {
-          backBtn?.classList.remove('opacity-0', 'pointer-events-none');
-          backBtn?.classList.add('opacity-100');
-        } else {
-          backBtn?.classList.add('opacity-0', 'pointer-events-none');
-          backBtn?.classList.remove('opacity-100');
+        if (!ticking) {
+          requestAnimationFrame(() => {
+            if (window.scrollY > 600) {
+              backBtn?.classList.remove('opacity-0', 'pointer-events-none');
+              backBtn?.classList.add('opacity-100');
+            } else {
+              backBtn?.classList.add('opacity-0', 'pointer-events-none');
+              backBtn?.classList.remove('opacity-100');
+            }
+            ticking = false;
+          });
+          ticking = true;
         }
-      });
+      }, { passive: true });
       backBtn?.addEventListener('click', () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
       });
@@ -120,7 +127,8 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
       // 鼠标光晕（仅在非触控设备上启用）
       const blob = document.getElementById('cursor-blob');
       const isTouch = window.matchMedia('(hover: none)').matches;
-      if (blob && !isTouch) {
+      const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (blob && !isTouch && !prefersReduced) {
         document.addEventListener('mousemove', (e) => {
           blob.style.left = `${e.clientX}px`;
           blob.style.top = `${e.clientY}px`;
@@ -129,15 +137,26 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
         blob.style.display = 'none';
       }
 
-      // 卡片微动效（轻量）
-      document.querySelectorAll('.magnetic-hover').forEach(item => {
-        item.addEventListener('mouseenter', () => {
-          item.style.transform = 'scale(1.008)';
+      // 滚动入场动画（IntersectionObserver，仅非 reduced-motion 用户）
+      if (!prefersReduced) {
+        const revealObserver = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              revealObserver.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+        document.querySelectorAll('.scroll-reveal').forEach(el => {
+          revealObserver.observe(el);
         });
-        item.addEventListener('mouseleave', () => {
-          item.style.transform = '';
+      } else {
+        // reduced-motion：直接显示所有
+        document.querySelectorAll('.scroll-reveal').forEach(el => {
+          el.classList.add('is-visible');
         });
-      });
+      }
     </script>
   </body>
 </html>
