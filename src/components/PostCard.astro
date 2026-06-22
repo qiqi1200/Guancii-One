@@ -97,10 +97,10 @@ const tagSlice = hasTags ? data.tags.slice(0, featured ? 4 : 3) : [];
                   class="postit-tag text-xs"
                   style={
                     i === 0
-                      ? 'background: rgb(var(--post-it-yellow, 255, 236, 179)); color: rgb(var(--post-it-text, 86, 31, 0));'
+                      ? 'background: rgb(var(--post-it-yellow, 255 236 179)); color: rgb(var(--post-it-text, 86 31 0));'
                       : i === 1
-                      ? 'background: rgba(var(--secondary), 0.15); color: rgb(var(--secondary));'
-                      : 'background: rgba(var(--surface-variant), 0.3); color: rgb(var(--fg-soft));'
+                      ? 'background: rgb(var(--secondary) / 0.15); color: rgb(var(--secondary));'
+                      : 'background: rgb(var(--surface-variant) / 0.3); color: rgb(var(--fg-soft));'
                   }
                 >
                   #{t}
@@ -150,12 +150,12 @@ const tagSlice = hasTags ? data.tags.slice(0, featured ? 4 : 3) : [];
                 class="postit-tag text-xs"
                 style={
                   i === 0
-                    ? 'background: rgb(var(--post-it-yellow, 255, 236, 179)); color: rgb(var(--post-it-text, 86, 31, 0));'
+                    ? 'background: rgb(var(--post-it-yellow, 255 236 179)); color: rgb(var(--post-it-text, 86 31 0));'
                     : i === 1
-                    ? 'background: rgba(var(--secondary), 0.15); color: rgb(var(--secondary));'
+                    ? 'background: rgb(var(--secondary) / 0.15); color: rgb(var(--secondary));'
                     : i === 2
-                    ? 'background: rgba(var(--sage, 177, 207, 167), 0.15); color: rgb(var(--tertiary));'
-                    : 'background: rgba(var(--surface-variant), 0.3); color: rgb(var(--fg-soft));'
+                    ? 'background: rgb(var(--sage, 177 207 167) / 0.15); color: rgb(var(--tertiary));'
+                    : 'background: rgb(var(--surface-variant) / 0.3); color: rgb(var(--fg-soft));'
                 }
               >
                 #{t}

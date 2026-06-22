@@ -49,5 +49,20 @@ const { class: className = '' } = Astro.props;
       window.__twikoo_loaded__ = true;
     }
     initTwikoo();
+
+    // 监听主题切换，同步更新 Twikoo 主题
+    function updateTwikooTheme() {
+      if (typeof twikoo === 'undefined') return;
+      const theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+      try {
+        twikoo.setDarkMode(theme);
+      } catch (e) {
+        // twikoo 可能还没完全初始化，忽略
+      }
+    }
+    // 监听主题切换按钮点击
+    document.getElementById('theme-toggle')?.addEventListener('click', () => {
+      setTimeout(updateTwikooTheme, 100);
+    });
   })();
 </script>

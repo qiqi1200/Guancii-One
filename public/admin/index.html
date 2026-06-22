@@ -888,14 +888,15 @@
       }
     }
 
-      // Click on title or edit button
-      tbody.querySelectorAll('.post-title').forEach(el => {
-        el.addEventListener('click', () => openEditor(el.dataset.slug));
-      });
-      tbody.querySelectorAll('.edit-btn').forEach(el => {
-        el.addEventListener('click', () => openEditor(el.dataset.slug));
-      });
-    }
+    // ---------- 文章列表点击事件（事件委托，避免 innerHTML 替换后事件丢失） ----------
+    $('posts-tbody').addEventListener('click', (e) => {
+      const postTitle = e.target.closest('.post-title');
+      const editBtn = e.target.closest('.edit-btn');
+      const target = postTitle || editBtn;
+      if (target && target.dataset.slug) {
+        openEditor(target.dataset.slug);
+      }
+    });
 
     // ---------- Search ----------
     $('search-input').addEventListener('input', (e) => {

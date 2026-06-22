@@ -343,16 +343,6 @@ const toc = headings.filter(h => h.depth === 2 || h.depth === 3);
       });
     });
 
-    // 监听暗色模式切换
-    function updateTwikooTheme() {
-      if (typeof twikoo === 'undefined') return;
-      const theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
-      twikoo.setDarkMode(theme);
-    }
-    document.getElementById('theme-toggle')?.addEventListener('click', () => {
-      setTimeout(updateTwikooTheme, 100);
-    });
-
     // 复制链接
     const copyBtn = document.getElementById('copy-link-btn');
     const copyLabel = document.getElementById('copy-link-label');
