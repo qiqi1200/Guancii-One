@@ -1255,7 +1255,7 @@
 
       try {
         const result = await apiPut(path, payload);
-        const commitSha = result.commit_sha;
+        const commitSha = result.commit ? result.commit.sha : null;
 
         toast(`✅ 已保存！${draft ? '(草稿)' : ''} 部署进行中...`, 'success');
         currentSlug = slug;
@@ -1401,9 +1401,12 @@
       }
     });
     // 禁止在 token 输入框上右键粘贴后保留明文（自动清除）
-    $('token').addEventListener('blur', () => {
-      // 延迟清除，让 submit 事件先读取
-      setTimeout(() => { $('token').value = ''; }, 500);
+    // token 输入框 blur 时安全清除（跳过表单提交场景）
+    $('token').addEventListener('blur', (e) => {
+      // 如果是点击提交按钮导致的 blur，不清理（submit 会先读值）
+      const related = e.relatedTarget;
+      if (related && related.closest && related.closest('form')) return;
+      setTimeout(() => { $('token').value = ''; }, 800);
     });
   </script>
 </body>
