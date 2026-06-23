@@ -2,13 +2,14 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' 'unsafe-eval' cdn.jsdelivr.net cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' cdn.jsdelivr.net cdnjs.cloudflare.com; connect-src api.github.com; img-src 'self' data: blob: https:; font-src 'self' cdn.jsdelivr.net cdnjs.cloudflare.com; frame-src 'none';">
   <title>博客管理后台 — guancii</title>
-
   <!-- EasyMDE -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css" integrity="sha256-bu42NAQyd21oLnNy7Ep+spvk/bP/raMsC/peMaXvNKI=" crossorigin="anonymous">
   <!-- Highlight.js for code in preview -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" integrity="sha256-47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=" crossorigin="anonymous">
 
   <style>
     /* ======================= Reset & Variables ======================= */
@@ -319,8 +320,24 @@
     </div>
   </div>
 
+  <!-- ====================== View: Admin Gate (密码门禁) ======================== -->
+  <div id="view-gate" class="view active">
+    <div class="login-card">
+      <h1>🔒 管理后台</h1>
+      <p>请输入管理员密码继续</p>
+      <form id="gate-form" autocomplete="off">
+        <div class="form-group">
+          <label for="admin-password">管理员密码</label>
+          <input type="password" id="admin-password" class="input" placeholder="请输入密码" required>
+        </div>
+        <button type="submit" class="btn btn-primary">🔓 验证</button>
+      </form>
+      <div class="login-status" id="gate-status"></div>
+    </div>
+  </div>
+
   <!-- ====================== View: Login ======================== -->
-  <div id="view-login" class="view active">
+  <div id="view-login" class="view">
     <div class="login-card">
       <h1>📝 博客管理后台</h1>
       <p>通过 GitHub API 管理你的博客文章</p>
@@ -471,8 +488,8 @@
   </div>
 
   <!-- ====================== Scripts ======================== -->
-  <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js" integrity="sha256-LAa939DIkXbbCMz51C4r6qm08aT/j7LsC/G+0lzgjgU=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha256-g3pvpbDHNrUrveKythkPMF2j/J7UFoHbUyFQcFe1yEY=" crossorigin="anonymous"></script>
   <script>
     /* =================================================================
        Blog Admin — GitHub API Client
@@ -487,14 +504,50 @@
     let easyMDE = null;
 
     const GITHUB_API = 'https://api.github.com';
+    // ---------- Admin Gate (密码门禁) ----------
+    // 管理员密码的 SHA-256 哈希，默认密码: guancii2026（可修改此处的哈希值来更换密码）
+    const ADMIN_GATE_HASH = 'qCUBCNaOMBAaArZ39tfIfNpQU5h/cZNofdfLSjdT/cI=';
+    let gatePassed = false;
+
+    // 简单 SHA-256 工具（浏览器原生 SubtleCrypto）
+    async function sha256Base64(str) {
+      const data = new TextEncoder().encode(str);
+      const hash = await crypto.subtle.digest('SHA-256', data);
+      return btoa(String.fromCharCode(...new Uint8Array(hash)));
+    }
 
     // ---------- DOM refs ----------
     const $ = id => document.getElementById(id);
     const views = {
+      gate: $('view-gate'),
       login: $('view-login'),
       dashboard: $('view-dashboard'),
       editor: $('view-editor'),
     };
+
+    // ---------- Gate form handler ----------
+    $('gate-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const status = $('gate-status');
+      const pw = $('admin-password').value;
+      if (!pw) { status.textContent = '请输入密码'; status.className = 'login-status error'; status.style.display = 'block'; return; }
+      const hash = await sha256Base64(pw);
+      if (hash === ADMIN_GATE_HASH) {
+        gatePassed = true;
+        sessionStorage.setItem('admin_gate', '1');
+        toast('密码验证通过', 'success');
+        // 如果有保存的 session，直接进 dashboard；否则进 GitHub 登录
+        const saved = sessionStorage.getItem('admin_config');
+        if (saved) {
+          initSavedSession();
+        } else {
+          showView('login');
+        }
+      } else {
+        status.textContent = '密码错误'; status.className = 'login-status error'; status.style.display = 'block';
+        $('admin-password').value = '';
+      }
+    });
 
     // ---------- Toast ----------
     function toast(msg, type = 'success') {
@@ -523,11 +576,35 @@
 
     // ---------- Deploy tracking (GitHub Actions) ----------
     let deployPollTimer = null;
-    function setDeployBanner(state, html) {
+    // 安全版本：用 DOM API 构建内容，避免 innerHTML 注入风险
+    function setDeployBannerSafe(state, children) {
       const b = $('deploy-banner');
       b.className = 'deploy-banner ' + state;
-      b.innerHTML = html;
+      b.textContent = '';
+      if (typeof children === 'string') {
+        b.textContent = children;
+      } else if (Array.isArray(children)) {
+        children.forEach(c => {
+          if (typeof c === 'string') b.appendChild(document.createTextNode(c));
+          else if (c instanceof Node) b.appendChild(c);
+        });
+      } else if (children instanceof Node) {
+        b.appendChild(children);
+      }
       b.style.display = 'flex';
+    }
+    function makeLink(href, text) {
+      const a = document.createElement('a');
+      a.href = href;
+      a.textContent = text;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      return a;
+    }
+    function makeSpinner() {
+      const s = document.createElement('span');
+      s.className = 'spinner';
+      return s;
     }
     function stopDeployPoll() {
       if (deployPollTimer) { clearTimeout(deployPollTimer); deployPollTimer = null; }
@@ -535,7 +612,7 @@
     // Poll the latest workflow run (optionally matching commitSha) and reflect its status
     async function trackDeploy(commitSha) {
       stopDeployPoll();
-      setDeployBanner('running', '<span class="spinner"></span>🚀 部署已触发，等待 GitHub Actions 启动…');
+      setDeployBannerSafe('running', [makeSpinner(), '🚀 部署已触发，等待 GitHub Actions 启动…']);
       let attempts = 0;
       const tick = async () => {
         try {
@@ -544,22 +621,23 @@
           let run = commitSha ? runs.find(r => r.head_sha === commitSha) : null;
           if (!run) run = runs[0]; // fallback: latest run
           if (!run) {
-            if (++attempts > 40) { setDeployBanner('failure', '⚠️ 未找到部署任务（Actions 可能未触发）'); return; }
+            if (++attempts > 40) { setDeployBannerSafe('failure', '⚠️ 未找到部署任务（Actions 可能未触发）'); return; }
             deployPollTimer = setTimeout(tick, 4000); return;
           }
           if (run.status === 'completed') {
             if (run.conclusion === 'success') {
-              setDeployBanner('success', `✅ 部署成功！稍等片刻博客即可更新。 <a href="${run.html_url}" target="_blank" rel="noopener">查看运行</a>`);
+              setDeployBannerSafe('success', ['✅ 部署成功！稍等片刻博客即可更新。 ', makeLink(run.html_url, '查看运行')]);
             } else {
-              setDeployBanner('failure', `❌ 部署失败（${run.conclusion}）。 <a href="${run.html_url}" target="_blank" rel="noopener">查看日志</a>`);
+              const conclusion = escAttr(run.conclusion || 'unknown');
+              setDeployBannerSafe('failure', ['❌ 部署失败（', conclusion, '）。 ', makeLink(run.html_url, '查看日志')]);
             }
             return;
           }
           const label = run.status === 'queued' ? '排队中' : '构建中';
-          setDeployBanner('running', `<span class="spinner"></span>🚀 部署中…（${label}） <a href="${run.html_url}" target="_blank" rel="noopener">查看运行</a>`);
+          setDeployBannerSafe('running', [makeSpinner(), `🚀 部署中…（${label}） `, makeLink(run.html_url, '查看运行')]);
           deployPollTimer = setTimeout(tick, 4000);
         } catch (e) {
-          if (++attempts > 40) { setDeployBanner('failure', '⚠️ 部署状态查询失败：' + (e.message || e)); return; }
+          if (++attempts > 40) { setDeployBannerSafe('failure', '⚠️ 部署状态查询失败：' + (e.message || e)); return; }
           deployPollTimer = setTimeout(tick, 4000);
         }
       };
@@ -567,6 +645,10 @@
     }
 
     // ---------- GitHub API helpers ----------
+    // 安全构建 API URL，对 owner/repo 做路径编码防止路径遍历
+    function apiBaseUrl() {
+      return `${GITHUB_API}/repos/${encodeURIComponent(config.owner)}/${encodeURIComponent(config.repo)}`;
+    }
     function apiHeaders() {
       return {
         'Authorization': `Bearer ${config.token}`,
@@ -575,8 +657,7 @@
     }
 
     async function apiGet(path) {
-      const baseUrl = `${GITHUB_API}/repos/${config.owner}/${config.repo}`;
-      const url = path ? `${baseUrl}/${path}` : baseUrl;
+      const url = path ? `${apiBaseUrl()}/${path}` : apiBaseUrl();
       const resp = await fetch(url, { headers: apiHeaders() });
       if (!resp.ok) {
         const err = await resp.json().catch(() => ({}));
@@ -586,7 +667,7 @@
     }
 
     async function apiPut(path, body) {
-      const resp = await fetch(`${GITHUB_API}/repos/${config.owner}/${config.repo}/${path}`, {
+      const resp = await fetch(`${apiBaseUrl()}/${path}`, {
         method: 'PUT',
         headers: { ...apiHeaders(), 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
@@ -599,7 +680,7 @@
     }
 
     async function apiDelete(path, body) {
-      const resp = await fetch(`${GITHUB_API}/repos/${config.owner}/${config.repo}/${path}`, {
+      const resp = await fetch(`${apiBaseUrl()}/${path}`, {
         method: 'DELETE',
         headers: { ...apiHeaders(), 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
@@ -747,7 +828,8 @@
     });
 
     // Check for saved session
-    (function initSession() {
+    // 提取为命名函数，供 gate handler 和 initIIFE 共用
+    function initSavedSession() {
       const saved = sessionStorage.getItem('admin_config');
       if (saved) {
         try {
@@ -758,7 +840,6 @@
           $('repo').value = c.repo;
           $('branch').value = c.branch || 'main';
           $('header-user').textContent = `@${c.owner}/${c.repo}`;
-          // Verify connection silently
           apiGet('').then((repoData) => {
             if (!repoData.permissions || repoData.permissions.push !== true) {
               toast('当前 Token 没有写入权限，无法保存文章。请退出后用有 repo/Contents:Write 权限的 Token 重新登录。', 'error');
@@ -766,19 +847,28 @@
             showView('dashboard');
             loadPosts();
           }).catch(() => {
-            // Stay on login if session expired
             sessionStorage.removeItem('admin_config');
           });
         } catch { /* ignore */ }
       }
+    }
+    // 启动时：如果已通过密码门禁且有 saved session，直接进 dashboard
+    (function initIIFE() {
+      if (sessionStorage.getItem('admin_gate') === '1') {
+        gatePassed = true;
+        initSavedSession();
+      }
+      // 否则停留在 gate 视图（默认）
     })();
 
     // ---------- Logout ----------
     $('btn-logout').addEventListener('click', () => {
       sessionStorage.removeItem('admin_config');
+      sessionStorage.removeItem('admin_gate');
+      gatePassed = false;
       config = { token: '', owner: '', repo: '', branch: '' };
       if (easyMDE) { easyMDE.toTextArea(); easyMDE = null; }
-      showView('login');
+      showView('gate');
       toast('已退出登录', 'info');
     });
 
@@ -855,9 +945,9 @@
       $('stat-drafts').textContent = posts.filter(p => p.draft).length;
 
       tbody.innerHTML = posts.map(p => `
-        <tr data-slug="${p.slug}">
+        <tr data-slug="${escAttr(p.slug)}">
           <td>
-            <div class="post-title" data-slug="${p.slug}">${escHtml(p.title) || escHtml(p.slug)}</div>
+            <div class="post-title" data-slug="${escAttr(p.slug)}">${escHtml(p.title) || escHtml(p.slug)}</div>
             ${p.description ? `<div style="font-size:.78rem;color:var(--gray-light);margin-top:2px;">${escHtml(p.description.slice(0, 60))}${p.description.length > 60 ? '…' : ''}</div>` : ''}
           </td>
           <td class="post-date">${p.date ? formatDate(p.date) : '-'}</td>
@@ -870,7 +960,7 @@
           <td><span class="badge ${p.draft ? 'badge-draft' : 'badge-published'}">${p.draft ? '草稿' : '已发布'}</span></td>
           <td>
             <div class="actions">
-              <button class="btn btn-ghost btn-sm edit-btn" data-slug="${p.slug}">编辑</button>
+              <button class="btn btn-ghost btn-sm edit-btn" data-slug="${escAttr(p.slug)}">编辑</button>
             </div>
           </td>
         </tr>
@@ -878,7 +968,7 @@
 
       // Highlight and scroll to the just-saved post
       if (currentSlug) {
-        const row = $(`tr[data-slug="${currentSlug}"]`);
+        const row = $(`tr[data-slug="${CSS.escape(currentSlug)}"]`);
         if (row) {
           row.classList.add('row-highlight');
           setTimeout(() => {
@@ -1283,6 +1373,10 @@
       div.textContent = str;
       return div.innerHTML;
     }
+    function escAttr(str) {
+      if (!str) return '';
+      return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
 
     function formatDate(dateStr) {
       if (!dateStr) return '-';
@@ -1292,11 +1386,25 @@
       } catch { return dateStr; }
     }
 
-    // Initial: show login
-    showView('login');
+    // Initial: show gate (密码门禁)
+    showView('gate');
 
     console.log('📝 Guancii Blog Admin loaded');
     console.log('💡 使用 Ctrl+S / Cmd+S 快速保存文章');
+    console.log('🔒 安全加固: SRI + CSP + 密码门禁 + URL编码 + DOM API');
+
+    // ---------- Token 安全增强 ----------
+    // 页面不可见时清除输入框中的 token，防止旁人偷看
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        $('token').value = '';
+      }
+    });
+    // 禁止在 token 输入框上右键粘贴后保留明文（自动清除）
+    $('token').addEventListener('blur', () => {
+      // 延迟清除，让 submit 事件先读取
+      setTimeout(() => { $('token').value = ''; }, 500);
+    });
   </script>
 </body>
 </html>
