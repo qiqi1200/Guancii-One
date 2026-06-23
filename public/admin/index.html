@@ -680,7 +680,7 @@
         } else if (typeof v === 'boolean') {
           yaml += `${k}: ${v}\n`;
         } else {
-          yaml += `${k}: '${String(v).replace(/'/g, "\\'")}'\n`;
+          yaml += `${k}: '${String(v).replace(/'/g, "''")}'\n`;
         }
       }
       yaml += '---\n';
@@ -1099,6 +1099,10 @@
         cover,
         draft,
       };
+      // 保留原文的更新日期字段
+      if (currentSlug && originalFrontmatter?.updated) {
+        fm.updated = originalFrontmatter.updated;
+      }
       if (fm.cover === undefined) delete fm.cover;
 
       const fileContent = buildFrontmatter(fm) + body + '\n';
@@ -1244,21 +1248,30 @@
       }
     });
 
+    // ---------- 检测是否有未保存的更改 ----------
+    function hasUnsavedChanges() {
+      if (!easyMDE) return false;
+      if (easyMDE.value() !== originalBody) return true;
+      if ($('editor-title').value !== (originalFrontmatter?.title || '')) return true;
+      if ($('editor-slug').value !== (currentSlug || '')) return true;
+      if ($('editor-tags').value !== ((originalFrontmatter?.tags || []).join(', '))) return true;
+      if ($('editor-date').value !== ((originalFrontmatter?.date || '').substring(0, 10))) return true;
+      if ($('editor-desc').value !== (originalFrontmatter?.description || '')) return true;
+      if ($('editor-cover').value !== (originalFrontmatter?.cover || '')) return true;
+      if ($('editor-draft').checked !== (!!originalFrontmatter?.draft)) return true;
+      return false;
+    }
+
     // ---------- Back to dashboard ----------
     $('editor-back').addEventListener('click', () => {
-      // Check for unsaved changes
-      if (easyMDE) {
-        const currentBody = easyMDE.value();
-        const currentTitle = $('editor-title').value;
-        if (currentBody !== originalBody || currentTitle !== (originalFrontmatter?.title || '')) {
-          showModal('放弃更改？', '你有未保存的更改，确定要离开吗？', '离开').then(leave => {
-            if (leave) {
-              showView('dashboard');
-              // Don't destroy EasyMDE to keep state if user comes back
-            }
-          });
-          return;
-        }
+      if (hasUnsavedChanges()) {
+        showModal('放弃更改？', '你有未保存的更改（标题/正文/标签/日期/封面/草稿状态），确定要离开吗？', '离开').then(leave => {
+          if (leave) {
+            showView('dashboard');
+            // Don't destroy EasyMDE to keep state if user comes back
+          }
+        });
+        return;
       }
       showView('dashboard');
     });
