@@ -22,46 +22,47 @@ const { class: className = '' } = Astro.props;
 
 <div id="tcomment" class={className}></div>
 
-<script src="https://cdn.jsdelivr.net/npm/twikoo@1.7.11/dist/twikoo.min.js" is:inline></script>
-
 <script is:inline>
   (function () {
-    // 防止重复初始化（SPA 导航或多处渲染）
+    // 防止重复初始化
     if (window.__twikoo_loaded__) return;
 
-    function initTwikoo() {
-      if (typeof twikoo === 'undefined') {
-        setTimeout(initTwikoo, 100);
-        return;
-      }
-      const config = window.__TWIKOO_CONFIG__ || {
-        envId: 'https://your-twikoo.vercel.app',
-        lang: 'zh-CN',
-        sort: 'desc',
-        emoticon: [
-          'https://cdn.jsdelivr.net/gh/qcm/qq_emoji@master/dist/qq_emoji/all.gif'
-        ]
+    function loadTwikoo() {
+      // 动态加载 twikoo，避免静态 script 带来的变量冲突
+      var s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/twikoo@1.7.11/dist/twikoo.min.js';
+      s.onload = function () {
+        var config = window.__TWIKOO_CONFIG__ || {
+          envId: 'https://your-twikoo.vercel.app',
+          lang: 'zh-CN',
+          sort: 'desc',
+          emoticon: [
+            'https://cdn.jsdelivr.net/gh/qcm/qq_emoji@master/dist/qq_emoji/all.gif'
+          ]
+        };
+        if (typeof twikoo !== 'undefined') {
+          twikoo.init({
+            el: '#tcomment',
+            ...config
+          });
+          window.__twikoo_loaded__ = true;
+        }
       };
-      twikoo.init({
-        el: '#tcomment',
-        ...config
-      });
-      window.__twikoo_loaded__ = true;
+      document.head.appendChild(s);
     }
-    initTwikoo();
+    loadTwikoo();
 
     // 监听主题切换，同步更新 Twikoo 主题
     function updateTwikooTheme() {
       if (typeof twikoo === 'undefined') return;
-      const theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+      var theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
       try {
         twikoo.setDarkMode(theme);
       } catch (e) {
         // twikoo 可能还没完全初始化，忽略
       }
     }
-    // 监听主题切换按钮点击
-    document.getElementById('theme-toggle')?.addEventListener('click', () => {
+    document.getElementById('theme-toggle')?.addEventListener('click', function () {
       setTimeout(updateTwikooTheme, 100);
     });
   })();
