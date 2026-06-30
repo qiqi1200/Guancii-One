@@ -28,10 +28,9 @@ const { class: className = '' } = Astro.props;
     if (window.__twikoo_loaded__) return;
 
     function loadTwikoo() {
-      // 动态加载 twikoo，避免静态 script 带来的变量冲突
-      var s = document.createElement('script');
-      s.src = 'https://cdn.jsdelivr.net/npm/twikoo@1.7.11/dist/twikoo.min.js';
-      s.onload = function () {
+      var src = 'https://cdn.jsdelivr.net/npm/twikoo@1.7.13/dist/twikoo.min.js';
+
+      function runTwikoo() {
         var config = window.__TWIKOO_CONFIG__ || {
           envId: 'https://your-twikoo.vercel.app',
           lang: 'zh-CN',
@@ -47,8 +46,29 @@ const { class: className = '' } = Astro.props;
           });
           window.__twikoo_loaded__ = true;
         }
-      };
-      document.head.appendChild(s);
+      }
+
+      // 先抓取脚本内容，替换默认头像 CDN（weavatar.com 已挂），再执行
+      fetch(src)
+        .then(function (r) { return r.text(); })
+        .then(function (code) {
+          // 默认头像 CDN 从坏的 weavatar.com 改为 cravatar.cn（国内可用）
+          // cravatar 有专门的 hash 兼容处理（SHA256）
+          code = code.replace(/weavatar\.com/g, 'cravatar.cn');
+          var blob = new Blob([code], { type: 'application/javascript' });
+          var url = URL.createObjectURL(blob);
+          var s = document.createElement('script');
+          s.src = url;
+          s.onload = runTwikoo;
+          document.head.appendChild(s);
+        })
+        .catch(function () {
+          // fetch 失败时降级直接加载原脚本
+          var s = document.createElement('script');
+          s.src = src;
+          s.onload = runTwikoo;
+          document.head.appendChild(s);
+        });
     }
     loadTwikoo();
 
