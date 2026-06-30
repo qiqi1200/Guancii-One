@@ -77,7 +77,7 @@ const timeline = [
       </h2>
       <div class="space-y-6">
         {timeline.map((t, i) => (
-          <div class="liquid-glass rounded-xl p-5 hover:translate-x-1 transition-transform duration-300 scroll-reveal" style={`--delay: ${i * 100}ms`}>
+          <div class="liquid-glass rounded-xl p-5 hover:translate-x-1 transition-transform duration-300 scroll-reveal" style={`--reveal-delay: ${i * 100}ms`}>
             <div class="text-sm text-[rgb(var(--primary))] font-handwritten">{t.year}</div>
             <div class="font-semibold mt-1">{t.title}</div>
             <div class="text-sm text-[rgb(var(--fg-soft))] mt-1">{t.desc}</div>

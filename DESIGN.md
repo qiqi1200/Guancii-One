@@ -141,8 +141,12 @@ animation:
     fadeIn: "opacity 0.5s cubic-bezier(0.23, 1, 0.32, 1)"
     slideUp: "opacity 0.45s, transform 0.45s cubic-bezier(0.23, 1, 0.32, 1)"
   scrollReveal:
-    initial: "opacity: 0; transform: translateY(12px)"
+    initial: "opacity: 0; transform: translateY(16px)"
     visible: "opacity: 1; transform: translateY(0)"
+    variants:
+      scale: "opacity: 0; transform: translateY(8px) scale(0.96)"
+      left: "opacity: 0; transform: translateX(-20px)"
+      right: "opacity: 0; transform: translateX(20px)"
 
 # ── 布局系统 ──────────────────────────────────────────────────────────────────
 layout:
@@ -212,6 +216,37 @@ components:
   reading-progress:
     description: "阅读进度条 — 顶部渐变条"
     style: "linear-gradient(primary → secondary), fixed top"
+
+  page-entrance:
+    description: "页面内容入场动画 — 仿 ai-slide-up 效果"
+    style: |
+      @keyframes page-entrance {
+        0% { opacity: 0; transform: translateY(12px); }
+        100% { opacity: 1; transform: translateY(0); }
+      }
+      animation: 0.5s ease-smooth both
+    apply: "BaseLayout.astro 的 <main> 标签"
+
+  img-zoom-wrapper:
+    description: "图片 hover 缩放 + 暗色叠加 + 放大镜图标弹入"
+    style: |
+      img: scale(1.05) 0.4s ease-smooth
+      overlay: background 0.25s ease-smooth → rgba(0,0,0,0.25)
+      icon: scale(0.7→1) 0.25s ease-snappy
+    ref: "MmzMing/blog 的 image-grid 组件"
+
+  archive-slide-hover:
+    description: "归档列表项 hover 右滑 6px"
+    style: "transform: translateX(6px) 0.2s ease-standard"
+    ref: "MmzMing/blog 的 .ap-post-row"
+
+  link-arrow:
+    description: "链接箭头 hover 右滑动画"
+    style: "父元素 :hover > .link-arrow → translateX(3px) 0.2s"
+
+  glow-pulse:
+    description: "脉冲光晕动画 — 类似 MmzMing/blog 的 cooldown pulse"
+    style: "@keyframes glow-pulse: box-shadow 由小变大再归零，2s 循环"
 
   skeleton:
     description: "骨架屏 — 加载占位"
