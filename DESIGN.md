@@ -162,9 +162,19 @@ layout:
 # ── 组件规范 ──────────────────────────────────────────────────────────────────
 components:
   liquid-glass:
-    description: "液态玻璃效果 — 毛玻璃卡片"
-    style: "backdrop-filter: blur(20px) saturate(180%); background: rgba(255,255,255,0.55); border: 1px solid rgba(215,195,184,0.4)"
-    hover: "box-shadow 增强"
+    description: "液态玻璃效果 — 增强版毛玻璃卡片（参考 MmzMing/blog）"
+    style: |
+      backdrop-filter: blur(12px) saturate(1.8) brightness(1.08);
+      background: rgba(255,255,255,0.55);
+      border: 1px solid rgba(215,195,184,0.35);
+      box-shadow: 5层阴影（3 外部投影 + 2 inset 高光）
+    hover: "阴影深度提升，保持通透不浑浊"
+    variables:
+      - "--glass-sat: 饱和度倍率（浅色 1.8，暗色 1.6）"
+      - "--glass-bright: 亮度倍率（浅色 1.08，暗色 1.15）"
+    note: |
+      blur 从 20px 降到 12px + brightness 补光，视觉效果更通透真实。
+      inset 高光边模拟玻璃边缘反光，多层阴影模拟光线折射。
 
   scrapbook-card:
     description: "涂鸦风格卡片 — 悬浮 translateY(-2px)"

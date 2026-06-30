@@ -40,6 +40,9 @@
     --glass-bg: 255 255 255;
     --glass-border: 215 195 184;
     --glass-shadow: 0 8px 32px 0 rgba(156, 63, 0, 0.08);
+    /* 玻璃可调参数：饱和度倍率、亮度倍率 */
+    --glass-sat: 1.8;
+    --glass-bright: 1.08;
 
     /* 鼠标光晕色 (浅色：暖橙) */
     --blob-color: 255 182 147;
@@ -85,6 +88,8 @@
     --glass-bg: 29 31 41;
     --glass-border: 90 65 54;
     --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    --glass-sat: 1.6;
+    --glass-bright: 1.15;
 
     --blob-color: 255 182 147;
 
@@ -136,39 +141,133 @@
 }
 
 @layer components {
-  /* ============= 液态玻璃（浅/深双套） ============= */
+  /* ============= 液态玻璃（增强版） =============
+     参考自 MmzMing/blog 的 glass-surface 方案：
+     - 多层阴影模拟真实玻璃的折射深度
+     - inset 高光边框制造边缘圆润感
+     - brightness + saturate 组合让玻璃更通透
+     - 自定义 CSS 变量实现组件级微调
+     - @supports 优雅降级
+  */
   .liquid-glass {
+    /* 基础玻璃底色 */
     background: rgb(var(--glass-bg) / 0.55);
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
-    border: 1px solid rgb(var(--glass-border) / 0.4);
-    box-shadow: var(--glass-shadow);
-    transition: box-shadow 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+
+    /* 滤镜组合：模糊 + 饱和度 + 亮度（模拟真实玻璃折射） */
+    -webkit-backdrop-filter: blur(12px) saturate(var(--glass-sat, 1.8)) brightness(var(--glass-bright, 1.08));
+    backdrop-filter: blur(12px) saturate(var(--glass-sat, 1.8)) brightness(var(--glass-bright, 1.08));
+
+    /* 边框：半透明白色边缘 + 可选自定义调色 */
+    border: 1px solid rgb(var(--glass-border) / 0.35);
+
+    /* 多层阴影：4 层外部投影模拟环境光折射 */
+    box-shadow:
+      /* 近景柔光 */
+      0 2px 8px 0 rgb(0 0 0 / 0.04),
+      /* 中景环境光 */
+      0 8px 24px -4px rgb(0 0 0 / 0.08),
+      /* 远景泛光 */
+      0 16px 48px -8px rgb(0 0 0 / 0.06),
+      /* 顶部边缘高光（玻璃边缘反光） */
+      inset 0 0.5px 0 0 rgb(255 255 255 / 0.6),
+      /* 底部边缘微暗 */
+      inset 0 -0.5px 0 0 rgb(255 255 255 / 0.1);
+
+    transition:
+      box-shadow 0.3s cubic-bezier(0.23, 1, 0.32, 1),
+      border-color 0.3s cubic-bezier(0.23, 1, 0.32, 1),
+      background 0.3s cubic-bezier(0.23, 1, 0.32, 1);
   }
   .dark .liquid-glass {
-    background: rgb(var(--glass-bg) / 0.65);
-    border-color: rgb(var(--glass-border) / 0.45);
-    box-shadow: 0 8px 32px 0 rgb(0 0 0 / 0.4),
-                inset 0 1px 0 0 rgb(255 255 255 / 0.05);
-  }
-  .liquid-glass:hover {
-    box-shadow: 0 12px 40px 0 rgb(0 0 0 / 0.15);
-  }
-  .dark .liquid-glass:hover {
-    box-shadow: 0 12px 40px 0 rgb(0 0 0 / 0.4);
+    background: rgb(var(--glass-bg) / 0.55);
+
+    /* 暗色模式降低亮度、饱和度保持通透 */
+    -webkit-backdrop-filter: blur(12px) saturate(var(--glass-sat, 1.6)) brightness(var(--glass-bright, 1.15));
+    backdrop-filter: blur(12px) saturate(var(--glass-sat, 1.6)) brightness(var(--glass-bright, 1.15));
+
+    border-color: rgb(var(--glass-border) / 0.35);
+
+    box-shadow:
+      /* 暗色下阴影更深但不浑浊 */
+      0 2px 8px 0 rgb(0 0 0 / 0.15),
+      0 8px 24px -4px rgb(0 0 0 / 0.25),
+      0 16px 48px -8px rgb(0 0 0 / 0.3),
+      /* 暗色下边缘高光更克制 */
+      inset 0 0.5px 0 0 rgb(255 255 255 / 0.08),
+      inset 0 -0.5px 0 0 rgb(255 255 255 / 0.03);
   }
 
-  /* ============= UniVibe 增强版液态玻璃（更圆润） ============= */
+  /* hover：提升阴影深度 + 轻微上浮感 */
+  .liquid-glass:hover {
+    box-shadow:
+      0 4px 12px 0 rgb(0 0 0 / 0.08),
+      0 12px 32px -4px rgb(0 0 0 / 0.12),
+      0 24px 64px -8px rgb(0 0 0 / 0.1),
+      inset 0 0.5px 0 0 rgb(255 255 255 / 0.6),
+      inset 0 -0.5px 0 0 rgb(255 255 255 / 0.1);
+  }
+  .dark .liquid-glass:hover {
+    box-shadow:
+      0 4px 12px 0 rgb(0 0 0 / 0.2),
+      0 12px 32px -4px rgb(0 0 0 / 0.35),
+      0 24px 64px -8px rgb(0 0 0 / 0.4),
+      inset 0 0.5px 0 0 rgb(255 255 255 / 0.08),
+      inset 0 -0.5px 0 0 rgb(255 255 255 / 0.03);
+  }
+
+  /* ============= 液态玻璃 — 不支持 backdrop-filter 的回退 ============= */
+  @supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+    .liquid-glass {
+      background: rgb(var(--glass-bg) / 0.75);
+      box-shadow:
+        0 2px 8px 0 rgb(0 0 0 / 0.06),
+        0 8px 24px -4px rgb(0 0 0 / 0.1);
+    }
+    .dark .liquid-glass {
+      background: rgb(var(--glass-bg) / 0.85);
+    }
+  }
+
+  /* ============= UniVibe 增强版液态玻璃（更通透、大圆角场景） ============= */
   .liquid-glass-vibe {
-    background: rgb(var(--glass-bg) / 0.4);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgb(var(--glass-border) / 0.2);
-    box-shadow: 0 8px 32px 0 rgb(0 0 0 / 0.3);
-    transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+    background: rgb(var(--glass-bg) / 0.35);
+    -webkit-backdrop-filter: blur(16px) saturate(1.6) brightness(1.1);
+    backdrop-filter: blur(16px) saturate(1.6) brightness(1.1);
+    border: 1px solid rgb(var(--glass-border) / 0.15);
+    box-shadow:
+      0 4px 16px -4px rgb(0 0 0 / 0.06),
+      0 12px 40px -8px rgb(0 0 0 / 0.05),
+      inset 0 0.5px 0 0 rgb(255 255 255 / 0.5),
+      inset 0 -0.5px 0 0 rgb(255 255 255 / 0.08);
+    transition:
+      box-shadow 0.3s cubic-bezier(0.23, 1, 0.32, 1),
+      border-color 0.3s cubic-bezier(0.23, 1, 0.32, 1),
+      background 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  .dark .liquid-glass-vibe {
+    background: rgb(var(--glass-bg) / 0.45);
+    -webkit-backdrop-filter: blur(16px) saturate(1.4) brightness(1.15);
+    backdrop-filter: blur(16px) saturate(1.4) brightness(1.15);
+    border-color: rgb(var(--glass-border) / 0.2);
+    box-shadow:
+      0 4px 16px -4px rgb(0 0 0 / 0.15),
+      0 12px 40px -8px rgb(0 0 0 / 0.25),
+      inset 0 0.5px 0 0 rgb(255 255 255 / 0.06),
+      inset 0 -0.5px 0 0 rgb(255 255 255 / 0.02);
   }
   .liquid-glass-vibe:hover {
-    box-shadow: 0 16px 48px 0 rgb(0 0 0 / 0.4);
+    box-shadow:
+      0 6px 20px -4px rgb(0 0 0 / 0.1),
+      0 16px 48px -8px rgb(0 0 0 / 0.08),
+      inset 0 0.5px 0 0 rgb(255 255 255 / 0.5),
+      inset 0 -0.5px 0 0 rgb(255 255 255 / 0.08);
+  }
+  .dark .liquid-glass-vibe:hover {
+    box-shadow:
+      0 6px 20px -4px rgb(0 0 0 / 0.2),
+      0 16px 48px -8px rgb(0 0 0 / 0.35),
+      inset 0 0.5px 0 0 rgb(255 255 255 / 0.06),
+      inset 0 -0.5px 0 0 rgb(255 255 255 / 0.02);
   }
 
   /* ============= 涂鸦下划线 ============= */
@@ -201,30 +300,49 @@
 
   /* ============= 涂鸦风格卡片（scrapbook 卡片） ============= */
   .scrapbook-card {
-    background: rgb(var(--glass-bg) / 0.4);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    background: rgb(var(--glass-bg) / 0.35);
+    -webkit-backdrop-filter: blur(12px) saturate(1.6) brightness(1.08);
+    backdrop-filter: blur(12px) saturate(1.6) brightness(1.08);
     border: 1px solid rgb(var(--glass-border) / 0.15);
-    box-shadow: 0 4px 20px 0 rgb(0 0 0 / 0.15);
-    transition: transform 0.25s cubic-bezier(0.23, 1, 0.32, 1),
-                box-shadow 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+    box-shadow:
+      0 2px 8px 0 rgb(0 0 0 / 0.04),
+      0 8px 24px -4px rgb(0 0 0 / 0.06),
+      inset 0 0.5px 0 0 rgb(255 255 255 / 0.5),
+      inset 0 -0.5px 0 0 rgb(255 255 255 / 0.08);
+    transition:
+      transform 0.25s cubic-bezier(0.23, 1, 0.32, 1),
+      box-shadow 0.25s cubic-bezier(0.23, 1, 0.32, 1),
+      border-color 0.25s cubic-bezier(0.23, 1, 0.32, 1);
     position: relative;
     overflow: hidden;
   }
   .dark .scrapbook-card {
-    background: rgb(var(--glass-bg) / 0.6);
-    border: 1px solid rgb(var(--glass-border) / 0.35);
-    box-shadow: 0 4px 24px 0 rgb(0 0 0 / 0.4),
-                inset 0 1px 0 0 rgb(255 255 255 / 0.04);
+    background: rgb(var(--glass-bg) / 0.5);
+    -webkit-backdrop-filter: blur(12px) saturate(1.4) brightness(1.12);
+    backdrop-filter: blur(12px) saturate(1.4) brightness(1.12);
+    border-color: rgb(var(--glass-border) / 0.25);
+    box-shadow:
+      0 2px 8px 0 rgb(0 0 0 / 0.12),
+      0 8px 24px -4px rgb(0 0 0 / 0.2),
+      inset 0 0.5px 0 0 rgb(255 255 255 / 0.05),
+      inset 0 -0.5px 0 0 rgb(255 255 255 / 0.02);
   }
   .scrapbook-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 12px 32px 0 rgb(0 0 0 / 0.25);
+    box-shadow:
+      0 4px 12px 0 rgb(0 0 0 / 0.08),
+      0 12px 32px -4px rgb(0 0 0 / 0.12),
+      inset 0 0.5px 0 0 rgb(255 255 255 / 0.5),
+      inset 0 -0.5px 0 0 rgb(255 255 255 / 0.08);
   }
   .dark .scrapbook-card:hover {
-    border-color: rgb(var(--primary) / 0.25);
-    box-shadow: 0 12px 40px 0 rgb(0 0 0 / 0.5),
-                0 0 0 1px rgb(var(--primary) / 0.08);
+    border-color: rgb(var(--primary) / 0.2);
+    box-shadow:
+      0 4px 12px 0 rgb(0 0 0 / 0.2),
+      0 12px 32px -4px rgb(0 0 0 / 0.35),
+      0 0 0 1px rgb(var(--primary) / 0.06),
+      inset 0 0.5px 0 0 rgb(255 255 255 / 0.05),
+      inset 0 -0.5px 0 0 rgb(255 255 255 / 0.02);
   }
 
   /* ============= 后贴标签 ============= */
