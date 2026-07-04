@@ -335,13 +335,31 @@ const toc = headings.filter(h => h.depth === 2 || h.depth === 3);
     window.addEventListener('scroll', updateProgress, { passive: true });
     updateProgress();
 
-    // medium-zoom：文章内图片点击放大
-    import('https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/medium-zoom.min.js').then(() => {
-      mediumZoom('.prose img, article img:not(.no-zoom)', {
-        background: 'rgba(17, 19, 28, 0.9)',
-        margin: 24
+    // FancyBox：文章内图片点击放大 + 图库导航
+    (function() {
+      // 为 .prose 内所有图片添加 data-fancybox 属性（形成图库，可前后切换）
+      document.querySelectorAll('.prose img:not(.no-zoom)').forEach(function(img) {
+        img.setAttribute('data-fancybox', 'article-gallery');
       });
-    });
+
+      // 动态加载 FancyBox UMD（仅在文章页按需加载）
+      var s = document.createElement('script');
+      s.src = '/fancybox/fancybox.umd.js';
+      s.onload = function() {
+        Fancybox.bind('[data-fancybox="article-gallery"]', {
+          Carousel: { infinite: false },
+          Toolbar: {
+            display: {
+              left: [],
+              middle: ['infobar'],
+              right: ['slideshow', 'download', 'close'],
+            },
+          },
+          Thumbs: { autoStart: false },
+        });
+      };
+      document.head.appendChild(s);
+    })();
 
     // 复制链接
     const copyBtn = document.getElementById('copy-link-btn');
