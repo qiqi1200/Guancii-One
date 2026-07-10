@@ -89,8 +89,8 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <div class="cursor-blob" id="cursor-blob"></div>
 
     <!-- TOP ROW: Navbar -->
-    <div id="top-row" class="z-50 pointer-events-none relative max-w-[var(--page-width,72rem)] px-0 md:px-4 mx-auto">
-      <div id="navbar-wrapper" class="pointer-events-auto sticky top-0 transition-all">
+    <div id="top-row" class="z-50 pointer-events-none relative max-w-[var(--page-width,72rem)] px-0 mx-auto">
+      <div id="navbar-wrapper" class="pointer-events-auto sticky top-0 transition-all z-50">
         <Header current={current} />
       </div>
     </div>
@@ -98,7 +98,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <!-- MAIN CONTENT -->
     <div class="w-full z-30 pointer-events-none">
       <div class="relative max-w-[var(--page-width,72rem)] mx-auto pointer-events-auto">
-        <div id="main-grid" class="w-full left-0 right-0 grid grid-cols-1 lg:grid-cols-[17.5rem_auto] mx-auto gap-4 px-0 md:px-4">
+        <div id="main-grid" class="w-full left-0 right-0 grid grid-cols-1 lg:grid-cols-[17.5rem_auto] mx-auto gap-4 px-4 md:px-4">
 
           <!-- Sidebar (left, second row on mobile, first column on desktop) -->
           <div class="mb-4 row-start-2 lg:row-start-1 lg:col-span-1 onload-animation">
