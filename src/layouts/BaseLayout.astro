@@ -88,12 +88,35 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <!-- 鼠标光晕 -->
     <div class="cursor-blob" id="cursor-blob"></div>
 
-    <Header current={current} />
+    <!-- TOP ROW: Navbar -->
+    <div id="top-row" class="z-50 pointer-events-none relative max-w-[var(--page-width,72rem)] px-0 md:px-4 mx-auto">
+      <div id="navbar-wrapper" class="pointer-events-auto sticky top-0 transition-all">
+        <Header current={current} />
+      </div>
+    </div>
 
-    <main class="flex-1 w-full relative z-10 page-entrance">
-      <slot />
-    </main>
+    <!-- MAIN CONTENT -->
+    <div class="w-full z-30 pointer-events-none">
+      <div class="relative max-w-[var(--page-width,72rem)] mx-auto pointer-events-auto">
+        <div id="main-grid" class="w-full left-0 right-0 grid grid-cols-1 lg:grid-cols-[17.5rem_auto] mx-auto gap-4 px-0 md:px-4">
 
+          <!-- Sidebar (left, second row on mobile, first column on desktop) -->
+          <div class="mb-4 row-start-2 lg:row-start-1 lg:col-span-1 onload-animation">
+            <slot name="sidebar" />
+          </div>
+
+          <!-- Main content (right, first on mobile, second column on desktop) -->
+          <main class="col-span-1 lg:col-span-1 overflow-hidden" id="swup-container">
+            <div id="content-wrapper" class="page-entrance onload-animation">
+              <slot />
+            </div>
+          </main>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
     <Footer />
 
     <!-- 返回顶部按钮 -->
@@ -164,3 +187,10 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     </script>
   </body>
 </html>
+
+<style>
+  :root {
+    --content-delay: 0ms;
+    --page-width: 72rem;
+  }
+</style>

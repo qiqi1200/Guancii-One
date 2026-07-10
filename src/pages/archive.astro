@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Sidebar from '../components/Sidebar.astro';
 import { getCollection } from 'astro:content';
 
 const posts = (await getCollection('posts'))
@@ -13,10 +14,18 @@ posts.forEach(p => {
   if (!groups.has(key)) groups.set(key, []);
   groups.get(key)!.push(p);
 });
+
+// 收集全部文章（给 Sidebar）
+const allPosts = posts;
 ---
+
 <BaseLayout title="归档" current="/archive">
-  <article class="max-w-3xl mx-auto px-6 py-12 md:py-20">
-    <header class="mb-12 animate-fade-in">
+  <div slot="sidebar">
+    <Sidebar posts={allPosts} />
+  </div>
+
+  <article class="pb-8 onload-animation">
+    <header class="mb-10">
       <div class="text-sm text-[rgb(var(--fg-soft))] mb-2">归档</div>
       <h1 class="text-4xl md:text-5xl font-semibold tracking-tight text-[rgb(var(--fg))]">
         全部文章
@@ -26,7 +35,7 @@ posts.forEach(p => {
       </p>
     </header>
 
-    <div class="space-y-12">
+    <div class="space-y-10">
       {[...groups.entries()].map(([month, items]) => (
         <section>
           <h2 class="text-lg font-bold text-[rgb(var(--fg))] mb-4 flex items-center gap-2">

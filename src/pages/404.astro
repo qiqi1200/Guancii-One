@@ -1,9 +1,17 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Sidebar from '../components/Sidebar.astro';
+import { getCollection } from 'astro:content';
+
+const allPosts = (await getCollection('posts')).filter(p => !p.data.draft);
 ---
 
 <BaseLayout title="页面未找到">
-  <article class="max-w-3xl mx-auto px-6 py-20 md:py-32 text-center animate-fade-in">
+  <div slot="sidebar">
+    <Sidebar posts={allPosts} />
+  </div>
+
+  <article class="text-center pb-8 onload-animation">
     <span class="material-symbols-outlined text-8xl text-[rgb(var(--primary))] opacity-50 mb-6 block">explore_off</span>
     <h1 class="text-4xl md:text-6xl font-headline font-bold text-[rgb(var(--fg))] mb-4">404</h1>
     <p class="text-lg text-[rgb(var(--fg-soft))] mb-8 font-body">
@@ -14,11 +22,11 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         <span class="material-symbols-outlined text-base align-middle mr-1">home</span>
         回到首页
       </a>
-      <a href="/archive" class="px-6 py-2.5 rounded-full border border-[rgb(var(--outline-variant))] hover:bg-[rgb(var(--surface-variant))]/30 font-label text-sm transition-all text-[rgb(var(--secondary))]">
+      <a href="/archive" class="px-6 py-2.5 rounded-full border border-[rgb(var(--border))] hover:bg-[rgb(var(--surface-variant))]/30 font-label text-sm transition-all text-[rgb(var(--secondary))]">
         <span class="material-symbols-outlined text-base align-middle mr-1">auto_stories</span>
         浏览归档
       </a>
-      <a href="/tags" class="px-6 py-2.5 rounded-full border border-[rgb(var(--outline-variant))] hover:bg-[rgb(var(--surface-variant))]/30 font-label text-sm transition-all text-[rgb(var(--secondary))]">
+      <a href="/tags" class="px-6 py-2.5 rounded-full border border-[rgb(var(--border))] hover:bg-[rgb(var(--surface-variant))]/30 font-label text-sm transition-all text-[rgb(var(--secondary))]">
         <span class="material-symbols-outlined text-base align-middle mr-1">label</span>
         查看标签
       </a>

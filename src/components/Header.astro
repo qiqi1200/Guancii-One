@@ -10,52 +10,95 @@ const navItems = [
 ];
 const path = current || Astro.url.pathname;
 ---
-<header class="fixed top-0 w-full z-50 bg-[rgb(var(--glass-bg))]/80 dark:bg-surface-dim/80 backdrop-blur-xl border-b border-[rgb(var(--glass-border))]/10 shadow-sm transition-all duration-300">
-  <div class="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
-    <a href="/" class="flex items-center gap-2 group">
+
+<div id="navbar" class="z-50 onload-animation">
+  <div class="card-base !overflow-visible max-w-[var(--page-width,72rem)] h-[4.5rem] !rounded-t-none mx-auto flex items-center justify-between px-4">
+    <a href="/" class="flex items-center gap-3 rounded-lg h-[3.25rem] px-4 hover:bg-[rgb(var(--primary-light)/0.08)] transition-colors active:scale-95">
       <img
         src={SITE.avatar}
         alt={SITE.author}
-        class="w-9 h-9 rounded-full object-cover shadow-sm transition-shadow duration-300 group-hover:shadow-md"
+        class="w-8 h-8 rounded-full object-cover shadow-sm"
       />
-      <span class="font-headline font-bold tracking-tight text-lg text-[rgb(var(--fg))]">
+      <span class="font-headline font-bold tracking-tight text-base text-[rgb(var(--fg))]">
         {SITE.shortTitle}
       </span>
     </a>
 
-    <nav class="flex items-center gap-1 sm:gap-2">
+    <nav class="hidden md:flex items-center gap-1">
       {navItems.map(item => {
         const active = path === item.href || (item.href !== '/' && path.startsWith(item.href));
         return (
           <a
             href={item.href}
-            class={`px-3 py-1.5 rounded-lg text-sm font-body transition-all duration-200 ${
+            class={`rounded-lg h-11 font-bold px-5 transition-all active:scale-95 flex items-center ${
               active
-                ? 'text-[rgb(var(--primary))] font-bold doodle-underline'
-                : 'text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] hover:bg-[rgb(var(--primary-light))]/8'
+                ? 'text-[rgb(var(--primary))] bg-[rgb(var(--primary-light)/0.1)]'
+                : 'text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] hover:bg-[rgb(var(--primary-light)/0.05)]'
             }`}
           >
             {item.label}
           </a>
         );
       })}
+    </nav>
+
+    <div class="flex items-center gap-1">
+      <!-- 搜索 -->
+      <a href="/search"
+        class="btn-plain rounded-lg h-11 w-11 flex items-center justify-center text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] hover:bg-[rgb(var(--primary-light)/0.08)] transition-all active:scale-90"
+        aria-label="搜索"
+      >
+        <span class="material-symbols-outlined text-xl">search</span>
+      </a>
 
       <!-- 主题切换 -->
       <button
         id="theme-toggle"
         aria-label="切换主题"
-        title="切换主题"
-        class="theme-toggle relative w-10 h-10"
+        class="rounded-lg h-11 w-11 flex items-center justify-center text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] hover:bg-[rgb(var(--primary-light)/0.08)] transition-all active:scale-90 relative"
       >
-        <span class="material-symbols-outlined absolute inset-0 flex items-center justify-center text-[rgb(var(--primary))] transition-all duration-400 ease-[cubic-bezier(0.23,1,0.32,1)] dark:rotate-90 dark:opacity-0 rotate-0 opacity-100">light_mode</span>
-        <span class="material-symbols-outlined absolute inset-0 flex items-center justify-center text-[rgb(var(--primary))] transition-all duration-400 ease-[cubic-bezier(0.23,1,0.32,1)] dark:rotate-0 dark:opacity-100 rotate-90 opacity-0">dark_mode</span>
+        <span class="material-symbols-outlined absolute text-xl transition-all duration-400 dark:rotate-90 dark:opacity-0 rotate-0 opacity-100">light_mode</span>
+        <span class="material-symbols-outlined absolute text-xl transition-all duration-400 dark:rotate-0 dark:opacity-100 rotate-90 opacity-0">dark_mode</span>
       </button>
+
+      <!-- 移动端菜单 -->
+      <button
+        id="nav-menu-switch"
+        aria-label="菜单"
+        class="rounded-lg w-11 h-11 flex items-center justify-center text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] hover:bg-[rgb(var(--primary-light)/0.08)] transition-all active:scale-90 md:hidden"
+      >
+        <span class="material-symbols-outlined text-xl">menu</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 移动端导航面板 -->
+<div id="nav-menu-panel" class="float-panel-closed fixed inset-0 z-40 md:hidden">
+  <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" id="nav-menu-overlay"></div>
+  <div class="absolute right-4 top-20 w-56 card-base rounded-2xl p-3 shadow-xl">
+    <nav class="flex flex-col gap-1">
+      {navItems.map(item => {
+        const active = path === item.href || (item.href !== '/' && path.startsWith(item.href));
+        return (
+          <a
+            href={item.href}
+            class={`block px-4 py-3 rounded-xl text-sm font-bold transition-all ${
+              active
+                ? 'text-[rgb(var(--primary))] bg-[rgb(var(--primary-light)/0.1)]'
+                : 'text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] hover:bg-[rgb(var(--primary-light)/0.05)]'
+            }`}
+          >
+            {item.label}
+          </a>
+        );
+      })}
     </nav>
   </div>
-</header>
+</div>
 
 <script is:inline>
-  // 主题切换（BaseLayout 已在 <head> 中初始化默认浅色，此处只负责切换交互）
+  // 主题切换
   const themeToggle = document.getElementById('theme-toggle');
   themeToggle?.addEventListener('click', () => {
     document.documentElement.classList.toggle('dark');
@@ -64,4 +107,16 @@ const path = current || Astro.url.pathname;
       document.documentElement.classList.contains('dark') ? 'dark' : 'light'
     );
   });
+
+  // 移动端菜单
+  const menuSwitch = document.getElementById('nav-menu-switch');
+  const menuPanel = document.getElementById('nav-menu-panel');
+  const menuOverlay = document.getElementById('nav-menu-overlay');
+
+  function toggleMenu() {
+    menuPanel?.classList.toggle('float-panel-closed');
+  }
+
+  menuSwitch?.addEventListener('click', toggleMenu);
+  menuOverlay?.addEventListener('click', toggleMenu);
 </script>

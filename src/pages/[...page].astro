@@ -31,25 +31,30 @@ function pageUrl(n: number): string {
   return n === 1 ? '/' : `/${n}`;
 }
 ---
+
 <BaseLayout title={pageTitle} current="/">
+  <div slot="sidebar">
+    <Sidebar posts={allPosts} />
+  </div>
+
   <!-- ═══════ Hero：不对称分栏 ═══════ -->
   {isFirstPage && (
-    <section class="relative pt-24 pb-10 md:pt-36 md:pb-16 px-6 max-w-6xl mx-auto overflow-hidden">
-      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-8 md:gap-16">
+    <section class="relative pt-4 pb-10 md:pt-8 md:pb-8 md:px-0 overflow-hidden onload-animation">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6 md:gap-12">
         <!-- 左侧：文字区 -->
-        <div class="flex-1 max-w-xl animate-fade-in">
+        <div class="flex-1 max-w-xl">
           <p class="text-sm font-handwritten text-[rgb(var(--fg-soft))] mb-3 tracking-wide">
             来自吉林四平，在天津读交通工程
           </p>
-          <h1 class="text-4xl md:text-5xl lg:text-6xl font-headline font-bold tracking-tight text-[rgb(var(--fg))] leading-[1.1]">
+          <h1 class="text-3xl md:text-4xl lg:text-5xl font-headline font-bold tracking-tight text-[rgb(var(--fg))] leading-[1.1]">
             你好，我是<br/>
             <span class="doodle-underline text-[rgb(var(--primary))]">{SITE.author}</span>
           </h1>
-          <p class="mt-5 text-base md:text-lg text-[rgb(var(--fg-soft))] leading-relaxed font-handwritten">
+          <p class="mt-4 text-base md:text-lg text-[rgb(var(--fg-soft))] leading-relaxed font-handwritten">
             记点生活里的小事、读过的书、学过的东西。<br class="hidden md:block"/>
             没什么宏大叙事，就是一些安静的思考和日常。
           </p>
-          <div class="mt-7 flex flex-wrap gap-3">
+          <div class="mt-6 flex flex-wrap gap-3">
             <a href="/about"
                class="px-5 py-2.5 rounded-full bg-[rgb(var(--primary-light))] text-[rgb(var(--fg-on-primary))] font-label text-sm font-bold transition-all hover:shadow-[0_0_12px_rgba(var(--primary-light),0.3)]">
               了解我
@@ -62,15 +67,15 @@ function pageUrl(n: number): string {
         </div>
 
         <!-- 右侧：头像 + 装饰 -->
-        <div class="relative flex-shrink-0 mx-auto md:mx-0 animate-fade-in" style="animation-delay: 100ms">
-          <div class="relative w-28 h-28 md:w-44 md:h-44">
+        <div class="relative flex-shrink-0 mx-auto md:mx-0">
+          <div class="relative w-24 h-24 md:w-36 md:h-36">
             <!-- 装饰：手绘风圆环 -->
             <svg class="absolute inset-0 w-full h-full -rotate-12 opacity-30" viewBox="0 0 200 200" fill="none">
               <circle cx="100" cy="100" r="90" stroke="rgb(var(--primary-light))" stroke-width="1.5" stroke-dasharray="8 12" stroke-linecap="round"/>
             </svg>
             <!-- 头像 -->
             <div class="absolute inset-2 md:inset-3 rounded-full p-0.5 shadow-md"
-                 style="background: linear-gradient(135deg, rgb(var(--primary-light)), rgb(var(--secondary)), rgb(--tertiary));">
+                 style="background: linear-gradient(135deg, rgb(var(--primary-light)), rgb(var(--secondary)), rgb(var(--tertiary)));">
               <img
                 src={SITE.avatar}
                 alt={SITE.author}
@@ -85,7 +90,7 @@ function pageUrl(n: number): string {
 
   <!-- ═══════ 非首页顶部返回 ═══════ -->
   {!isFirstPage && (
-    <section class="pt-24 pb-6 px-6 max-w-6xl mx-auto">
+    <section class="pt-2 pb-4 md:px-0">
       <a href="/"
          class="inline-flex items-center gap-1 text-sm text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] transition-colors">
         <span class="material-symbols-outlined text-base">arrow_back</span>
@@ -96,7 +101,7 @@ function pageUrl(n: number): string {
 
   <!-- ═══════ 标签筛选：紧凑内联 ═══════ -->
   {allTags.length > 0 && isFirstPage && (
-    <section class="max-w-6xl mx-auto px-6 mb-10">
+    <section class="mb-6">
       <div class="flex items-center gap-3 overflow-x-auto scrollbar-none pb-1">
         <span class="text-xs text-[rgb(var(--fg-soft))] font-label uppercase tracking-wider shrink-0">筛选</span>
         <div class="h-4 w-px bg-[rgb(var(--border))]/50 shrink-0"></div>
@@ -112,91 +117,81 @@ function pageUrl(n: number): string {
     </section>
   )}
 
-  <!-- ═══════ 内容区：主栏 + 侧边栏 ═══════ -->
-  <section class="max-w-6xl mx-auto px-6 pb-16">
-    <div class="grid lg:grid-cols-[1fr_260px] gap-10 md:gap-14">
-      <div>
-        <!-- ─── Featured 卡片：横向大卡 ─── -->
-        {featured && (
-          <div class="mb-8 post-container scroll-reveal" data-tags={JSON.stringify(featured.data.tags || [])}>
-            <PostCard post={featured} featured={true} />
-          </div>
-        )}
-
-        {/* ─── 文章网格：干净 2 列 ─── */}
-        <div class="grid gap-5 post-grid sm:grid-cols-2">
-          {rest.map((p, i) => (
-            <div
-              class="post-container scroll-reveal"
-              data-tags={JSON.stringify(p.data.tags || [])}
-              style={`--delay: ${(i + 1) * 80}ms`}
-            >
-              <PostCard post={p} />
-            </div>
-          ))}
-        </div>
-
-        {posts.length === 0 && (
-          <div class="text-center py-20 text-[rgb(var(--fg-soft))] font-body">
-            <span class="material-symbols-outlined text-6xl mb-4 block opacity-40">edit_note</span>
-            还没有文章，先去写下第一篇吧
-          </div>
-        )}
-
-        <!-- ─── 分页导航 ─── -->
-        {page.lastPage > 1 && (
-          <nav class="mt-14 flex items-center justify-center gap-2" aria-label="分页导航">
-            {page.currentPage > 1 ? (
-              <a href={pageUrl(page.currentPage - 1)}
-                 class="px-3 py-1.5 rounded-lg text-sm border border-[rgb(var(--border))]/50 text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] hover:border-[rgb(var(--primary))]/30 transition-colors flex items-center gap-0.5">
-                <span class="material-symbols-outlined text-base">chevron_left</span>
-                <span class="hidden sm:inline">上一页</span>
-              </a>
-            ) : (
-              <span class="px-3 py-1.5 rounded-lg text-sm border border-[rgb(var(--border))]/20 text-[rgb(var(--fg-soft))]/30 flex items-center gap-0.5 pointer-events-none">
-                <span class="material-symbols-outlined text-base">chevron_left</span>
-                <span class="hidden sm:inline">上一页</span>
-              </span>
-            )}
-
-            {Array.from({ length: Math.min(page.lastPage, 7) }, (_, i) => i + 1).map(p => (
-              <a href={pageUrl(p)}
-                 class={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                   p === page.currentPage
-                     ? 'bg-[rgb(var(--primary))] text-[rgb(var(--fg-on-primary))]'
-                     : 'border border-[rgb(var(--border))]/50 text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] hover:border-[rgb(var(--primary))]/30'
-                 }`}>
-                {p}
-              </a>
-            ))}
-
-            {page.lastPage > 7 && (
-              <span class="px-2 text-[rgb(var(--fg-soft))]">...</span>
-            )}
-
-            {page.currentPage < page.lastPage ? (
-              <a href={pageUrl(page.currentPage + 1)}
-                 class="px-3 py-1.5 rounded-lg text-sm border border-[rgb(var(--border))]/50 text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] hover:border-[rgb(var(--primary))]/30 transition-colors flex items-center gap-0.5">
-                <span class="hidden sm:inline">下一页</span>
-                <span class="material-symbols-outlined text-base">chevron_right</span>
-              </a>
-            ) : (
-              <span class="px-3 py-1.5 rounded-lg text-sm border border-[rgb(var(--border))]/20 text-[rgb(var(--fg-soft))]/30 flex items-center gap-0.5 pointer-events-none">
-                <span class="hidden sm:inline">下一页</span>
-                <span class="material-symbols-outlined text-base">chevron_right</span>
-              </span>
-            )}
-          </nav>
-        )}
+  <!-- ═══════ 文章区 ═══════ -->
+  <div class="pb-8">
+    <!-- ─── Featured 卡片：横向大卡 ─── -->
+    {featured && (
+      <div class="mb-6 post-container scroll-reveal" data-tags={JSON.stringify(featured.data.tags || [])}>
+        <PostCard post={featured} featured={true} />
       </div>
+    )}
 
-      <div class="hidden lg:block">
-        <div class="sticky top-24">
-          <Sidebar posts={allPosts} />
+    {/* ─── 文章网格 ─── */}
+    <div class="grid gap-4 post-grid sm:grid-cols-2">
+      {rest.map((p, i) => (
+        <div
+          class="post-container scroll-reveal"
+          data-tags={JSON.stringify(p.data.tags || [])}
+          style={`--delay: ${(i + 1) * 80}ms`}
+        >
+          <PostCard post={p} />
         </div>
-      </div>
+      ))}
     </div>
-  </section>
+
+    {posts.length === 0 && (
+      <div class="text-center py-20 text-[rgb(var(--fg-soft))] font-body">
+        <span class="material-symbols-outlined text-6xl mb-4 block opacity-40">edit_note</span>
+        还没有文章，先去写下第一篇吧
+      </div>
+    )}
+
+    <!-- ─── 分页导航 ─── -->
+    {page.lastPage > 1 && (
+      <nav class="mt-10 flex items-center justify-center gap-2" aria-label="分页导航">
+        {page.currentPage > 1 ? (
+          <a href={pageUrl(page.currentPage - 1)}
+             class="px-3 py-1.5 rounded-lg text-sm border border-[rgb(var(--border))]/50 text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] hover:border-[rgb(var(--primary))]/30 transition-colors flex items-center gap-0.5">
+            <span class="material-symbols-outlined text-base">chevron_left</span>
+            <span class="hidden sm:inline">上一页</span>
+          </a>
+        ) : (
+          <span class="px-3 py-1.5 rounded-lg text-sm border border-[rgb(var(--border))]/20 text-[rgb(var(--fg-soft))]/30 flex items-center gap-0.5 pointer-events-none">
+            <span class="material-symbols-outlined text-base">chevron_left</span>
+            <span class="hidden sm:inline">上一页</span>
+          </span>
+        )}
+
+        {Array.from({ length: Math.min(page.lastPage, 7) }, (_, i) => i + 1).map(p => (
+          <a href={pageUrl(p)}
+             class={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+               p === page.currentPage
+                 ? 'bg-[rgb(var(--primary))] text-[rgb(var(--fg-on-primary))]'
+                 : 'border border-[rgb(var(--border))]/50 text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] hover:border-[rgb(var(--primary))]/30'
+             }`}>
+            {p}
+          </a>
+        ))}
+
+        {page.lastPage > 7 && (
+          <span class="px-2 text-[rgb(var(--fg-soft))]">...</span>
+        )}
+
+        {page.currentPage < page.lastPage ? (
+          <a href={pageUrl(page.currentPage + 1)}
+             class="px-3 py-1.5 rounded-lg text-sm border border-[rgb(var(--border))]/50 text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] hover:border-[rgb(var(--primary))]/30 transition-colors flex items-center gap-0.5">
+            <span class="hidden sm:inline">下一页</span>
+            <span class="material-symbols-outlined text-base">chevron_right</span>
+          </a>
+        ) : (
+          <span class="px-3 py-1.5 rounded-lg text-sm border border-[rgb(var(--border))]/20 text-[rgb(var(--fg-soft))]/30 flex items-center gap-0.5 pointer-events-none">
+            <span class="hidden sm:inline">下一页</span>
+            <span class="material-symbols-outlined text-base">chevron_right</span>
+          </span>
+        )}
+      </nav>
+    )}
+  </div>
 </BaseLayout>
 
 <script is:inline>

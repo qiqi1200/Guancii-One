@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Sidebar from '../components/Sidebar.astro';
 import { getCollection } from 'astro:content';
 
 // 构建搜索索引：提取精简字段供客户端使用
@@ -19,8 +20,12 @@ const index = allPosts.map(p => ({
 ---
 
 <BaseLayout title="搜索">
-  <article class="max-w-6xl mx-auto px-6 py-12 md:py-20">
-    <header class="mb-12 animate-fade-in">
+  <div slot="sidebar">
+    <Sidebar posts={allPosts} />
+  </div>
+
+  <article class="pb-8 onload-animation">
+    <header class="mb-8">
       <h1 class="text-4xl md:text-5xl font-headline font-semibold tracking-tight text-[rgb(var(--fg))]">
         搜索
       </h1>
@@ -38,7 +43,7 @@ const index = allPosts.map(p => ({
 
     <p id="search-info" class="text-[rgb(var(--fg-soft))] mb-8 hidden"></p>
 
-    <div id="search-results" class="grid sm:grid-cols-2 gap-6"></div>
+    <div id="search-results" class="grid sm:grid-cols-2 gap-4"></div>
 
     <p id="search-empty" class="text-[rgb(var(--fg-soft))] text-center py-12 hidden">
       没有找到相关文章
@@ -83,7 +88,7 @@ const index = allPosts.map(p => ({
       : '';
 
     return `
-      <article class="group scrapbook-card rounded-[2rem] p-6 magnetic-hover relative" style="transform: rotate(0deg);">
+      <article class="group scrapbook-card rounded-[2rem] p-6 relative">
         <a href="/posts/${post.slug}/" class="block h-full">
           ${coverHtml}
           <div class="space-y-3">

@@ -1,25 +1,32 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import Sidebar from '../../components/Sidebar.astro';
 import PostCard from '../../components/PostCard.astro';
 import { getCollection } from 'astro:content';
 
 export async function getStaticPaths() {
-  const posts = (await getCollection('posts')).filter(p => !p.data.draft);
-  const tags = [...new Set(posts.flatMap(p => p.data.tags || []))];
-  return tags.map(tag => ({
-    params: { tag },
-    props: { posts: posts.filter(p => p.data.tags?.includes(tag)) }
+  const postsList = (await getCollection('posts')).filter(p => !p.data.draft);
+  const tags = [...new Set(postsList.flatMap(p => p.data.tags || []))];
+  return tags.map(t => ({
+    params: { tag: t },
+    props: { allPosts: postsList, posts: postsList.filter(p => p.data.tags?.includes(t)) }
   }));
 }
 
 const { tag } = Astro.params;
-const { posts } = Astro.props;
+const { posts, allPosts } = Astro.props;
 ---
+
 <BaseLayout title={`#${tag}`} description={`关于 ${tag} 的所有文章`}>
-  <article class="max-w-6xl mx-auto px-6 py-12 md:py-20">
-    <header class="mb-12 animate-fade-in">
-      <a href="/tags" class="text-sm text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] transition-colors">
-        ← 返回所有标签
+  <div slot="sidebar">
+    <Sidebar posts={allPosts} />
+  </div>
+
+  <article class="pb-8 onload-animation">
+    <header class="mb-8">
+      <a href="/tags" class="text-sm text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] transition-colors inline-flex items-center gap-1">
+        <span class="material-symbols-outlined text-base">arrow_back</span>
+        返回所有标签
       </a>
       <h1 class="text-4xl md:text-5xl font-semibold tracking-tight text-[rgb(var(--fg))] mt-4">
         #<span class="text-[rgb(var(--primary))]">{tag}</span>
@@ -29,7 +36,7 @@ const { posts } = Astro.props;
       </p>
     </header>
 
-    <div class="grid sm:grid-cols-2 gap-6">
+    <div class="grid sm:grid-cols-2 gap-4">
       {posts
         .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
         .map(p => <PostCard post={p} />)

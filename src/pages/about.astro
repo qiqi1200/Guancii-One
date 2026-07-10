@@ -1,5 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Sidebar from '../components/Sidebar.astro';
+import { getCollection } from 'astro:content';
 import site from '../site.json';
 const SITE = site;
 
@@ -12,10 +14,18 @@ const timeline = [
   { year: '2025 - 现在', title: '中国民航大学 · 交通工程 · 大一', desc: '写写博客，学点代码，记录生活' },
   { year: '2025', title: '高考结束，进入大学', desc: '开始接触编程和独立博客' }
 ];
+
+// 收集全部文章（给 Sidebar）
+const allPosts = (await getCollection('posts')).filter(p => !p.data.draft);
 ---
+
 <BaseLayout title="关于" current="/about">
-  <article class="max-w-3xl mx-auto px-6 py-12 md:py-20">
-    <header class="mb-12 animate-fade-in">
+  <div slot="sidebar">
+    <Sidebar posts={allPosts} />
+  </div>
+
+  <article class="pb-8 onload-animation">
+    <header class="mb-10">
       <div class="text-sm text-[rgb(var(--fg-soft))] mb-2 font-handwritten">关于</div>
       <h1 class="text-4xl md:text-5xl font-bold tracking-tight text-[rgb(var(--fg))]">
         关于我
