@@ -75,7 +75,7 @@ const path = current || Astro.url.pathname;
 
 <!-- 移动端导航面板 -->
 <div id="nav-menu-panel" class="float-panel-closed fixed inset-0 z-40 md:hidden">
-  <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" id="nav-menu-overlay"></div>
+  <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" id="nav-menu-overlay" style="pointer-events: none;"></div>
   <div class="absolute right-4 top-20 w-56 card-base rounded-2xl p-3 shadow-xl">
     <nav class="flex flex-col gap-1">
       {navItems.map(item => {
@@ -108,15 +108,77 @@ const path = current || Astro.url.pathname;
     );
   });
 
-  // 移动端菜单
-  const menuSwitch = document.getElementById('nav-menu-switch');
-  const menuPanel = document.getElementById('nav-menu-panel');
-  const menuOverlay = document.getElementById('nav-menu-overlay');
+  // 移动端菜单（兼容桌面 click 与移动端 touch）
+  (function() {
+    const menuSwitch = document.getElementById('nav-menu-switch');
+    const menuPanel = document.getElementById('nav-menu-panel');
+    if (!menuSwitch || !menuPanel) return;
 
-  function toggleMenu() {
-    menuPanel?.classList.toggle('float-panel-closed');
-  }
+    let navigating = false;
 
-  menuSwitch?.addEventListener('click', toggleMenu);
-  menuOverlay?.addEventListener('click', toggleMenu);
+    function openMenu() {
+      menuPanel.classList.remove('float-panel-closed');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeMenu() {
+      menuPanel.classList.add('float-panel-closed');
+      document.body.style.overflow = '';
+    }
+
+    function toggleMenu() {
+      if (menuPanel.classList.contains('float-panel-closed')) {
+        openMenu();
+      } else {
+        closeMenu();
+      }
+    }
+
+    // 导航到目标页面
+    function navigateTo(link) {
+      if (!link || navigating) return;
+      const href = link.getAttribute('href');
+      if (!href || href.startsWith('#')) return;
+
+      if (window.location.pathname === href) {
+        closeMenu();
+        return;
+      }
+
+      navigating = true;
+      closeMenu();
+      window.location.href = href;
+    }
+
+    // 事件委托：菜单项点击/触摸 → 导航；空白区域 → 关菜单
+    function handlePanelActivate(e) {
+      const link = e.target.closest('#nav-menu-panel a[href]');
+      if (link) {
+        e.stopPropagation();
+        e.preventDefault();
+        navigateTo(link);
+      } else {
+        closeMenu();
+      }
+    }
+
+    // 开关按钮
+    function handleSwitch(e) {
+      e.stopPropagation();
+      toggleMenu();
+    }
+
+    menuSwitch.addEventListener('click', handleSwitch);
+    menuSwitch.addEventListener('touchend', handleSwitch);
+
+    menuPanel.addEventListener('click', handlePanelActivate);
+    menuPanel.addEventListener('touchend', handlePanelActivate, { passive: false });
+
+    // 键盘 ESC 关闭
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && !menuPanel.classList.contains('float-panel-closed')) {
+        closeMenu();
+      }
+    });
+  })();
 </script>

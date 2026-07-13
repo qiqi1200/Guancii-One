@@ -813,4 +813,12 @@
   .hide-scrollbar::-webkit-scrollbar {
     display: none;
   }
+
+  /* ============= 移动端导航面板显示/隐藏 ============= */
+  .float-panel-closed {
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transition: visibility 0.25s, opacity 0.25s;
+  }
 }
