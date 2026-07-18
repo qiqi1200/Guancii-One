@@ -904,28 +904,19 @@
     display: none;
   }
 
-<<<<<<< HEAD
-  /* ============= 移动端导航面板显示/隐藏 ============= */
-  .float-panel-closed {
-    visibility: hidden;
-    opacity: 0;
-    pointer-events: none;
-    transition: visibility 0.25s, opacity 0.25s;
-=======
-  /* ============= 浮动面板（移动端菜单） ============= */
-  .float-panel-closed {
-    opacity: 0;
-    pointer-events: none;
-    visibility: hidden;
-    transition: opacity 0.2s ease, visibility 0.2s ease;
-  }
-  .float-panel-closed:not(.float-panel-closed) {
-    /* 当 class 被移除时自动恢复 */
-  }
-  #nav-menu-panel:not(.float-panel-closed) {
-    opacity: 1;
-    pointer-events: auto;
-    visibility: visible;
->>>>>>> 691bd2e (feat: iOS 风格改造 — 毛玻璃材质、按压反馈、Spring 入场)
-  }
+/* ============= 浮动面板（移动端菜单） ============= */
+.float-panel-closed {
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+.float-panel-closed:not(.float-panel-closed) {
+  /* 当 class 被移除时自动恢复 */
+}
+#nav-menu-panel:not(.float-panel-closed) {
+  opacity: 1;
+  pointer-events: auto;
+  visibility: visible;
+}
 }

@@ -5,8 +5,10 @@ date: 2026-06-27
 tags: ['AI']
 draft: false
 ---
-代码如下：
-<canvas id=c>
+代码如下，这是一个在 canvas 上绘制动态心形粒子的交互脚本：
+
+```html
+<canvas id=c></canvas>
 <script>
 (function() {
   let w,h,X,Y,Mx,My,P=[],i,N=450,t=0,c=document.getElementById('c'),C=c.getContext('2d');
@@ -41,3 +43,4 @@ draft: false
   draw();
 })();
 </script>
+```
