@@ -14,30 +14,39 @@ export async function GET({ site: siteUrl }: { site: URL }) {
     { path: '/tags/', priority: '0.5', changefreq: 'weekly' as const },
   ];
 
-  // 仅包含 ASCII tag 页面，排除中文 tag（避免 XML 编码问题）
+  // 所有 tag 页面（包含中文，做 XML 转义）
   const allTags = [...new Set(posts.flatMap(p => p.data.tags || []))];
-  const asciiTagPages = allTags
-    .filter(tag => /^[a-zA-Z0-9\-_+]+$/.test(tag))
-    .map(tag => ({
-      path: `/tags/${encodeURIComponent(tag)}/`,
-      priority: '0.4',
-      changefreq: 'weekly' as const,
-    }));
+  const tagPages = allTags.map(tag => ({
+    path: `/tags/${encodeURIComponent(tag)}/`,
+    priority: '0.4' as const,
+    changefreq: 'weekly' as const,
+  }));
 
   const pageEntries = [
     ...staticPages,
-    ...asciiTagPages,
+    ...tagPages,
     ...posts.map(p => ({
-      path: `/posts/${p.slug}/`,
-      priority: '0.6',
+      path: `/posts/${encodeURIComponent(p.slug)}/`,
+      priority: '0.6' as const,
       changefreq: 'monthly' as const,
       lastmod: p.data.updated || p.data.date,
     })),
   ];
 
+  // XML 转义函数
+  function xmlEscape(s: string): string {
+    return s
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&apos;');
+  }
+
   const urlElements = pageEntries.map(entry => {
     const fullUrl = new URL(entry.path, siteUrl).href;
-    let el = `  <url>\n    <loc>${fullUrl}</loc>\n    <priority>${entry.priority}</priority>\n    <changefreq>${entry.changefreq}</changefreq>`;
+    const safeLoc = xmlEscape(fullUrl);
+    let el = `  <url>\n    <loc>${safeLoc}</loc>\n    <priority>${entry.priority}</priority>\n    <changefreq>${entry.changefreq}</changefreq>`;
     if ('lastmod' in entry && entry.lastmod) {
       const d: Date = entry.lastmod instanceof Date ? entry.lastmod : new Date(entry.lastmod);
       el += `\n    <lastmod>${d.toISOString().split('T')[0]}</lastmod>`;
