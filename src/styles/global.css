@@ -145,15 +145,117 @@
 }
 
 @layer components {
-  /* ============= 统一缓动曲线（参考 MmzMing/blog 标准） ============= */
+  /* ============= iOS 风格缓动曲线（源自 Apple Design / Emil Kowalski） ============= */
   :root {
     --ease-smooth: cubic-bezier(0.23, 1, 0.32, 1);
     --ease-snappy: cubic-bezier(0.34, 1.56, 0.64, 1);
     --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
     --ease-emphasized: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);      /* iOS sheet/drawer 曲线 (from Ionic) */
+    --ease-active: cubic-bezier(0.23, 1, 0.32, 1);       /* iOS 按压反馈 */
     --radius-large: 1rem;
-    --content-delay: 150ms;
+    --content-delay: 150ms;                                /* iOS 交错延迟基准 150ms */
     --page-width: 72rem;
+  }
+
+  /* ============= iOS Material 系统 — 仿 iOS 毛玻璃材质（源自 Apple Design WWDC） =============
+     Apple 的 translucent material 遵循三项原则：
+     1. 更高的 blur (20px) + saturate(180%) 模拟真实玻璃折射
+     2. 顶部半透明白色边缘高光（light catching the material）
+     3. 材质权重编码层级：light → heavy
+     ───────────────────────────────────────── */
+  .ios-surface {
+    background: rgb(var(--glass-bg) / 0.4);          /* iOS 典型的 40% 透明度 */
+    -webkit-backdrop-filter: blur(20px) saturate(180%) brightness(1.1);
+    backdrop-filter: blur(20px) saturate(180%) brightness(1.1);
+    border: 1px solid rgb(var(--glass-border) / 0.12);
+    box-shadow:
+      0 0.5px 0 0 rgb(255 255 255 / 0.6) inset,      /* iOS 标志性顶部高光 */
+      0 2px 8px 0 rgb(0 0 0 / 0.04),
+      0 8px 24px -4px rgb(0 0 0 / 0.06);
+    transition:
+      box-shadow 0.3s var(--ease-smooth),
+      border-color 0.3s var(--ease-smooth),
+      background 0.3s var(--ease-smooth);
+  }
+  .dark .ios-surface {
+    background: rgb(var(--glass-bg) / 0.45);
+    -webkit-backdrop-filter: blur(20px) saturate(140%) brightness(1.15);
+    backdrop-filter: blur(20px) saturate(140%) brightness(1.15);
+    border-color: rgb(var(--glass-border) / 0.2);
+    box-shadow:
+      0 0.5px 0 0 rgb(255 255 255 / 0.08) inset,
+      0 2px 8px 0 rgb(0 0 0 / 0.15),
+      0 8px 24px -4px rgb(0 0 0 / 0.25);
+  }
+
+  /* iOS Heavy Material — 用于导航栏、侧边栏等结构性表面 */
+  .ios-surface-heavy {
+    background: rgb(var(--glass-bg) / 0.55);
+    -webkit-backdrop-filter: blur(30px) saturate(180%) brightness(1.08);
+    backdrop-filter: blur(30px) saturate(180%) brightness(1.08);
+    border: 1px solid rgb(var(--glass-border) / 0.15);
+    box-shadow:
+      0 0.5px 0 0 rgb(255 255 255 / 0.5) inset,
+      0 4px 12px 0 rgb(0 0 0 / 0.06),
+      0 12px 32px -4px rgb(0 0 0 / 0.08);
+  }
+  .dark .ios-surface-heavy {
+    background: rgb(var(--glass-bg) / 0.6);
+    border-color: rgb(var(--glass-border) / 0.25);
+    box-shadow:
+      0 0.5px 0 0 rgb(255 255 255 / 0.06) inset,
+      0 4px 12px 0 rgb(0 0 0 / 0.2),
+      0 12px 32px -4px rgb(0 0 0 / 0.3);
+  }
+
+  /* ============= iOS 按压反馈 — 全局 :active 缩放 =============
+     来自 emil-design-eng: "Buttons must feel responsive — add scale(0.97) on :active"
+     使用自定义属性方便组件级覆盖 */
+  .ios-press {
+    transition: transform 120ms var(--ease-active);
+  }
+  .ios-press:active {
+    transform: scale(0.97);
+  }
+
+  /* 更轻量的按压反馈（小图标等） */
+  .ios-press-light {
+    transition: transform 100ms var(--ease-active);
+  }
+  .ios-press-light:active {
+    transform: scale(0.92);
+  }
+
+  /* ============= iOS 页面入场 — 基于 CSS transition 交错序列 =============
+     替代原有的 @keyframes fade-in-up，transition 可中断且可反向追随
+     交错延迟通过 iOS 风格的 150ms 间隔实现类似 Spring 的序列感
+     ───────────────────────────────────────── */
+  .onload-animation {
+    opacity: 0;
+    transform: translateY(12px);
+    transition:
+      opacity var(--content-delay, 150ms) var(--ease-smooth),
+      transform var(--content-delay, 150ms) var(--ease-smooth);
+  }
+  .onload-animation.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* iOS 样式 — Spring 感更强的入场（更短、更弹） */
+  @keyframes ios-enter {
+    0% {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .ios-enter {
+    animation: ios-enter 250ms var(--ease-smooth) both;
   }
 
   /* ============= 液态玻璃（增强版） =============
@@ -450,51 +552,47 @@
     transform: scale(1.005);
   }
 
-  /* ============= 涂鸦风格卡片（scrapbook 卡片） ============= */
+  /* ============= iOS 风格卡片（scrapbook 材质 + iOS 阴影） ============= */
   .scrapbook-card {
-    background: rgb(var(--glass-bg) / 0.35);
-    -webkit-backdrop-filter: blur(12px) saturate(1.6) brightness(1.08);
-    backdrop-filter: blur(12px) saturate(1.6) brightness(1.08);
-    border: 1px solid rgb(var(--glass-border) / 0.15);
+    background: rgb(var(--glass-bg) / 0.4);
+    -webkit-backdrop-filter: blur(20px) saturate(180%) brightness(1.1);
+    backdrop-filter: blur(20px) saturate(180%) brightness(1.1);
+    border: 1px solid rgb(var(--glass-border) / 0.12);
     box-shadow:
+      0 0.5px 0 0 rgb(255 255 255 / 0.6) inset,
       0 2px 8px 0 rgb(0 0 0 / 0.04),
-      0 8px 24px -4px rgb(0 0 0 / 0.06),
-      inset 0 0.5px 0 0 rgb(255 255 255 / 0.5),
-      inset 0 -0.5px 0 0 rgb(255 255 255 / 0.08);
+      0 8px 24px -4px rgb(0 0 0 / 0.06);
     transition:
-      transform 0.25s cubic-bezier(0.23, 1, 0.32, 1),
-      box-shadow 0.25s cubic-bezier(0.23, 1, 0.32, 1),
-      border-color 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+      transform 0.25s var(--ease-smooth),
+      box-shadow 0.25s var(--ease-smooth),
+      border-color 0.25s var(--ease-smooth);
     position: relative;
     overflow: hidden;
   }
   .dark .scrapbook-card {
     background: rgb(var(--glass-bg) / 0.5);
-    -webkit-backdrop-filter: blur(12px) saturate(1.4) brightness(1.12);
-    backdrop-filter: blur(12px) saturate(1.4) brightness(1.12);
-    border-color: rgb(var(--glass-border) / 0.25);
+    -webkit-backdrop-filter: blur(20px) saturate(140%) brightness(1.15);
+    backdrop-filter: blur(20px) saturate(140%) brightness(1.15);
+    border-color: rgb(var(--glass-border) / 0.2);
     box-shadow:
-      0 2px 8px 0 rgb(0 0 0 / 0.12),
-      0 8px 24px -4px rgb(0 0 0 / 0.2),
-      inset 0 0.5px 0 0 rgb(255 255 255 / 0.05),
-      inset 0 -0.5px 0 0 rgb(255 255 255 / 0.02);
+      0 0.5px 0 0 rgb(255 255 255 / 0.06) inset,
+      0 2px 8px 0 rgb(0 0 0 / 0.15),
+      0 8px 24px -4px rgb(0 0 0 / 0.25);
   }
   .scrapbook-card:hover {
-    transform: translateY(-2px);
+    transform: translateY(-1px);
     box-shadow:
-      0 4px 12px 0 rgb(0 0 0 / 0.08),
-      0 12px 32px -4px rgb(0 0 0 / 0.12),
-      inset 0 0.5px 0 0 rgb(255 255 255 / 0.5),
-      inset 0 -0.5px 0 0 rgb(255 255 255 / 0.08);
+      0 0.5px 0 0 rgb(255 255 255 / 0.6) inset,
+      0 4px 12px 0 rgb(0 0 0 / 0.06),
+      0 12px 32px -4px rgb(0 0 0 / 0.1);
+    border-color: rgb(var(--primary-light) / 0.15);
   }
   .dark .scrapbook-card:hover {
     border-color: rgb(var(--primary) / 0.2);
     box-shadow:
+      0 0.5px 0 0 rgb(255 255 255 / 0.06) inset,
       0 4px 12px 0 rgb(0 0 0 / 0.2),
-      0 12px 32px -4px rgb(0 0 0 / 0.35),
-      0 0 0 1px rgb(var(--primary) / 0.06),
-      inset 0 0.5px 0 0 rgb(255 255 255 / 0.05),
-      inset 0 -0.5px 0 0 rgb(255 255 255 / 0.02);
+      0 12px 32px -4px rgb(0 0 0 / 0.35);
   }
 
   /* ============= 后贴标签 ============= */
@@ -544,19 +642,25 @@
     background: linear-gradient(90deg, rgb(var(--primary)), rgb(var(--secondary)));
   }
 
-  /* ============= 卡片悬浮（scrapbook 风格） ============= */
+  /* ============= 卡片悬浮（iOS 风格 — 更轻的阴影提升） ============= */
   .card-hover {
     @apply transition-all duration-200;
   }
   .card-hover:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 24px -8px rgba(156, 63, 0, 0.15);
+    transform: translateY(-1px);
+    box-shadow:
+      0 0.5px 0 0 rgb(255 255 255 / 0.6) inset,
+      0 4px 12px 0 rgb(0 0 0 / 0.06),
+      0 12px 32px -4px rgb(0 0 0 / 0.08);
   }
   .dark .card-hover {
     border: 1px solid rgba(var(--glass-border), 0.3);
   }
   .dark .card-hover:hover {
-    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+    box-shadow:
+      0 0.5px 0 0 rgb(255 255 255 / 0.06) inset,
+      0 4px 12px 0 rgb(0 0 0 / 0.2),
+      0 12px 32px -4px rgb(0 0 0 / 0.35);
   }
 
   /* ============= 标签 chip ============= */
@@ -581,12 +685,17 @@
     background-color: rgb(var(--primary) / 0.25);
   }
 
-  /* ============= 按钮 ============= */
+  /* ============= 按钮（iOS 风格按压反馈） ============= */
   .btn {
-    @apply inline-flex items-center gap-2 px-4 py-2 rounded-xl
-           text-sm transition-all duration-200
-           hover:-translate-y-0.5 active:translate-y-0;
+    @apply inline-flex items-center gap-2 px-4 py-2 rounded-2xl
+           text-sm transition-all;
     font-family: 'Montserrat', sans-serif;
+    transition-duration: 120ms;
+    transition-timing-function: var(--ease-active);
+    transition-property: transform, background, color, box-shadow;
+  }
+  .btn:active {
+    transform: scale(0.97);
   }
 
   .btn-primary {
@@ -604,7 +713,9 @@
 
   .btn-ghost {
     @apply btn;
+    /* 重置 btn 的 transform transition，使用独立属性 */
     color: rgb(var(--fg-soft));
+    transition-property: transform, background, color;
   }
   .btn-ghost:hover {
     color: rgb(var(--primary));
@@ -691,10 +802,12 @@
       transition-duration: 0.01ms !important;
       scroll-behavior: auto !important;
     }
-    .scroll-reveal {
+    .scroll-reveal,
+    .onload-animation {
       opacity: 1;
       transform: none;
       transition: none;
+      animation: none;
     }
     .page-entrance {
       animation: none;
@@ -729,71 +842,48 @@
     }
   }
 
-  /* ============= Fuwaari 入场动画 ============= */
-  @keyframes fade-in-up {
-    0% {
-      transform: translateY(2rem);
-      opacity: 0;
-    }
-    100% {
-      transform: translateY(0);
-      opacity: 1;
-    }
-  }
-
-  .onload-animation {
-    opacity: 0;
-    animation: 300ms fade-in-up;
-    animation-fill-mode: forwards;
-  }
-
-  #navbar {
-    animation-delay: 0ms;
-  }
-
-  #sidebar {
-    animation-delay: 100ms;
-  }
-
-  #swup-container {
-    outline: none;
-  }
-
-  #content-wrapper {
-    animation-delay: var(--content-delay, 150ms);
-  }
-
-  .footer {
-    animation-delay: 250ms;
-  }
-
-  /* ============= Fuwaari 卡片基础样式 ============= */
+  /* ============= iOS 风格卡片基础 — 类 iOS 毛玻璃卡片 =============
+     使用 Apple 推的 blur(20px) + saturate(180%) 材质标准
+     阴影更轻更扩散，仿 iOS Widget / 通知中心卡片
+     ───────────────────────────────────────── */
   .card-base {
-    background: rgb(var(--glass-bg) / 0.35);
-    -webkit-backdrop-filter: blur(12px) saturate(1.6) brightness(1.08);
-    backdrop-filter: blur(12px) saturate(1.6) brightness(1.08);
-    border: 1px solid rgb(var(--glass-border) / 0.15);
+    background: rgb(var(--glass-bg) / 0.4);
+    -webkit-backdrop-filter: blur(20px) saturate(180%) brightness(1.1);
+    backdrop-filter: blur(20px) saturate(180%) brightness(1.1);
+    border: 1px solid rgb(var(--glass-border) / 0.12);
     border-radius: var(--radius-large, 1rem);
     box-shadow:
+      0 0.5px 0 0 rgb(255 255 255 / 0.6) inset,
       0 2px 8px 0 rgb(0 0 0 / 0.04),
-      0 8px 24px -4px rgb(0 0 0 / 0.06),
-      inset 0 0.5px 0 0 rgb(255 255 255 / 0.5),
-      inset 0 -0.5px 0 0 rgb(255 255 255 / 0.08);
+      0 8px 24px -4px rgb(0 0 0 / 0.06);
     transition:
-      transform 0.25s cubic-bezier(0.23, 1, 0.32, 1),
-      box-shadow 0.25s cubic-bezier(0.23, 1, 0.32, 1),
-      border-color 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+      transform 0.25s var(--ease-smooth),
+      box-shadow 0.25s var(--ease-smooth),
+      border-color 0.25s var(--ease-smooth);
+  }
+  .card-base:hover {
+    box-shadow:
+      0 0.5px 0 0 rgb(255 255 255 / 0.6) inset,
+      0 4px 12px 0 rgb(0 0 0 / 0.06),
+      0 12px 32px -4px rgb(0 0 0 / 0.1);
+    border-color: rgb(var(--primary-light) / 0.15);
   }
   .dark .card-base {
     background: rgb(var(--glass-bg) / 0.5);
-    -webkit-backdrop-filter: blur(12px) saturate(1.4) brightness(1.12);
-    backdrop-filter: blur(12px) saturate(1.4) brightness(1.12);
-    border-color: rgb(var(--glass-border) / 0.25);
+    -webkit-backdrop-filter: blur(20px) saturate(140%) brightness(1.15);
+    backdrop-filter: blur(20px) saturate(140%) brightness(1.15);
+    border-color: rgb(var(--glass-border) / 0.2);
     box-shadow:
-      0 2px 8px 0 rgb(0 0 0 / 0.12),
-      0 8px 24px -4px rgb(0 0 0 / 0.2),
-      inset 0 0.5px 0 0 rgb(255 255 255 / 0.05),
-      inset 0 -0.5px 0 0 rgb(255 255 255 / 0.02);
+      0 0.5px 0 0 rgb(255 255 255 / 0.06) inset,
+      0 2px 8px 0 rgb(0 0 0 / 0.15),
+      0 8px 24px -4px rgb(0 0 0 / 0.25);
+  }
+  .dark .card-base:hover {
+    border-color: rgb(var(--primary) / 0.2);
+    box-shadow:
+      0 0.5px 0 0 rgb(255 255 255 / 0.06) inset,
+      0 4px 12px 0 rgb(0 0 0 / 0.2),
+      0 12px 32px -4px rgb(0 0 0 / 0.35);
   }
 
   /* ============= TOC 动画样式 ============= */
@@ -814,11 +904,28 @@
     display: none;
   }
 
+<<<<<<< HEAD
   /* ============= 移动端导航面板显示/隐藏 ============= */
   .float-panel-closed {
     visibility: hidden;
     opacity: 0;
     pointer-events: none;
     transition: visibility 0.25s, opacity 0.25s;
+=======
+  /* ============= 浮动面板（移动端菜单） ============= */
+  .float-panel-closed {
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+  }
+  .float-panel-closed:not(.float-panel-closed) {
+    /* 当 class 被移除时自动恢复 */
+  }
+  #nav-menu-panel:not(.float-panel-closed) {
+    opacity: 1;
+    pointer-events: auto;
+    visibility: visible;
+>>>>>>> 691bd2e (feat: iOS 风格改造 — 毛玻璃材质、按压反馈、Spring 入场)
   }
 }

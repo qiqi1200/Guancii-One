@@ -5,8 +5,8 @@ const year = new Date().getFullYear();
 ---
 <footer class="mt-16 md:mt-24 border-t border-dashed border-[rgb(var(--border))]/40 bg-[rgb(var(--bg-soft))]/30 transition-colors">
   <div class="max-w-6xl mx-auto px-6 py-8 md:py-10">
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 md:gap-8 text-sm font-body">
-      <div class="sm:col-span-3 md:col-span-1">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8 text-sm font-body">
+      <div class="sm:col-span-2 md:col-span-1">
         <div class="font-handwritten text-lg text-[rgb(var(--secondary))] mb-2">
           {SITE.title}
         </div>
@@ -18,10 +18,10 @@ const year = new Date().getFullYear();
       <div>
         <div class="font-label text-xs uppercase tracking-widest text-[rgb(var(--fg-soft))] mb-3">链接</div>
         <ul class="space-y-2 text-[rgb(var(--fg))]">
-          <li><a href="/about" class="hover:text-[rgb(var(--primary))] transition-colors inline-block">关于我</a></li>
-          <li><a href="/archive" class="hover:text-[rgb(var(--primary))] transition-colors inline-block">归档</a></li>
-          <li><a href="/tags" class="hover:text-[rgb(var(--primary))] transition-colors inline-block">标签</a></li>
-          <li><a href="/rss.xml" class="hover:text-[rgb(var(--primary))] transition-colors inline-block">RSS</a></li>
+          <li><a href="/about" class="hover:text-[rgb(var(--primary))] transition-all ios-press inline-block">关于我</a></li>
+          <li><a href="/archive" class="hover:text-[rgb(var(--primary))] transition-all ios-press inline-block">归档</a></li>
+          <li><a href="/tags" class="hover:text-[rgb(var(--primary))] transition-all ios-press inline-block">标签</a></li>
+          <li><a href="/rss.xml" class="hover:text-[rgb(var(--primary))] transition-all ios-press inline-block">RSS</a></li>
         </ul>
       </div>
 
@@ -29,13 +29,13 @@ const year = new Date().getFullYear();
         <div class="font-label text-xs uppercase tracking-widest text-[rgb(var(--fg-soft))] mb-3">联系</div>
         <ul class="space-y-2 text-[rgb(var(--fg))]">
           <li>
-            <a href={SITE.links.github} class="hover:text-[rgb(var(--primary))] transition-colors inline-flex items-center gap-1.5" target="_blank" rel="noopener">
+            <a href={SITE.links.github} class="hover:text-[rgb(var(--primary))] transition-all ios-press inline-flex items-center gap-1.5" target="_blank" rel="noopener">
               <span class="material-symbols-outlined text-base">code</span>
               GitHub
             </a>
           </li>
           <li>
-            <a href={SITE.links.email} class="hover:text-[rgb(var(--primary))] transition-colors inline-flex items-center gap-1.5">
+            <a href={SITE.links.email} class="hover:text-[rgb(var(--primary))] transition-all ios-press inline-flex items-center gap-1.5">
               <span class="material-symbols-outlined text-base">mail</span>
               邮箱
             </a>

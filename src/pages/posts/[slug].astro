@@ -69,7 +69,7 @@ const allPosts = (await getCollection('posts')).filter(p => !p.data.draft);
   <article class="pb-8 onload-animation">
     <a
       href="/"
-      class="no-print inline-flex items-center gap-1 text-sm text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] transition-colors mb-4"
+      class="no-print inline-flex items-center gap-1 text-sm text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] transition-all ios-press mb-4"
     >
       <span class="material-symbols-outlined text-base">arrow_back</span>
       返回文章
@@ -137,7 +137,7 @@ const allPosts = (await getCollection('posts')).filter(p => !p.data.draft);
         <div class="no-print mt-10 pt-6 border-t border-dashed border-[rgb(var(--border))]/40 flex items-center justify-between flex-wrap gap-4">
           <button
             id="like-btn"
-            class="group flex items-center gap-2 px-5 py-2.5 rounded-xl border border-[rgb(var(--border))]/60 hover:border-[rgb(var(--primary))]/40 hover:bg-[rgb(var(--primary-light))]/5 transition-all active:scale-95"
+            class="group flex items-center gap-2 px-5 py-2.5 rounded-2xl border border-[rgb(var(--border))]/60 hover:border-[rgb(var(--primary))]/40 hover:bg-[rgb(var(--primary-light))]/5 transition-all ios-press"
           >
             <span id="like-heart" class="material-symbols-outlined text-[rgb(var(--fg-soft))] group-hover:text-[rgb(var(--primary))] transition-colors text-2xl">favorite</span>
             <span class="text-sm text-[rgb(var(--fg-soft))] group-hover:text-[rgb(var(--primary))] transition-colors">
@@ -157,7 +157,7 @@ const allPosts = (await getCollection('posts')).filter(p => !p.data.draft);
           {prev && (
             <a
               href={`/posts/${prev.slug}/`}
-              class="group card-base rounded-2xl p-5"
+              class="group card-base rounded-2xl p-5 ios-press"
             >
               <div class="text-xs text-[rgb(var(--fg-soft))] mb-1 font-handwritten">← 上一篇</div>
               <div class="text-[rgb(var(--fg))] group-hover:text-[rgb(var(--primary))] transition-colors font-medium line-clamp-2">
@@ -168,7 +168,7 @@ const allPosts = (await getCollection('posts')).filter(p => !p.data.draft);
           {next && (
             <a
               href={`/posts/${next.slug}/`}
-              class={`group card-base rounded-2xl p-5 text-right ${!prev ? 'sm:col-start-2' : ''}`}
+              class={`group card-base rounded-2xl p-5 text-right ios-press ${!prev ? 'sm:col-start-2' : ''}`}
             >
               <div class="text-xs text-[rgb(var(--fg-soft))] mb-1 font-handwritten">下一篇 →</div>
               <div class="text-[rgb(var(--fg))] group-hover:text-[rgb(var(--primary))] transition-colors font-medium line-clamp-2">
@@ -195,7 +195,7 @@ const allPosts = (await getCollection('posts')).filter(p => !p.data.draft);
                 </p>
                 <button
                   id="copy-link-btn"
-                  class="text-xs text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] transition-colors inline-flex items-center gap-1 cursor-pointer"
+                  class="text-xs text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] transition-all inline-flex items-center gap-1 cursor-pointer ios-press"
                   title="复制本页链接"
                 >
                   <span class="material-symbols-outlined text-sm">link</span>
@@ -231,7 +231,7 @@ const allPosts = (await getCollection('posts')).filter(p => !p.data.draft);
                   <li class={h.depth === 3 ? 'pl-5' : 'pl-0'}>
                     <a
                       href={`#${h.slug}`}
-                      class="text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] transition-colors block py-1 border-l-2 border-transparent hover:border-[rgb(var(--primary))] -ml-px pl-2 text-sm"
+                      class="text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] transition-all block py-1 border-l-2 border-transparent hover:border-[rgb(var(--primary))] -ml-px pl-2 text-sm ios-press"
                     >
                       {h.text}
                     </a>

@@ -13,7 +13,7 @@ const path = current || Astro.url.pathname;
 
 <div id="navbar" class="z-50 onload-animation">
   <div class="card-base !overflow-visible max-w-[var(--page-width,72rem)] h-[4.5rem] !rounded-t-none mx-auto flex items-center justify-between px-4">
-    <a href="/" class="flex items-center gap-3 rounded-lg h-[3.25rem] px-4 hover:bg-[rgb(var(--primary-light)/0.08)] transition-colors active:scale-95">
+    <a href="/" class="flex items-center gap-3 rounded-2xl h-[3.25rem] px-4 hover:bg-[rgb(var(--primary-light)/0.08)] transition-all ios-press">
       <img
         src={SITE.avatar}
         alt={SITE.author}
@@ -30,7 +30,7 @@ const path = current || Astro.url.pathname;
         return (
           <a
             href={item.href}
-            class={`rounded-lg h-11 font-bold px-5 transition-all active:scale-95 flex items-center ${
+            class={`rounded-2xl h-11 font-bold px-5 transition-all ios-press flex items-center ${
               active
                 ? 'text-[rgb(var(--primary))] bg-[rgb(var(--primary-light)/0.1)]'
                 : 'text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] hover:bg-[rgb(var(--primary-light)/0.05)]'
@@ -45,7 +45,7 @@ const path = current || Astro.url.pathname;
     <div class="flex items-center gap-1">
       <!-- 搜索 -->
       <a href="/search"
-        class="btn-plain rounded-lg h-11 w-11 flex items-center justify-center text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] hover:bg-[rgb(var(--primary-light)/0.08)] transition-all active:scale-90"
+        class="btn-plain rounded-2xl h-11 w-11 flex items-center justify-center text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] hover:bg-[rgb(var(--primary-light)/0.08)] transition-all ios-press-light"
         aria-label="搜索"
       >
         <span class="material-symbols-outlined text-xl">search</span>
@@ -55,7 +55,7 @@ const path = current || Astro.url.pathname;
       <button
         id="theme-toggle"
         aria-label="切换主题"
-        class="rounded-lg h-11 w-11 flex items-center justify-center text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] hover:bg-[rgb(var(--primary-light)/0.08)] transition-all active:scale-90 relative"
+        class="rounded-2xl h-11 w-11 flex items-center justify-center text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] hover:bg-[rgb(var(--primary-light)/0.08)] transition-all ios-press-light relative"
       >
         <span class="material-symbols-outlined absolute text-xl transition-all duration-400 dark:rotate-90 dark:opacity-0 rotate-0 opacity-100">light_mode</span>
         <span class="material-symbols-outlined absolute text-xl transition-all duration-400 dark:rotate-0 dark:opacity-100 rotate-90 opacity-0">dark_mode</span>
@@ -65,7 +65,9 @@ const path = current || Astro.url.pathname;
       <button
         id="nav-menu-switch"
         aria-label="菜单"
-        class="rounded-lg w-11 h-11 flex items-center justify-center text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] hover:bg-[rgb(var(--primary-light)/0.08)] transition-all active:scale-90 md:hidden"
+        aria-expanded="false"
+        aria-controls="nav-menu-panel"
+        class="rounded-2xl w-11 h-11 flex items-center justify-center text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] hover:bg-[rgb(var(--primary-light)/0.08)] transition-all ios-press-light md:hidden"
       >
         <span class="material-symbols-outlined text-xl">menu</span>
       </button>
@@ -83,7 +85,7 @@ const path = current || Astro.url.pathname;
         return (
           <a
             href={item.href}
-            class={`block px-4 py-3 rounded-xl text-sm font-bold transition-all ${
+            class={`block px-4 py-3 rounded-2xl text-sm font-bold transition-all ios-press ${
               active
                 ? 'text-[rgb(var(--primary))] bg-[rgb(var(--primary-light)/0.1)]'
                 : 'text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] hover:bg-[rgb(var(--primary-light)/0.05)]'
@@ -114,7 +116,21 @@ const path = current || Astro.url.pathname;
     const menuPanel = document.getElementById('nav-menu-panel');
     if (!menuSwitch || !menuPanel) return;
 
+<<<<<<< HEAD
     let navigating = false;
+=======
+  function isMenuOpen() {
+    return !menuPanel?.classList.contains('float-panel-closed');
+  }
+
+  function toggleMenu() {
+    menuPanel?.classList.toggle('float-panel-closed');
+    var open = isMenuOpen();
+    if (menuSwitch) {
+      menuSwitch.setAttribute('aria-expanded', String(open));
+    }
+  }
+>>>>>>> 691bd2e (feat: iOS 风格改造 — 毛玻璃材质、按压反馈、Spring 入场)
 
     function openMenu() {
       menuPanel.classList.remove('float-panel-closed');

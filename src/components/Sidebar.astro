@@ -37,7 +37,7 @@ const archives = [...archiveMap.entries()].slice(0, 8);
 <div id="sidebar" class="w-full">
   <!-- 个人信息卡片 (Fuwaari-style profile) -->
   <div class="card-base p-4 mb-4 onload-animation">
-    <a href="/about" class="group block relative overflow-hidden rounded-xl active:scale-95 mb-4">
+    <a href="/about" class="group block relative overflow-hidden rounded-2xl ios-press mb-4">
       <img
         src={SITE.avatar}
         alt={SITE.author}
@@ -53,15 +53,15 @@ const archives = [...archiveMap.entries()].slice(0, 8);
       <div class="text-sm text-[rgb(var(--fg-soft))] mb-3">{SITE.description}</div>
       <div class="flex justify-center gap-2">
         <a href={SITE.links.github} target="_blank" rel="noopener"
-           class="w-9 h-9 rounded-lg flex items-center justify-center text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] hover:bg-[rgb(var(--primary-light)/0.1)] transition-all">
+           class="w-9 h-9 rounded-2xl flex items-center justify-center text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] hover:bg-[rgb(var(--primary-light)/0.1)] transition-all ios-press-light">
           <span class="material-symbols-outlined text-lg">code</span>
         </a>
         <a href={SITE.links.email}
-           class="w-9 h-9 rounded-lg flex items-center justify-center text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] hover:bg-[rgb(var(--primary-light)/0.1)] transition-all">
+           class="w-9 h-9 rounded-2xl flex items-center justify-center text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] hover:bg-[rgb(var(--primary-light)/0.1)] transition-all ios-press-light">
           <span class="material-symbols-outlined text-lg">mail</span>
         </a>
         <a href="/rss.xml"
-           class="w-9 h-9 rounded-lg flex items-center justify-center text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] hover:bg-[rgb(var(--primary-light)/0.1)] transition-all">
+           class="w-9 h-9 rounded-2xl flex items-center justify-center text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] hover:bg-[rgb(var(--primary-light)/0.1)] transition-all ios-press-light">
           <span class="material-symbols-outlined text-lg">rss_feed</span>
         </a>
       </div>

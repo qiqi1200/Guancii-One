@@ -49,24 +49,49 @@ const { class: className = '' } = Astro.props;
       }
 
       // 先抓取脚本内容，替换默认头像 CDN（weavatar.com 已挂），再执行
-      fetch(src)
-        .then(function (r) { return r.text(); })
+      fetch(src, { credentials: 'omit' })
+        .then(function (r) {
+          // 安全检查：拒绝非 JS 响应（防止 CDN 劫持返回 HTML 钓鱼页）
+          var ct = r.headers.get('content-type') || '';
+          if (!ct.includes('javascript') && !ct.includes('json') && !ct.includes('text/plain')) {
+            throw new Error('Unexpected content type: ' + ct);
+          }
+          return r.text();
+        })
         .then(function (code) {
+          // 安全检查：拒绝 HTML 响应（防止中间人注入）
+          if (/^\s*<!doctype\s*html/i.test(code) || /^\s*<html/i.test(code)) {
+            throw new Error('HTML response rejected');
+          }
           // 默认头像 CDN 从坏的 weavatar.com 改为 cravatar.cn（国内可用）
-          // cravatar 有专门的 hash 兼容处理（SHA256）
           code = code.replace(/weavatar\.com/g, 'cravatar.cn');
           var blob = new Blob([code], { type: 'application/javascript' });
           var url = URL.createObjectURL(blob);
           var s = document.createElement('script');
           s.src = url;
-          s.onload = runTwikoo;
+          s.onload = function () {
+            URL.revokeObjectURL(url);
+            if (s.parentNode) s.parentNode.removeChild(s);
+            runTwikoo();
+          };
+          s.onerror = function () {
+            URL.revokeObjectURL(url);
+            if (s.parentNode) s.parentNode.removeChild(s);
+          };
           document.head.appendChild(s);
         })
         .catch(function () {
           // fetch 失败时降级直接加载原脚本
           var s = document.createElement('script');
           s.src = src;
-          s.onload = runTwikoo;
+          s.crossOrigin = 'anonymous';
+          s.onload = function () {
+            if (s.parentNode) s.parentNode.removeChild(s);
+            runTwikoo();
+          };
+          s.onerror = function () {
+            if (s.parentNode) s.parentNode.removeChild(s);
+          };
           document.head.appendChild(s);
         });
     }

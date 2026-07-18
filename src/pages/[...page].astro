@@ -121,7 +121,7 @@ function pageUrl(n: number): string {
   <div class="pb-8">
     <!-- ─── Featured 卡片：横向大卡 ─── -->
     {featured && (
-      <div class="mb-6 post-container scroll-reveal" data-tags={JSON.stringify(featured.data.tags || [])}>
+      <div class="mb-6 post-container scroll-reveal" data-tags={JSON.stringify(featured.data.tags || []).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}>
         <PostCard post={featured} featured={true} />
       </div>
     )}
@@ -131,7 +131,7 @@ function pageUrl(n: number): string {
       {rest.map((p, i) => (
         <div
           class="post-container scroll-reveal"
-          data-tags={JSON.stringify(p.data.tags || [])}
+          data-tags={JSON.stringify(p.data.tags || []).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}
           style={`--delay: ${(i + 1) * 80}ms`}
         >
           <PostCard post={p} />
@@ -148,7 +148,7 @@ function pageUrl(n: number): string {
 
     <!-- ─── 分页导航 ─── -->
     {page.lastPage > 1 && (
-      <nav class="mt-10 flex items-center justify-center gap-2" aria-label="分页导航">
+      <nav class="mt-10 flex items-center justify-center gap-2 flex-wrap" aria-label="分页导航">
         {page.currentPage > 1 ? (
           <a href={pageUrl(page.currentPage - 1)}
              class="px-3 py-1.5 rounded-lg text-sm border border-[rgb(var(--border))]/50 text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] hover:border-[rgb(var(--primary))]/30 transition-colors flex items-center gap-0.5">
