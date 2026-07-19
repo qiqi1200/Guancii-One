@@ -116,21 +116,7 @@ const path = current || Astro.url.pathname;
     const menuPanel = document.getElementById('nav-menu-panel');
     if (!menuSwitch || !menuPanel) return;
 
-<<<<<<< HEAD
     let navigating = false;
-=======
-  function isMenuOpen() {
-    return !menuPanel?.classList.contains('float-panel-closed');
-  }
-
-  function toggleMenu() {
-    menuPanel?.classList.toggle('float-panel-closed');
-    var open = isMenuOpen();
-    if (menuSwitch) {
-      menuSwitch.setAttribute('aria-expanded', String(open));
-    }
-  }
->>>>>>> 691bd2e (feat: iOS 风格改造 — 毛玻璃材质、按压反馈、Spring 入场)
 
     function openMenu() {
       menuPanel.classList.remove('float-panel-closed');
