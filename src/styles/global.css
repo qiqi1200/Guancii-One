@@ -552,16 +552,13 @@
     transform: scale(1.005);
   }
 
-  /* ============= iOS 风格卡片（scrapbook 材质 + iOS 阴影） ============= */
+  /* ============= iOS Glassmorphism 卡片（scrapbook 版本） ============= */
   .scrapbook-card {
-    background: rgb(var(--glass-bg) / 0.4);
-    -webkit-backdrop-filter: blur(20px) saturate(180%) brightness(1.1);
-    backdrop-filter: blur(20px) saturate(180%) brightness(1.1);
-    border: 1px solid rgb(var(--glass-border) / 0.12);
-    box-shadow:
-      0 0.5px 0 0 rgb(255 255 255 / 0.6) inset,
-      0 2px 8px 0 rgb(0 0 0 / 0.04),
-      0 8px 24px -4px rgb(0 0 0 / 0.06);
+    background: rgba(255, 255, 255, 0.18);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.30);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.4);
     transition:
       transform 0.25s var(--ease-smooth),
       box-shadow 0.25s var(--ease-smooth),
@@ -570,29 +567,18 @@
     overflow: hidden;
   }
   .dark .scrapbook-card {
-    background: rgb(var(--glass-bg) / 0.5);
-    -webkit-backdrop-filter: blur(20px) saturate(140%) brightness(1.15);
-    backdrop-filter: blur(20px) saturate(140%) brightness(1.15);
-    border-color: rgb(var(--glass-border) / 0.2);
-    box-shadow:
-      0 0.5px 0 0 rgb(255 255 255 / 0.06) inset,
-      0 2px 8px 0 rgb(0 0 0 / 0.15),
-      0 8px 24px -4px rgb(0 0 0 / 0.25);
+    background: rgba(30, 35, 60, 0.25);
+    border-color: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.15);
   }
   .scrapbook-card:hover {
     transform: translateY(-1px);
-    box-shadow:
-      0 0.5px 0 0 rgb(255 255 255 / 0.6) inset,
-      0 4px 12px 0 rgb(0 0 0 / 0.06),
-      0 12px 32px -4px rgb(0 0 0 / 0.1);
-    border-color: rgb(var(--primary-light) / 0.15);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    border-color: rgba(255, 255, 255, 0.45);
   }
   .dark .scrapbook-card:hover {
-    border-color: rgb(var(--primary) / 0.2);
-    box-shadow:
-      0 0.5px 0 0 rgb(255 255 255 / 0.06) inset,
-      0 4px 12px 0 rgb(0 0 0 / 0.2),
-      0 12px 32px -4px rgb(0 0 0 / 0.35);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.25);
   }
 
   /* ============= 后贴标签 ============= */
@@ -642,25 +628,19 @@
     background: linear-gradient(90deg, rgb(var(--primary)), rgb(var(--secondary)));
   }
 
-  /* ============= 卡片悬浮（iOS 风格 — 更轻的阴影提升） ============= */
+  /* ============= 卡片悬浮（iOS Glassmorphism — 轻盈悬浮感） ============= */
   .card-hover {
     @apply transition-all duration-200;
   }
   .card-hover:hover {
     transform: translateY(-1px);
-    box-shadow:
-      0 0.5px 0 0 rgb(255 255 255 / 0.6) inset,
-      0 4px 12px 0 rgb(0 0 0 / 0.06),
-      0 12px 32px -4px rgb(0 0 0 / 0.08);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.4);
   }
   .dark .card-hover {
-    border: 1px solid rgba(var(--glass-border), 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.15);
   }
   .dark .card-hover:hover {
-    box-shadow:
-      0 0.5px 0 0 rgb(255 255 255 / 0.06) inset,
-      0 4px 12px 0 rgb(0 0 0 / 0.2),
-      0 12px 32px -4px rgb(0 0 0 / 0.35);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.15);
   }
 
   /* ============= 标签 chip ============= */
@@ -842,48 +822,32 @@
     }
   }
 
-  /* ============= iOS 风格卡片基础 — 类 iOS 毛玻璃卡片 =============
-     使用 Apple 推的 blur(20px) + saturate(180%) 材质标准
-     阴影更轻更扩散，仿 iOS Widget / 通知中心卡片
-     ───────────────────────────────────────── */
+  /* ============= iOS Glassmorphism 基础卡片 — 导航栏/菜单面板 =============
+     统一玻璃参数，与 .card-cream 保持一致 */
   .card-base {
-    background: rgb(var(--glass-bg) / 0.4);
-    -webkit-backdrop-filter: blur(20px) saturate(180%) brightness(1.1);
-    backdrop-filter: blur(20px) saturate(180%) brightness(1.1);
-    border: 1px solid rgb(var(--glass-border) / 0.12);
+    background: rgba(255, 255, 255, 0.18);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.30);
     border-radius: var(--radius-large, 1rem);
-    box-shadow:
-      0 0.5px 0 0 rgb(255 255 255 / 0.6) inset,
-      0 2px 8px 0 rgb(0 0 0 / 0.04),
-      0 8px 24px -4px rgb(0 0 0 / 0.06);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.4);
     transition:
       transform 0.25s var(--ease-smooth),
       box-shadow 0.25s var(--ease-smooth),
       border-color 0.25s var(--ease-smooth);
   }
   .card-base:hover {
-    box-shadow:
-      0 0.5px 0 0 rgb(255 255 255 / 0.6) inset,
-      0 4px 12px 0 rgb(0 0 0 / 0.06),
-      0 12px 32px -4px rgb(0 0 0 / 0.1);
-    border-color: rgb(var(--primary-light) / 0.15);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    border-color: rgba(255, 255, 255, 0.45);
   }
   .dark .card-base {
-    background: rgb(var(--glass-bg) / 0.5);
-    -webkit-backdrop-filter: blur(20px) saturate(140%) brightness(1.15);
-    backdrop-filter: blur(20px) saturate(140%) brightness(1.15);
-    border-color: rgb(var(--glass-border) / 0.2);
-    box-shadow:
-      0 0.5px 0 0 rgb(255 255 255 / 0.06) inset,
-      0 2px 8px 0 rgb(0 0 0 / 0.15),
-      0 8px 24px -4px rgb(0 0 0 / 0.25);
+    background: rgba(30, 35, 60, 0.25);
+    border-color: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.15);
   }
   .dark .card-base:hover {
-    border-color: rgb(var(--primary) / 0.2);
-    box-shadow:
-      0 0.5px 0 0 rgb(255 255 255 / 0.06) inset,
-      0 4px 12px 0 rgb(0 0 0 / 0.2),
-      0 12px 32px -4px rgb(0 0 0 / 0.35);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.25);
   }
 
   /* ============= TOC 动画样式 ============= */
@@ -924,18 +888,21 @@
    🍮 奶油风重构 — 极简柔和卡片体系
    ================================================================ */
 
-/* ============= 奶油卡片（液态玻璃版） ============= */
+/* ============= iOS Glassmorphism 卡片（通透液态玻璃） =============
+    核心规范：
+    - 背景极低不透明度（<40%）实现通透感
+    - blur(20px) + saturate(180%) 标准 Apple 玻璃虚化
+    - 1px 半透明白色高光边框区分玻璃与塑料
+    - 大模糊半径、低不透明度柔和阴影，营造悬浮轻盈感
+    - inset 顶部高光模拟玻璃顶面反光
+    ================================================================ */
 .card-cream {
-  background: rgb(var(--glass-bg) / 0.60);
-  -webkit-backdrop-filter: blur(16px) saturate(1.6) brightness(1.08);
-  backdrop-filter: blur(16px) saturate(1.6) brightness(1.08);
-  border: 1px solid rgb(var(--glass-border) / 0.18);
+  background: rgba(255, 255, 255, 0.18);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.30);
   border-radius: 14px;
-  box-shadow:
-    0 2px 8px 0 rgb(0 0 0 / 0.04),
-    0 8px 24px -4px rgb(0 0 0 / 0.06),
-    inset 0 0.5px 0 0 rgb(255 255 255 / 0.5),
-    inset 0 -0.5px 0 0 rgb(255 255 255 / 0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.4);
   transition:
     transform 0.25s cubic-bezier(0.23, 1, 0.32, 1),
     box-shadow 0.25s cubic-bezier(0.23, 1, 0.32, 1),
@@ -946,32 +913,18 @@
   flex-direction: column;
 }
 .dark .card-cream {
-  background: rgb(var(--glass-bg) / 0.65);
-  border-color: rgb(var(--glass-border) / 0.25);
-  box-shadow:
-    0 2px 8px 0 rgb(0 0 0 / 0.12),
-    0 8px 24px -4px rgb(0 0 0 / 0.2),
-    inset 0 0.5px 0 0 rgb(255 255 255 / 0.06),
-    inset 0 -0.5px 0 0 rgb(255 255 255 / 0.02);
+  background: rgba(30, 35, 60, 0.25);
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 .card-cream:hover {
   transform: translateY(-2px);
-  box-shadow:
-    0 4px 12px 0 rgb(0 0 0 / 0.06),
-    0 12px 32px -4px rgb(0 0 0 / 0.1),
-    0 24px 64px -8px rgb(0 0 0 / 0.08),
-    inset 0 0.5px 0 0 rgb(255 255 255 / 0.5),
-    inset 0 -0.5px 0 0 rgb(255 255 255 / 0.08);
-  border-color: rgb(var(--primary-light) / 0.2);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  border-color: rgba(255, 255, 255, 0.45);
 }
 .dark .card-cream:hover {
-  box-shadow:
-    0 4px 12px 0 rgb(0 0 0 / 0.2),
-    0 12px 32px -4px rgb(0 0 0 / 0.35),
-    0 24px 64px -8px rgb(0 0 0 / 0.4),
-    inset 0 0.5px 0 0 rgb(255 255 255 / 0.06),
-    inset 0 -0.5px 0 0 rgb(255 255 255 / 0.02);
-  border-color: rgb(var(--primary) / 0.25);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.25);
 }
 
 /* ============= 卡片内部统一内边距 ============= */
@@ -1093,32 +1046,24 @@
   border-color: rgb(var(--primary) / 0.2);
 }
 
-/* ============= 侧边栏统一模块（液态玻璃版） ============= */
+/* ============= 侧边栏统一模块（iOS Glassmorphism） ============= */
 .sidebar-section {
-  background: rgb(var(--glass-bg) / 0.55);
-  -webkit-backdrop-filter: blur(16px) saturate(1.6) brightness(1.08);
-  backdrop-filter: blur(16px) saturate(1.6) brightness(1.08);
-  border: 1px solid rgb(var(--glass-border) / 0.15);
+  background: rgba(255, 255, 255, 0.18);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.30);
   border-radius: 14px;
   padding: 20px;
-  box-shadow:
-    0 2px 8px 0 rgb(0 0 0 / 0.04),
-    0 8px 24px -4px rgb(0 0 0 / 0.06),
-    inset 0 0.5px 0 0 rgb(255 255 255 / 0.5),
-    inset 0 -0.5px 0 0 rgb(255 255 255 / 0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.4);
   transition:
     box-shadow 0.25s cubic-bezier(0.23, 1, 0.32, 1),
     border-color 0.25s cubic-bezier(0.23, 1, 0.32, 1),
     background 0.3s cubic-bezier(0.23, 1, 0.32, 1);
 }
 .dark .sidebar-section {
-  background: rgb(var(--glass-bg) / 0.60);
-  border-color: rgb(var(--glass-border) / 0.2);
-  box-shadow:
-    0 2px 8px 0 rgb(0 0 0 / 0.12),
-    0 8px 24px -4px rgb(0 0 0 / 0.18),
-    inset 0 0.5px 0 0 rgb(255 255 255 / 0.06),
-    inset 0 -0.5px 0 0 rgb(255 255 255 / 0.02);
+  background: rgba(30, 35, 60, 0.25);
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 .sidebar-section-title {
   font-size: 11px;
