@@ -230,18 +230,20 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
   }
   #bg-layer img {
     position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
+    inset: -5%;
+    width: 110%;
+    height: 110%;
     object-fit: cover;
-    will-change: opacity;
-    transition: opacity 0.9s cubic-bezier(0.23, 1, 0.32, 1);
+    will-change: opacity, transform;
+    transition: opacity 1.5s cubic-bezier(0.23, 1, 0.32, 1);
   }
   #bg-light {
     opacity: 1;
+    animation: ken-burns-light 30s ease-in-out infinite alternate;
   }
   #bg-dark {
     opacity: 0;
+    animation: ken-burns-dark 30s ease-in-out infinite alternate;
   }
   .dark #bg-light {
     opacity: 0;
@@ -249,15 +251,26 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
   .dark #bg-dark {
     opacity: 1;
   }
+  /* 缓慢肯尼兹缩放 — 画面始终在微运动，切换时人眼不易察觉内容错位 */
+  @keyframes ken-burns-light {
+    0%   { transform: scale(1) translate(0, 0); }
+    50%  { transform: scale(1.04) translate(-1%, 0.5%); }
+    100% { transform: scale(1) translate(0, 0); }
+  }
+  @keyframes ken-burns-dark {
+    0%   { transform: scale(1) translate(0, 0); }
+    50%  { transform: scale(1.04) translate(-1%, 0.5%); }
+    100% { transform: scale(1) translate(0, 0); }
+  }
   /* 半透明遮罩 — 保证文字始终可读 */
   #bg-overlay {
     position: absolute;
     inset: 0;
-    background: rgb(var(--bg) / 0.55);
-    transition: background 0.9s cubic-bezier(0.23, 1, 0.32, 1);
+    background: rgb(var(--bg) / 0.62);
+    transition: background 1.2s cubic-bezier(0.23, 1, 0.32, 1);
   }
   .dark #bg-overlay {
-    background: rgb(17 19 28 / 0.6);
+    background: rgb(17 19 28 / 0.66);
   }
 
   /* 缩短上滑距离，加快入场，更 iOS */
