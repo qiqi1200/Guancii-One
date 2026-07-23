@@ -554,7 +554,7 @@
 
   /* ============= iOS Glassmorphism 卡片（scrapbook 版本） ============= */
   .scrapbook-card {
-    background: rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.28);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
     backdrop-filter: blur(20px) saturate(180%);
     border: 1px solid rgba(255, 255, 255, 0.30);
@@ -567,7 +567,7 @@
     overflow: hidden;
   }
   .dark .scrapbook-card {
-    background: rgba(30, 35, 60, 0.25);
+    background: rgba(30, 35, 60, 0.35);
     border-color: rgba(255, 255, 255, 0.15);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.15);
   }
@@ -825,7 +825,7 @@
   /* ============= iOS Glassmorphism 基础卡片 — 导航栏/菜单面板 =============
      统一玻璃参数，与 .card-cream 保持一致 */
   .card-base {
-    background: rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.28);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
     backdrop-filter: blur(20px) saturate(180%);
     border: 1px solid rgba(255, 255, 255, 0.30);
@@ -841,7 +841,7 @@
     border-color: rgba(255, 255, 255, 0.45);
   }
   .dark .card-base {
-    background: rgba(30, 35, 60, 0.25);
+    background: rgba(30, 35, 60, 0.35);
     border-color: rgba(255, 255, 255, 0.15);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.15);
   }
@@ -897,7 +897,7 @@
     - inset 顶部高光模拟玻璃顶面反光
     ================================================================ */
 .card-cream {
-  background: rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.28);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   backdrop-filter: blur(20px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.30);
@@ -913,7 +913,7 @@
   flex-direction: column;
 }
 .dark .card-cream {
-  background: rgba(30, 35, 60, 0.25);
+  background: rgba(30, 35, 60, 0.35);
   border-color: rgba(255, 255, 255, 0.15);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
@@ -1048,7 +1048,7 @@
 
 /* ============= 侧边栏统一模块（iOS Glassmorphism） ============= */
 .sidebar-section {
-  background: rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.28);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   backdrop-filter: blur(20px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.30);
@@ -1061,7 +1061,7 @@
     background 0.3s cubic-bezier(0.23, 1, 0.32, 1);
 }
 .dark .sidebar-section {
-  background: rgba(30, 35, 60, 0.25);
+  background: rgba(30, 35, 60, 0.35);
   border-color: rgba(255, 255, 255, 0.15);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
