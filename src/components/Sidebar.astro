@@ -34,73 +34,66 @@ posts.forEach(p => {
 const archives = [...archiveMap.entries()].slice(0, 8);
 ---
 
-<div id="sidebar" class="w-full">
-  <!-- 个人信息卡片 (Fuwaari-style profile) -->
-  <div class="card-base p-4 mb-4 onload-animation">
-    <a href="/about" class="group block relative overflow-hidden rounded-2xl ios-press mb-4">
+<div id="sidebar" class="w-full flex flex-col gap-5">
+  <!-- 个人信息卡片 -->
+  <div class="sidebar-section onload-animation">
+    <a href="/about" class="group block relative overflow-hidden rounded-xl mb-4">
       <img
         src={SITE.avatar}
         alt={SITE.author}
         class="w-full h-auto rounded-xl"
       />
-      <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all flex items-center justify-center">
-        <span class="material-symbols-outlined text-white text-4xl opacity-0 group-hover:opacity-100 transition-opacity">person</span>
-      </div>
     </a>
     <div class="text-center">
-      <div class="font-headline font-bold text-lg text-[rgb(var(--fg))] mb-1">{SITE.author}</div>
-      <div class="h-1 w-8 bg-[rgb(var(--primary))] mx-auto rounded-full mb-2"></div>
-      <div class="text-sm text-[rgb(var(--fg-soft))] mb-3">{SITE.description}</div>
+      <div class="font-semibold text-base text-cream-heading mb-1">{SITE.author}</div>
+      <div class="h-[3px] w-8 bg-[#c46010] mx-auto rounded-full mb-3"></div>
+      <div class="text-xs text-cream-body mb-3 leading-relaxed">{SITE.description}</div>
       <div class="flex justify-center gap-2">
         <a href={SITE.links.github} target="_blank" rel="noopener"
-           class="w-9 h-9 rounded-2xl flex items-center justify-center text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] hover:bg-[rgb(var(--primary-light)/0.1)] transition-all ios-press-light">
-          <span class="material-symbols-outlined text-lg">code</span>
+           class="w-8 h-8 rounded-lg flex items-center justify-center text-cream-soft hover:text-cream-link hover:bg-[#c46010]/10 transition-all">
+          <span class="material-symbols-outlined text-base">code</span>
         </a>
         <a href={SITE.links.email}
-           class="w-9 h-9 rounded-2xl flex items-center justify-center text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] hover:bg-[rgb(var(--primary-light)/0.1)] transition-all ios-press-light">
-          <span class="material-symbols-outlined text-lg">mail</span>
+           class="w-8 h-8 rounded-lg flex items-center justify-center text-cream-soft hover:text-cream-link hover:bg-[#c46010]/10 transition-all">
+          <span class="material-symbols-outlined text-base">mail</span>
         </a>
         <a href="/rss.xml"
-           class="w-9 h-9 rounded-2xl flex items-center justify-center text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] hover:bg-[rgb(var(--primary-light)/0.1)] transition-all ios-press-light">
-          <span class="material-symbols-outlined text-lg">rss_feed</span>
+           class="w-8 h-8 rounded-lg flex items-center justify-center text-cream-soft hover:text-cream-link hover:bg-[#c46010]/10 transition-all">
+          <span class="material-symbols-outlined text-base">rss_feed</span>
         </a>
       </div>
     </div>
   </div>
 
   <!-- 侧边栏粘性区域 -->
-  <div id="sidebar-sticky" class="flex flex-col gap-4 sticky top-24 transition-all duration-700">
+  <div id="sidebar-sticky" class="flex flex-col gap-5 sticky top-24 transition-all duration-700">
     <!-- 搜索 -->
-    <section class="card-base p-4 onload-animation" style="animation-delay: 100ms">
-      <h4 class="text-xs font-semibold text-[rgb(var(--fg-soft))] uppercase tracking-wider mb-3">
-        <span class="flex items-center gap-1.5">
-          <span class="material-symbols-outlined text-sm">search</span>
-          搜索
-        </span>
-      </h4>
+    <section class="sidebar-section onload-animation" style="animation-delay: 100ms">
+      <div class="sidebar-section-title">
+        <span class="material-symbols-outlined text-sm">search</span>
+        搜索
+      </div>
       <form action="/search" method="get" class="relative">
         <input
           type="search"
           name="q"
           placeholder="搜索文章..."
-          class="w-full pl-9 pr-3 py-2 rounded-lg bg-[rgb(var(--bg-soft))] border border-[rgb(var(--border))]/50 text-[rgb(var(--fg))] placeholder:text-[rgb(var(--fg-soft))] focus:outline-none focus:border-[rgb(var(--primary))] focus:ring-1 focus:ring-[rgb(var(--primary))]/30 transition-colors"
+          class="w-full pl-9 pr-3 py-2 rounded-lg bg-cream-search border border-cream text-cream-heading placeholder:text-cream-soft focus:outline-none focus:border-cream-link focus:ring-1 focus:ring-[#c46010]/20 transition-colors text-sm"
         />
-        <span class="material-symbols-outlined absolute left-2.5 top-2 text-sm text-[rgb(var(--fg-soft))]">search</span>
+        <span class="material-symbols-outlined absolute left-2.5 top-2 text-sm text-cream-soft">search</span>
       </form>
     </section>
 
     <!-- 标签云 -->
     {tags.length > 0 && (
-      <section class="card-base p-4 onload-animation" style="animation-delay: 150ms">
-        <h4 class="text-xs font-semibold text-[rgb(var(--fg-soft))] uppercase tracking-wider mb-3">
-          <span class="flex items-center gap-1.5">
-            <span class="material-symbols-outlined text-sm">local_offer</span>
-            标签
-          </span>
-        </h4>
-        <div class="flex flex-wrap gap-1.5">
+      <section class="sidebar-section onload-animation" style="animation-delay: 150ms">
+        <div class="sidebar-section-title">
+          <span class="material-symbols-outlined text-sm">local_offer</span>
+          标签
+        </div>
+        <div class="flex flex-wrap gap-2" style="gap: 8px 8px; row-gap: 10px;">
           {tags.map(([tag, count]) => (
-            <a href={`/tags/${tag}`} class="tag-chip">
+            <a href={`/tags/${tag}`} class="tag-chip-cream">
               #{tag} <span class="opacity-50 ml-0.5">{count}</span>
             </a>
           ))}
@@ -110,54 +103,41 @@ const archives = [...archiveMap.entries()].slice(0, 8);
 
     <!-- 最新文章 -->
     {recent.length > 0 && (
-      <section class="card-base p-4 onload-animation" style="animation-delay: 200ms">
-        <h4 class="text-xs font-semibold text-[rgb(var(--fg-soft))] uppercase tracking-wider mb-3">
-          <span class="flex items-center gap-1.5">
-            <span class="material-symbols-outlined text-sm">article</span>
-            最新
-          </span>
-        </h4>
-        <ul class="space-y-3">
+      <section class="sidebar-section onload-animation" style="animation-delay: 200ms">
+        <div class="sidebar-section-title">
+          <span class="material-symbols-outlined text-sm">article</span>
+          最新
+        </div>
+        <div class="flex flex-col gap-0">
           {recent.map(p => (
-            <li>
-              <a href={`/posts/${p.slug}/`} class="block group">
-                <div class="text-[rgb(var(--fg))] group-hover:text-[rgb(var(--primary))] transition-colors font-medium line-clamp-2 leading-snug text-sm">
-                  {p.data.title}
-                </div>
-                <div class="flex items-center gap-2 mt-0.5 text-xs text-[rgb(var(--fg-soft))]">
-                  <span>{p.data.date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' })}</span>
-                  {p.data.tags && p.data.tags.length > 0 && (
-                    <span class="flex gap-1 flex-wrap">
-                      {p.data.tags.slice(0, 2).map(t => (
-                        <span class="opacity-60">#{t}</span>
-                      ))}
-                    </span>
-                  )}
-                </div>
+            <div class="sidebar-recent-item">
+              <a href={`/posts/${p.slug}/`}>
+                {p.data.title}
               </a>
-            </li>
+              <span class="text-xs text-cream-soft ml-2 shrink-0">
+                {p.data.date.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' })}
+              </span>
+            </div>
           ))}
-        </ul>
+        </div>
       </section>
     )}
 
     <!-- 归档 -->
     {archives.length > 0 && (
-      <section class="card-base p-4 onload-animation" style="animation-delay: 250ms">
-        <h4 class="text-xs font-semibold text-[rgb(var(--fg-soft))] uppercase tracking-wider mb-3">
-          <span class="flex items-center gap-1.5">
-            <span class="material-symbols-outlined text-sm">archive</span>
-            归档
-          </span>
-        </h4>
-        <ul class="space-y-1.5">
+      <section class="sidebar-section onload-animation" style="animation-delay: 250ms">
+        <div class="sidebar-section-title">
+          <span class="material-symbols-outlined text-sm">archive</span>
+          归档
+        </div>
+        <div class="flex flex-col gap-0">
           {archives.map(([month, count]) => (
-            <li class="flex items-center justify-between text-sm text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] transition-colors">
+            <div class="sidebar-archive-item">
               <span>{month}</span>
-              <span class="text-xs opacity-60">{count}</span>
-            </li>
+              <span class="count">{count}</span>
+            </div>
           ))}
-        </ul>
+        </div>
       </section>
     )}
   </div>

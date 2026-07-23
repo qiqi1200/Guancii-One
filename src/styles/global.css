@@ -919,4 +919,326 @@
   pointer-events: auto;
   visibility: visible;
 }
+
+/* ================================================================
+   🍮 奶油风重构 — 极简柔和卡片体系
+   ================================================================ */
+
+/* ============= 奶油卡片（替代 scrapbook-card） ============= */
+.card-cream {
+  background: #fffaf0;
+  border: 1px solid rgba(215, 195, 184, 0.15);
+  border-radius: 14px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  transition:
+    transform 0.25s cubic-bezier(0.23, 1, 0.32, 1),
+    box-shadow 0.25s cubic-bezier(0.23, 1, 0.32, 1),
+    border-color 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.dark .card-cream {
+  background: rgb(40 32 28);
+  border-color: rgb(90 65 54 / 0.3);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+}
+.card-cream:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  border-color: rgba(156, 63, 0, 0.18);
+}
+.dark .card-cream:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+  border-color: rgba(255, 182, 147, 0.2);
+}
+
+/* ============= 卡片内部统一内边距 ============= */
+.card-cream-body {
+  padding: 20px;
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ============= 卡片封面图容器 ============= */
+.card-cream-cover {
+  width: 100%;
+  height: 140px;
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.card-cream-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+.card-cream:hover .card-cream-cover img {
+  transform: scale(1.04);
+}
+
+/* ============= 卡片标签色块（低饱和区分色） ============= */
+.tag-cream {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.6;
+  transition: opacity 0.2s ease;
+}
+.tag-cream:hover {
+  opacity: 0.8;
+}
+/* 按标签名称分配底色（低饱和不刺眼） */
+.tag-cream[data-tag="公告"] {
+  background: #f9e9c8;
+  color: #7a5f2e;
+}
+.tag-cream[data-tag="AI"] {
+  background: #e8f0f9;
+  color: #3d5e8a;
+}
+.tag-cream[data-tag="随笔"] {
+  background: #e9f7e9;
+  color: #3d7a3d;
+}
+.tag-cream[data-tag="工具"] {
+  background: #f2e8f9;
+  color: #6a3d8a;
+}
+.tag-cream[data-tag="更新"] {
+  background: #fce8e8;
+  color: #8a3d3d;
+}
+.tag-cream[data-tag="日记"] {
+  background: #fef3e2;
+  color: #8a6a3d;
+}
+.tag-cream[data-tag="分享"] {
+  background: #e6f0fa;
+  color: #3d5e7a;
+}
+.tag-cream[data-tag="学习"] {
+  background: #eaf4e8;
+  color: #3a6a3a;
+}
+.tag-cream[data-tag="旅行"] {
+  background: #e8f4f8;
+  color: #3a6a7a;
+}
+/* 未知标签使用默认柔和色 */
+.tag-cream:not([data-tag]) {
+  background: #f0ebe4;
+  color: #6a5a4a;
+}
+
+/* ============= 侧边栏标签按钮（统一圆角8px） ============= */
+.tag-chip-cream {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #6a5a4a;
+  background: #f5efe8;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+  cursor: pointer;
+  line-height: 1.5;
+}
+.tag-chip-cream:hover {
+  background: #e8ddd0;
+  color: #4a3a2a;
+}
+.dark .tag-chip-cream {
+  background: rgb(60 48 40);
+  color: rgb(200 180 160);
+}
+
+/* ============= 侧边栏统一模块 ============= */
+.sidebar-section {
+  background: #fffaf0;
+  border: 1px solid rgba(215, 195, 184, 0.15);
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+}
+.dark .sidebar-section {
+  background: rgb(40 32 28);
+  border-color: rgb(90 65 54 / 0.3);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+}
+.sidebar-section-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: #999999;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ============= 侧边栏最新文章条目 ============= */
+.sidebar-recent-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 36px;
+  padding: 0;
+  border-bottom: 1px solid rgba(215, 195, 184, 0.1);
+  transition: color 0.2s ease;
+}
+.sidebar-recent-item:last-child {
+  border-bottom: none;
+}
+.sidebar-recent-item a {
+  flex: 1;
+  font-size: 13px;
+  color: #4a4a4a;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+.sidebar-recent-item a:hover {
+  color: #c46010;
+}
+.dark .sidebar-recent-item a {
+  color: rgb(200 185 175);
+}
+
+/* ============= 侧边栏归档条目 ============= */
+.sidebar-archive-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 32px;
+  font-size: 13px;
+  color: #666666;
+  border-bottom: 1px solid rgba(215, 195, 184, 0.08);
+  transition: color 0.2s ease;
+  cursor: default;
+}
+.sidebar-archive-item:last-child {
+  border-bottom: none;
+}
+.sidebar-archive-item:hover {
+  color: #c46010;
+}
+.sidebar-archive-item .count {
+  font-size: 12px;
+  color: #999999;
+}
+.dark .sidebar-archive-item {
+  color: rgb(180 165 155);
+}
+
+/* ============= 阅读全文链接 ============= */
+.read-more-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #c46010;
+  text-decoration: none;
+  transition: gap 0.2s ease;
+}
+.read-more-link:hover {
+  gap: 8px;
+}
+
+/* ============= 奶油风文字颜色（适配暗色模式） ============= */
+.text-cream-heading {
+  color: #2a2a2a;
+}
+.dark .text-cream-heading {
+  color: #e8ddd0;
+}
+
+.text-cream-body {
+  color: #666666;
+}
+.dark .text-cream-body {
+  color: #b8a89a;
+}
+
+.text-cream-soft {
+  color: #999999;
+}
+.dark .text-cream-soft {
+  color: #8a7a6a;
+}
+
+.text-cream-link {
+  color: #c46010;
+}
+.dark .text-cream-link {
+  color: #ffb693;
+}
+
+.bg-cream-search {
+  background-color: #f5efe8;
+}
+.dark .bg-cream-search {
+  background-color: rgb(50 40 34);
+}
+
+.border-cream {
+  border-color: rgba(215, 195, 184, 0.25);
+}
+.dark .border-cream {
+  border-color: rgba(90, 65, 54, 0.3);
+}
+
+/* ============= 标签筛选按钮（奶油风） ============= */
+.tag-filter-cream {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #6a5a4a;
+  background: transparent;
+  border: 1px solid rgba(215, 195, 184, 0.25);
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+  line-height: 1.5;
+}
+.tag-filter-cream:hover {
+  background: #f5efe8;
+  border-color: rgba(215, 195, 184, 0.4);
+}
+.tag-filter-cream.active {
+  background: #c46010;
+  color: #fff;
+  border-color: #c46010;
+}
+.dark .tag-filter-cream {
+  color: rgb(200 180 160);
+  border-color: rgb(90 65 54 / 0.3);
+}
+.dark .tag-filter-cream:hover {
+  background: rgb(60 48 40);
+}
+.dark .tag-filter-cream.active {
+  background: #c46010;
+  color: #fff;
+  border-color: #c46010;
+}
 }

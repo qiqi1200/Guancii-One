@@ -39,7 +39,7 @@ function pageUrl(n: number): string {
 
   <!-- ═══════ Hero：不对称分栏 ═══════ -->
   {isFirstPage && (
-    <section class="relative pt-6 pb-8 md:pt-8 md:pb-8 md:px-0 overflow-hidden onload-animation">
+    <section class="relative pt-4 pb-6 md:pt-6 md:pb-6 overflow-hidden onload-animation">
       <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6 md:gap-12">
         <!-- 左侧：文字区 -->
         <div class="flex-1 max-w-xl">
@@ -102,14 +102,14 @@ function pageUrl(n: number): string {
   <!-- ═══════ 标签筛选：紧凑内联 ═══════ -->
   {allTags.length > 0 && isFirstPage && (
     <section class="mb-6">
-      <div class="flex items-center gap-3 overflow-x-auto scrollbar-none pb-1">
-        <span class="text-xs text-[rgb(var(--fg-soft))] font-label uppercase tracking-wider shrink-0">筛选</span>
-        <div class="h-4 w-px bg-[rgb(var(--border))]/50 shrink-0"></div>
-        <button data-tag="all" class="tag-chip tag-filter active font-label shrink-0 text-xs">
+      <div class="flex items-center gap-2 overflow-x-auto scrollbar-none pb-1">
+        <span class="text-xs text-cream-soft font-medium shrink-0">筛选</span>
+        <div class="h-4 w-px bg-cream shrink-0"></div>
+        <button data-tag="all" class="tag-filter-cream active shrink-0 text-xs">
           全部
         </button>
         {allTags.map(tag => (
-          <button data-tag={tag} class="tag-chip tag-filter font-label shrink-0 text-xs">
+          <button data-tag={tag} class="tag-filter-cream shrink-0 text-xs">
             #{tag}
           </button>
         ))}
@@ -127,7 +127,7 @@ function pageUrl(n: number): string {
     )}
 
     {/* ─── 文章网格 ─── */}
-    <div class="grid gap-4 post-grid sm:grid-cols-2">
+    <div class="grid gap-6 gap-y-7 post-grid sm:grid-cols-2 lg:grid-cols-3">
       {rest.map((p, i) => (
         <div
           class="post-container scroll-reveal"
@@ -140,7 +140,7 @@ function pageUrl(n: number): string {
     </div>
 
     {posts.length === 0 && (
-      <div class="text-center py-20 text-[rgb(var(--fg-soft))] font-body">
+      <div class="text-center py-20 text-cream-body font-body">
         <span class="material-symbols-outlined text-6xl mb-4 block opacity-40">edit_note</span>
         还没有文章，先去写下第一篇吧
       </div>
@@ -148,15 +148,15 @@ function pageUrl(n: number): string {
 
     <!-- ─── 分页导航 ─── -->
     {page.lastPage > 1 && (
-      <nav class="mt-10 flex items-center justify-center gap-2 flex-wrap" aria-label="分页导航">
+      <nav class="mt-12 flex items-center justify-center gap-2 flex-wrap" aria-label="分页导航">
         {page.currentPage > 1 ? (
           <a href={pageUrl(page.currentPage - 1)}
-             class="px-3 py-1.5 rounded-lg text-sm border border-[rgb(var(--border))]/50 text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] hover:border-[rgb(var(--primary))]/30 transition-colors flex items-center gap-0.5">
+             class="px-3 py-1.5 rounded-lg text-sm border border-[#d7c3b8]/40 text-[#666] hover:text-[#c46010] hover:border-[#c46010]/30 transition-colors flex items-center gap-0.5">
             <span class="material-symbols-outlined text-base">chevron_left</span>
             <span class="hidden sm:inline">上一页</span>
           </a>
         ) : (
-          <span class="px-3 py-1.5 rounded-lg text-sm border border-[rgb(var(--border))]/20 text-[rgb(var(--fg-soft))]/30 flex items-center gap-0.5 pointer-events-none">
+          <span class="px-3 py-1.5 rounded-lg text-sm border border-[#d7c3b8]/15 text-[#999] flex items-center gap-0.5 pointer-events-none">
             <span class="material-symbols-outlined text-base">chevron_left</span>
             <span class="hidden sm:inline">上一页</span>
           </span>
@@ -166,25 +166,25 @@ function pageUrl(n: number): string {
           <a href={pageUrl(p)}
              class={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                p === page.currentPage
-                 ? 'bg-[rgb(var(--primary))] text-[rgb(var(--fg-on-primary))]'
-                 : 'border border-[rgb(var(--border))]/50 text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] hover:border-[rgb(var(--primary))]/30'
+                 ? 'bg-[#c46010] text-white'
+                 : 'border border-[#d7c3b8]/40 text-[#666] hover:text-[#c46010] hover:border-[#c46010]/30'
              }`}>
             {p}
           </a>
         ))}
 
         {page.lastPage > 7 && (
-          <span class="px-2 text-[rgb(var(--fg-soft))]">...</span>
+          <span class="px-2 text-[#999]">...</span>
         )}
 
         {page.currentPage < page.lastPage ? (
           <a href={pageUrl(page.currentPage + 1)}
-             class="px-3 py-1.5 rounded-lg text-sm border border-[rgb(var(--border))]/50 text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] hover:border-[rgb(var(--primary))]/30 transition-colors flex items-center gap-0.5">
+             class="px-3 py-1.5 rounded-lg text-sm border border-[#d7c3b8]/40 text-[#666] hover:text-[#c46010] hover:border-[#c46010]/30 transition-colors flex items-center gap-0.5">
             <span class="hidden sm:inline">下一页</span>
             <span class="material-symbols-outlined text-base">chevron_right</span>
           </a>
         ) : (
-          <span class="px-3 py-1.5 rounded-lg text-sm border border-[rgb(var(--border))]/20 text-[rgb(var(--fg-soft))]/30 flex items-center gap-0.5 pointer-events-none">
+          <span class="px-3 py-1.5 rounded-lg text-sm border border-[#d7c3b8]/15 text-[#999] flex items-center gap-0.5 pointer-events-none">
             <span class="hidden sm:inline">下一页</span>
             <span class="material-symbols-outlined text-base">chevron_right</span>
           </span>
@@ -196,7 +196,7 @@ function pageUrl(n: number): string {
 
 <script is:inline>
   // 标签筛选（同时作用于 featured 和普通卡片，带平滑过渡）
-  const filterBtns = document.querySelectorAll('.tag-filter');
+  const filterBtns = document.querySelectorAll('.tag-filter-cream');
   const allContainers = document.querySelectorAll('.post-container');
 
   filterBtns.forEach(btn => {

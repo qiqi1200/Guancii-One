@@ -11,11 +11,6 @@ const { post, featured = false } = Astro.props;
 const { data, slug } = post;
 const url = `/posts/${slug}/`;
 
-// 轻微随机偏移（去除夸张旋转）
-const rotations = ['-0.3deg', '0deg', '0.3deg'];
-const rotIdx = slug.length % rotations.length;
-const rotateVal = rotations[rotIdx];
-
 // 按中文字数+英文词数精确估算阅读时间
 const readTime = getReadingTime(post.body || '');
 
@@ -25,157 +20,95 @@ const dateStr = data.date.toLocaleDateString('zh-CN', {
   day: 'numeric'
 });
 
-const dayStr = String(data.date.getDate()).padStart(2, '0');
-const monthStr = String(data.date.getMonth() + 1).padStart(2, '0');
-const yearStr = String(data.date.getFullYear());
-
 const hasCover = !!data.cover;
 const hasTags = data.tags && data.tags.length > 0;
-const tagSlice = hasTags ? data.tags.slice(0, featured ? 4 : 3) : [];
+const tagSlice = hasTags ? data.tags.slice(0, 3) : [];
 ---
 
 {featured ? (
-  /* ═══════ Featured：横向大卡（图片左 + 内容右）═══════ */
-  <article class="group scrapbook-card featured-card rounded-[1.5rem] md:rounded-[2rem] relative overflow-hidden">
+  /* ═══════ Featured：横向大卡（奶油风）═══════ */
+  <article class="card-cream featured-card overflow-hidden">
     <a href={url} class="block h-full">
       <div class="flex flex-col md:flex-row">
-        {/* 左侧：封面图 / 日期装饰 */}
         {hasCover ? (
-          <div class="md:w-2/5 overflow-hidden md:rounded-l-[2rem] rounded-t-[1.5rem] md:rounded-tr-none aspect-[16/10] md:aspect-auto md:min-h-[280px] bg-[rgb(var(--bg-soft))] relative">
+          <div class="md:w-2/5 overflow-hidden aspect-[16/10] md:aspect-auto md:min-h-[240px] relative">
             <img
               src={data.cover}
               alt={data.title}
               loading="lazy"
               class="w-full h-full object-cover transition-transform duration-500 ease-[var(--ease-smooth)] group-hover:scale-[1.03]"
-              />
-              <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            />
           </div>
         ) : (
-          <div class="hidden md:flex flex-col items-center justify-center shrink-0 w-28 md:w-32 border-r border-dashed border-[rgb(var(--border))]/30 py-8">
-            <span class="text-4xl font-bold text-[rgb(var(--primary))] leading-none font-headline">{dayStr}</span>
-            <span class="text-xs text-[rgb(var(--fg-soft))] mt-1.5 font-handwritten">{yearStr}/{monthStr}</span>
-            <div class="mt-5 flex flex-col gap-1.5 items-center">
-              {tagSlice.map(t => (
-                <span class="text-[10px] px-2 py-0.5 rounded-full bg-[rgb(var(--primary-light))]/10 text-[rgb(var(--primary))] whitespace-nowrap font-handwritten">
-                  #{t}
-                </span>
-              ))}
-            </div>
+          <div class="hidden md:flex flex-col items-center justify-center shrink-0 w-28 md:w-32 py-8">
+            <span class="text-4xl font-bold text-cream-link leading-none">{dayStr}</span>
+            <span class="text-xs text-cream-soft mt-1.5">{yearStr}/{monthStr}</span>
           </div>
         )}
-
-        {/* 右侧：内容 */}
         <div class="flex-1 p-5 md:p-7 min-w-0 flex flex-col justify-center">
-          {/* 移动端日期 */}
-          <div class="flex items-center gap-2 flex-wrap text-xs text-[rgb(var(--fg-soft))] font-body mb-3 md:hidden">
+          <div class="flex items-center gap-2 text-xs text-cream-soft mb-2">
             <time datetime={data.date.toISOString()}>{dateStr}</time>
             <span>·</span>
             <span>{readTime} 分钟</span>
           </div>
-
-          {/* 桌面端日期 */}
-          <div class="hidden md:flex items-center gap-2 text-xs text-[rgb(var(--fg-soft))] font-body mb-3">
-            <time datetime={data.date.toISOString()}>{dateStr}</time>
-            <span>·</span>
-            <span>{readTime} 分钟阅读</span>
-          </div>
-
-          <h2 class="font-headline font-semibold tracking-tight text-[rgb(var(--fg))] group-hover:text-[rgb(var(--primary))] transition-colors duration-300 text-xl md:text-2xl lg:text-3xl leading-tight">
-            {data.title}
-          </h2>
-
-          {data.description && (
-            <p class="mt-2.5 text-[rgb(var(--fg-soft))] line-clamp-2 leading-relaxed text-sm font-body">
-              {data.description}
-            </p>
-          )}
-
           {hasTags && (
-            <div class="hidden md:flex flex-wrap gap-1.5 mt-4">
-              {tagSlice.map((t, i) => (
-                <span
-                  class="postit-tag text-xs"
-                  style={
-                    i === 0
-                      ? 'background: rgb(var(--post-it-yellow, 255 236 179)); color: rgb(var(--post-it-text, 86 31 0));'
-                      : i === 1
-                      ? 'background: rgb(var(--secondary) / 0.15); color: rgb(var(--secondary));'
-                      : 'background: rgb(var(--surface-variant) / 0.3); color: rgb(var(--fg-soft));'
-                  }
-                >
-                  #{t}
-                </span>
+            <div class="flex flex-wrap gap-1.5 mb-3">
+              {tagSlice.map(t => (
+                <span class="tag-cream" data-tag={t}>#{t}</span>
               ))}
             </div>
           )}
-
-          <div class="mt-4 flex items-center text-[rgb(var(--primary))] text-sm font-label font-semibold">
+          <h2 class="font-semibold tracking-tight text-cream-heading text-xl md:text-2xl leading-snug mb-3">
+            {data.title}
+          </h2>
+          {data.description && (
+            <p class="text-cream-body line-clamp-2 leading-relaxed text-sm mb-4">
+              {data.description}
+            </p>
+          )}
+          <div class="read-more-link mt-auto">
             阅读全文
-            <span class="material-symbols-outlined text-base ml-1 transition-transform duration-300 ease-[var(--ease-smooth)] group-hover:translate-x-0.5">arrow_forward</span>
           </div>
         </div>
       </div>
     </a>
   </article>
 ) : (
-  /* ═══════ 普通卡片：纵向 ══════ */
-  <article
-    class="group scrapbook-card rounded-[1.5rem] relative"
-    style={`transform: rotate(${rotateVal});`}
-  >
-    <a href={url} class="block h-full">
+  /* ═══════ 普通卡片：奶油风纵向标准卡片 ═══════ */
+  <article class="card-cream">
+    <a href={url} class="block h-full flex flex-col">
       {hasCover && (
-        <div class="overflow-hidden rounded-t-[1.5rem] aspect-[16/9] bg-[rgb(var(--bg-soft))] relative">
+        <div class="card-cream-cover mx-[20px] mt-[20px]">
           <img
             src={data.cover}
             alt={data.title}
             loading="lazy"
-            class="w-full h-full object-cover transition-transform duration-500 ease-[var(--ease-smooth)] group-hover:scale-[1.03]"
           />
-          <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
         </div>
       )}
-      <div class="p-4 md:p-5 space-y-2.5">
-        <div class="flex items-center gap-2 text-xs text-[rgb(var(--fg-soft))] font-body">
+      <div class="card-cream-body">
+        <div class="flex items-center gap-2 text-xs text-cream-soft mb-[8px]">
           <time datetime={data.date.toISOString()}>{dateStr}</time>
           <span>·</span>
           <span>{readTime} 分钟</span>
         </div>
-
         {hasTags && (
-          <div class="flex flex-wrap gap-1.5">
-            {tagSlice.map((t, i) => (
-              <span
-                class="postit-tag text-xs"
-                style={
-                  i === 0
-                    ? 'background: rgb(var(--post-it-yellow, 255 236 179)); color: rgb(var(--post-it-text, 86 31 0));'
-                    : i === 1
-                    ? 'background: rgb(var(--secondary) / 0.15); color: rgb(var(--secondary));'
-                    : i === 2
-                    ? 'background: rgb(var(--sage, 177 207 167) / 0.15); color: rgb(var(--tertiary));'
-                    : 'background: rgb(var(--surface-variant) / 0.3); color: rgb(var(--fg-soft));'
-                }
-              >
-                #{t}
-              </span>
+          <div class="flex flex-wrap gap-1.5 mb-[10px]">
+            {tagSlice.map(t => (
+              <span class="tag-cream" data-tag={t}>#{t}</span>
             ))}
           </div>
         )}
-
-        <h3 class="font-headline font-semibold tracking-tight text-[rgb(var(--fg))] group-hover:text-[rgb(var(--primary))] transition-colors duration-300 text-lg leading-snug">
+        <h3 class="font-semibold tracking-tight text-cream-heading text-base leading-snug mb-[10px] line-clamp-2">
           {data.title}
         </h3>
-
         {data.description && (
-          <p class="text-[rgb(var(--fg-soft))] line-clamp-2 leading-relaxed text-sm font-body">
+          <p class="text-cream-body line-clamp-2 leading-relaxed text-sm mb-[16px]">
             {data.description}
           </p>
         )}
-
-        <div class="flex items-center text-[rgb(var(--primary))] text-sm font-label font-semibold pt-1">
+        <div class="read-more-link mt-auto pt-1">
           阅读全文
-          <span class="material-symbols-outlined text-base ml-1 transition-transform duration-300 ease-[var(--ease-smooth)] group-hover:translate-x-0.5">arrow_forward</span>
         </div>
       </div>
     </a>

@@ -46,10 +46,8 @@ const allPosts = posts;
         return (
           <a
             href={`/tags/${tag}`}
-            class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-[rgb(var(--border))]/50
-                   text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] hover:border-[rgb(var(--primary))]/30
-                   transition-all hover:-translate-y-0.5"
-            style={`font-size: ${fontSize};`}
+            class="tag-chip-cream"
+            style={`font-size: ${fontSize}; padding: 6px 16px;`}
           >
             #{tag}
             <span class="text-xs opacity-50">{count}</span>
