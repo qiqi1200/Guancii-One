@@ -231,14 +231,14 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
   }
 
   /* ════════════════════════════════════════════
-     背景图层 — 桌面端 + 移动端双壁纸切换 v2
+     背景图层 — 全屏固定，桌面端 + 移动端双壁纸切换
      
      两套独立壁纸：
      - 桌面端（>768px）：横版壁纸，原样保留
      - 移动端（≤768px）：竖版壁纸，居中顶部对齐
      
      亮/暗模式通过 .dark 类切换 opacity 实现
-     移动端取消 position:fixed 提升 iOS 滚动性能
+     全屏 position: fixed，背景永不滚动
      ════════════════════════════════════════════ */
   #bg-layer {
     position: fixed;
@@ -293,14 +293,9 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
       object-position: center top;
     }
 
-    /*
-      iOS 兼容性优化：
-      - position:fixed → position:absolute，避免 iOS Safari
-        地址栏显隐时背景抖动
-      - translateZ(0) 强制 GPU 合成层，减少滚动重绘
-    */
+    /* #bg-layer 保持 position: fixed（继承自桌面端），背景永不随页面滚动 */
+    /* translateZ(0) 强制 GPU 合成层，iOS Safari 下减少背景重绘开销 */
     #bg-layer {
-      position: absolute;
       -webkit-transform: translateZ(0);
       transform: translateZ(0);
     }
