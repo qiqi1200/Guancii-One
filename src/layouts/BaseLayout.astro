@@ -54,7 +54,11 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
-    <link rel="dns-prefetch" href="https://pic.224418.xyz" />
+    <link rel="preconnect" href="https://pic.224418.xyz" />
+
+    <!-- 预加载深浅模式背景图 -->
+    <link rel="preload" as="image" href="https://pic.224418.xyz/file/archive/pic/1784819551828_bdad1114d2a2802d718351066ed154e4.jpg" />
+    <link rel="preload" as="image" href="https://pic.224418.xyz/file/archive/pic/1784819713707_a9cdc5e92737e00b5d10535f43a06be3.jpg" />
 
     <!-- 字体：Montserrat + 手写体 Architects Daughter + Material Symbols -->
     <link
@@ -84,6 +88,12 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <script>LA.init({id:"3QTlGG2A1JijpoBK",ck:"3QTlGG2A1JijpoBK"})</script>
   </head>
   <body class="min-h-screen flex flex-col bg-[rgb(var(--bg))] text-[rgb(var(--fg))] transition-colors">
+    <!-- 背景图片层（全屏、固定、下层） -->
+    <div id="bg-layer" aria-hidden="true">
+      <img id="bg-light" src="https://pic.224418.xyz/file/archive/pic/1784819551828_bdad1114d2a2802d718351066ed154e4.jpg" alt="" />
+      <img id="bg-dark" src="https://pic.224418.xyz/file/archive/pic/1784819713707_a9cdc5e92737e00b5d10535f43a06be3.jpg" alt="" />
+      <div id="bg-overlay"></div>
+    </div>
     <!-- 鼠标光晕 -->
     <div class="cursor-blob" id="cursor-blob"></div>
 
@@ -209,6 +219,45 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
   }
   body {
     letter-spacing: 0.01em;
+  }
+
+  /* 背景图层 — 全屏固定，z-index 在 body 之下 */
+  #bg-layer {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+  }
+  #bg-layer img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    will-change: opacity;
+    transition: opacity 0.9s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  #bg-light {
+    opacity: 1;
+  }
+  #bg-dark {
+    opacity: 0;
+  }
+  .dark #bg-light {
+    opacity: 0;
+  }
+  .dark #bg-dark {
+    opacity: 1;
+  }
+  /* 半透明遮罩 — 保证文字始终可读 */
+  #bg-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgb(var(--bg) / 0.55);
+    transition: background 0.9s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  .dark #bg-overlay {
+    background: rgb(17 19 28 / 0.6);
   }
 
   /* 缩短上滑距离，加快入场，更 iOS */
