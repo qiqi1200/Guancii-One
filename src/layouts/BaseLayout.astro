@@ -56,9 +56,13 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
     <link rel="preconnect" href="https://pic.224418.xyz" />
 
-    <!-- 预加载深浅模式背景图 -->
+    <!-- 预加载深浅模式背景图（桌面端+移动端各两张） -->
+    <!-- 桌面端壁纸（横版） -->
     <link rel="preload" as="image" href="https://pic.224418.xyz/file/archive/pic/1784819551828_bdad1114d2a2802d718351066ed154e4.jpg" />
     <link rel="preload" as="image" href="https://pic.224418.xyz/file/archive/pic/1784821252803_33ae94da66a57820d8db2a6371f353fc.jpg" />
+    <!-- 移动端壁纸（竖版）— TODO: 替换为你自己的竖版壁纸地址 -->
+    <link rel="preload" as="image" href="https://pic.224418.xyz/file/archive/pic/1784824832785_25045e9d346642940d6dc2e4f8ce4f2b.jpg" />
+    <link rel="preload" as="image" href="https://pic.224418.xyz/file/archive/pic/1784824863422_e0e3e2b57e219b203dc2ea7d6b542c25.jpg" />
 
     <!-- 字体：Montserrat + 手写体 Architects Daughter + Material Symbols -->
     <link
@@ -88,10 +92,15 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <script>LA.init({id:"3QTlGG2A1JijpoBK",ck:"3QTlGG2A1JijpoBK"})</script>
   </head>
   <body class="min-h-screen flex flex-col bg-[rgb(var(--bg))] text-[rgb(var(--fg))] transition-colors">
-    <!-- 背景图片层（全屏、固定、下层） -->
+    <!-- 背景图片层（全屏、固定、下层）
+         桌面端横版壁纸 / 移动端竖版壁纸 两套独立 -->
     <div id="bg-layer" aria-hidden="true">
-      <img id="bg-light" src="https://pic.224418.xyz/file/archive/pic/1784819551828_bdad1114d2a2802d718351066ed154e4.jpg" alt="" />
-      <img id="bg-dark" src="https://pic.224418.xyz/file/archive/pic/1784821252803_33ae94da66a57820d8db2a6371f353fc.jpg" alt="" />
+      <!-- 桌面端壁纸（横版）— 屏幕宽度 >768px 时显示 -->
+      <img id="bg-light" class="bg-desktop" src="https://pic.224418.xyz/file/archive/pic/1784819551828_bdad1114d2a2802d718351066ed154e4.jpg" alt="" />
+      <img id="bg-dark" class="bg-desktop" src="https://pic.224418.xyz/file/archive/pic/1784821252803_33ae94da66a57820d8db2a6371f353fc.jpg" alt="" />
+      <!-- 移动端壁纸（竖版）— 屏幕宽度 ≤768px 时显示 — TODO: 替换为竖版壁纸 -->
+      <img id="bg-light-mobile" class="bg-mobile" src="https://pic.224418.xyz/file/archive/pic/1784824832785_25045e9d346642940d6dc2e4f8ce4f2b.jpg" alt="" />
+      <img id="bg-dark-mobile" class="bg-mobile" src="https://pic.224418.xyz/file/archive/pic/1784824863422_e0e3e2b57e219b203dc2ea7d6b542c25.jpg" alt="" />
       <div id="bg-overlay"></div>
     </div>
     <!-- 鼠标光晕 -->
@@ -221,7 +230,16 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     letter-spacing: 0.01em;
   }
 
-  /* 背景图层 — 全屏固定，z-index 在 body 之下 */
+  /* ════════════════════════════════════════════
+     背景图层 — 桌面端 + 移动端双壁纸切换 v2
+     
+     两套独立壁纸：
+     - 桌面端（>768px）：横版壁纸，原样保留
+     - 移动端（≤768px）：竖版壁纸，居中顶部对齐
+     
+     亮/暗模式通过 .dark 类切换 opacity 实现
+     移动端取消 position:fixed 提升 iOS 滚动性能
+     ════════════════════════════════════════════ */
   #bg-layer {
     position: fixed;
     inset: 0;
@@ -237,11 +255,22 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     will-change: opacity;
     transition: opacity 0.9s cubic-bezier(0.23, 1, 0.32, 1);
   }
-  #bg-light { opacity: 1; }
-  #bg-dark { opacity: 0; }
-  .dark #bg-light { opacity: 0; }
-  .dark #bg-dark { opacity: 1; }
-  /* 半透明遮罩 — 保证文字始终可读 */
+
+  /* ── 亮/暗主题切换（桌面端 + 移动端统一规则）── */
+  #bg-light,
+  #bg-light-mobile { opacity: 1; }
+  #bg-dark,
+  #bg-dark-mobile { opacity: 0; }
+  .dark #bg-light,
+  .dark #bg-light-mobile { opacity: 0; }
+  .dark #bg-dark,
+  .dark #bg-dark-mobile { opacity: 1; }
+
+  /* ── 默认：桌面端显示横版，隐藏竖版 ── */
+  .bg-desktop { display: block; }
+  .bg-mobile  { display: none; }
+
+  /* ── 半透明遮罩 — 保证文字始终可读 ── */
   #bg-overlay {
     position: absolute;
     inset: 0;
@@ -250,6 +279,31 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
   }
   .dark #bg-overlay {
     background: rgb(17 19 28 / 0.6);
+  }
+
+  /* ── 移动端（≤768px）：切换竖版壁纸 + iOS 优化 ── */
+  @media (max-width: 768px) {
+    /* 隐藏桌面横版壁纸，显示移动端竖版壁纸 */
+    .bg-desktop { display: none; }
+    .bg-mobile  { display: block; }
+
+    /* 竖版壁纸：cover 铺满，居中对齐 + 顶部优先，确保主体完整可见 */
+    #bg-layer img.bg-mobile {
+      object-fit: cover;
+      object-position: center top;
+    }
+
+    /*
+      iOS 兼容性优化：
+      - position:fixed → position:absolute，避免 iOS Safari
+        地址栏显隐时背景抖动
+      - translateZ(0) 强制 GPU 合成层，减少滚动重绘
+    */
+    #bg-layer {
+      position: absolute;
+      -webkit-transform: translateZ(0);
+      transform: translateZ(0);
+    }
   }
 
   /* 缩短上滑距离，加快入场，更 iOS */

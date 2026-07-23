@@ -100,14 +100,59 @@ const path = current || Astro.url.pathname;
 </div>
 
 <script is:inline>
-  // 主题切换
+  // 主题切换（带圆形揭示动画）
   const themeToggle = document.getElementById('theme-toggle');
-  themeToggle?.addEventListener('click', () => {
-    document.documentElement.classList.toggle('dark');
-    localStorage.setItem(
-      'theme',
-      document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+  themeToggle?.addEventListener('click', (e) => {
+    const isDark = document.documentElement.classList.contains('dark');
+
+    // 切换主题的核心逻辑
+    function applyTheme() {
+      document.documentElement.classList.toggle('dark');
+      localStorage.setItem(
+        'theme',
+        document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+      );
+    }
+
+    // 如果浏览器不支持 View Transition API 或用户偏好减少动画，直接切换
+    if (!document.startViewTransition || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      applyTheme();
+      return;
+    }
+
+    // 计算动画起始点（按钮中心）
+    const rect = themeToggle.getBoundingClientRect();
+    const x = rect.left + rect.width / 2;
+    const y = rect.top + rect.height / 2;
+
+    // 计算覆盖整个视口所需的最大半径
+    const endRadius = Math.hypot(
+      Math.max(x, window.innerWidth - x),
+      Math.max(y, window.innerHeight - y)
     );
+
+    const transition = document.startViewTransition(applyTheme);
+
+    // 设置动画：从按钮中心向外扩散的圆形
+    transition.ready.then(() => {
+      const clipPath = [
+        `circle(0px at ${x}px ${y}px)`,
+        `circle(${endRadius}px at ${x}px ${y}px)`
+      ];
+
+      document.documentElement.animate(
+        {
+          clipPath: isDark ? clipPath : [...clipPath].reverse()
+        },
+        {
+          duration: 500,
+          easing: 'cubic-bezier(0.23, 1, 0.32, 1)',
+          pseudoElement: isDark
+            ? '::view-transition-new(root)'
+            : '::view-transition-old(root)'
+        }
+      );
+    });
   });
 
   // 移动端菜单（兼容桌面 click 与移动端 touch）
