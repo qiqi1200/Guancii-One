@@ -794,27 +794,6 @@
     visibility: hidden;
   }
 
-  /* ============= 主题切换圆形揭示动画（View Transition API） ============= */
-  ::view-transition-old(root),
-  ::view-transition-new(root) {
-    animation: none;
-    mix-blend-mode: normal;
-  }
-  /* 暗色→浅色：旧视图（暗色）在上层，圆形缩小消失 */
-  ::view-transition-old(root) {
-    z-index: 9999;
-  }
-  ::view-transition-new(root) {
-    z-index: 1;
-  }
-  /* 浅色→暗色：新视图（暗色）在上层，圆形扩大出现 */
-  .dark::view-transition-old(root) {
-    z-index: 1;
-  }
-  .dark::view-transition-new(root) {
-    z-index: 9999;
-  }
-
   /* ============= prefers-reduced-motion ============= */
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
