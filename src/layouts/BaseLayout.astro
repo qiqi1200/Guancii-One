@@ -182,6 +182,32 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
         blob.style.display = 'none';
       }
 
+      // 折射液态玻璃卡片 — 鼠标追踪镜面高光
+      // 将鼠标在卡片内的相对位置映射为 --hl-x / --hl-y CSS 变量
+      // ::after 伪元素的 radial-gradient 据此改变高光位置
+      if (!isTouch && !prefersReduced) {
+        const glassCards = document.querySelectorAll('.card-cream');
+        glassCards.forEach(card => {
+          let rafId = null;
+          card.addEventListener('mousemove', (e) => {
+            if (rafId) cancelAnimationFrame(rafId);
+            rafId = requestAnimationFrame(() => {
+              const rect = card.getBoundingClientRect();
+              const x = ((e.clientX - rect.left) / rect.width) * 100;
+              const y = ((e.clientY - rect.top) / rect.height) * 100;
+              card.style.setProperty('--hl-x', `${x}%`);
+              card.style.setProperty('--hl-y', `${y}%`);
+              rafId = null;
+            });
+          });
+          card.addEventListener('mouseleave', () => {
+            // 离开时高光平滑移回顶部中间
+            card.style.setProperty('--hl-x', '50%');
+            card.style.setProperty('--hl-y', '0%');
+          });
+        });
+      }
+
       // 滚动入场动画（IntersectionObserver，仅非 reduced-motion 用户）
       if (!prefersReduced) {
         // iOS 交错入场：.onload-animation 元素在页面加载后依次显现
