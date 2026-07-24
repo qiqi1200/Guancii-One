@@ -888,133 +888,167 @@
    ================================================================ */
 
 /* ============= Refractive Liquid Glass（折射液态玻璃卡片） =============
-    从基础 iOS Glassmorphism 升级为物理光学折射质感：
-    - 多层级 blur + saturate + brightness 滤镜模拟真实玻璃折射
-    - ::before 棱镜色散边缘（Prismatic Bevel）模拟光线穿过玻璃边缘的色散
-    - ::after 动态镜面扫光（Specular Sweep），跟随鼠标位置
-    - 液体表面张力 inset 阴影（Liquid Surface Tension）
-    - 硬件加速 transform: translateZ(0)
+    升级为厚玻璃光学折射质感，核心物理模拟：
+    - 高模糊半径（24px）模拟厚玻璃深度对背景的散焦折射
+    - ::before 厚切面棱镜斜边（4px Bevel）模拟玻璃边缘厚度与色散
+    - 色差边缘（Chromatic Aberration）：青色/品红在左右边缘分色
+    - ::after 径向「透镜」叠加层 + 鼠标追踪镜面高光
+    - 暗边吸收效应：厚玻璃边缘光损耗
+    - 液态张力收缩暗角
+    硬件加速 transform: translateZ(0)
     ================================================================ */
 .card-cream {
   position: relative;
-  background: rgb(var(--glass-bg) / 0.25);
-  -webkit-backdrop-filter: blur(16px) saturate(var(--glass-sat, 1.8)) brightness(var(--glass-bright, 1.1));
-  backdrop-filter: blur(16px) saturate(var(--glass-sat, 1.8)) brightness(var(--glass-bright, 1.1));
-  border: 0.5px solid rgb(var(--glass-border) / 0.12);
+  /* 更低的不透明度 = 背景更清晰穿透，但 blur 更大会散焦 */
+  background: rgb(var(--glass-bg) / 0.16);
+  /* ⚡ 24px 模糊半径 — 厚玻璃深度感，背景散焦明显 */
+  -webkit-backdrop-filter: blur(24px) saturate(1.35) brightness(1.04);
+  backdrop-filter: blur(24px) saturate(1.35) brightness(1.04);
+  border: none;
   border-radius: 14px;
 
   /* 鼠标追踪坐标 — JS 动态更新 */
   --hl-x: 50%;
   --hl-y: 0%;
 
-  /* 物理折射阴影系统 */
+  /* ═══ 厚玻璃物理折射阴影系统 ═══
+     厚玻璃（≈8-12mm）的光学特性：
+     - 更深的投影（光线折射路径更长）
+     - 边缘暗角（光在玻璃内被吸收/散射）
+     - 顶部/底部边缘明显反光
+     - 液态表面的收缩张力感（内凹阴影）
+  */
   box-shadow:
-    /* ① 近景柔光 — 卡片直接接触面的环境光吸收 */
-    0 2px 8px 0 rgb(0 0 0 / 0.03),
-    /* ② 中景环境光 — 模拟玻璃厚度造成的中距离折射散光 */
-    0 8px 24px -4px rgb(0 0 0 / 0.06),
-    /* ③ 远景泛光 — 玻璃底部折射出去的散射光斑 */
-    0 16px 56px -8px rgb(0 0 0 / 0.05),
-    /* ④ 液体表面张力 — 液态玻璃收缩内凹的细微暗角 */
-    inset 0 2px 8px -2px rgb(0 0 0 / 0.04),
-    /* ⑤ 顶部边缘高光 — 玻璃顶面的入射光反射 */
-    inset 0 0.5px 0 0 rgb(255 255 255 / 0.55),
-    /* ⑥ 底部边缘微反光 — 玻璃底部的间接光反弹 */
-    inset 0 -0.5px 0 0 rgb(255 255 255 / 0.08);
+    /* ① 近距接触阴影 — 玻璃底部与桌面的接触点阴影 */
+    0 2px 6px 0 rgb(0 0 0 / 0.04),
+    /* ② 中距折射散光 — 玻璃内部光线多次折射后的扩散 */
+    0 8px 28px -4px rgb(0 0 0 / 0.10),
+    /* ③ 远距散射光晕 — 光线从玻璃底部射出的散焦光斑 */
+    0 20px 64px -8px rgb(0 0 0 / 0.08),
+    /* ④ 厚玻璃暗边吸收 — 光线在厚玻璃边缘被吸收产生的暗边 */
+    inset 0 0 14px 2px rgb(0 0 0 / 0.06),
+    /* ⑤ 液体表面张力 — 液态玻璃收缩内凹的暗角 */
+    inset 0 3px 10px -4px rgb(0 0 0 / 0.06),
+    /* ⑥ 顶部边缘反光 — 玻璃顶面的入射光强烈反射 */
+    inset 0 0.5px 0 0 rgb(255 255 255 / 0.5),
+    /* ⑦ 底部边缘微弱反光 — 玻璃底部的间接光反弹 */
+    inset 0 -0.5px 0 0 rgb(255 255 255 / 0.06);
 
   display: flex;
   flex-direction: column;
 
-  /* 硬件加速 — 避免模糊/阴影重绘卡顿 */
+  /* 硬件加速 — 避免模糊/重绘卡顿 */
   transform: translateZ(0);
   will-change: transform;
 
   transition:
     transform 0.25s cubic-bezier(0.23, 1, 0.32, 1),
     box-shadow 0.25s cubic-bezier(0.23, 1, 0.32, 1),
-    border-color 0.25s cubic-bezier(0.23, 1, 0.32, 1),
     background 0.3s cubic-bezier(0.23, 1, 0.32, 1);
 }
 .dark .card-cream {
-  background: rgb(var(--glass-bg) / 0.35);
-  border-color: rgb(var(--glass-border) / 0.15);
+  background: rgb(var(--glass-bg) / 0.22);
+  -webkit-backdrop-filter: blur(24px) saturate(1.25) brightness(1.08);
+  backdrop-filter: blur(24px) saturate(1.25) brightness(1.08);
   box-shadow:
-    0 2px 8px 0 rgb(0 0 0 / 0.12),
-    0 8px 24px -4px rgb(0 0 0 / 0.22),
-    0 16px 56px -8px rgb(0 0 0 / 0.25),
-    inset 0 2px 8px -2px rgb(0 0 0 / 0.15),
+    0 2px 6px 0 rgb(0 0 0 / 0.12),
+    0 8px 28px -4px rgb(0 0 0 / 0.22),
+    0 20px 64px -8px rgb(0 0 0 / 0.28),
+    inset 0 0 14px 2px rgb(0 0 0 / 0.18),
+    inset 0 3px 10px -4px rgb(0 0 0 / 0.18),
     inset 0 0.5px 0 0 rgb(255 255 255 / 0.06),
     inset 0 -0.5px 0 0 rgb(255 255 255 / 0.02);
 }
 .card-cream:hover {
-  transform: translateY(-2px);
+  transform: translateY(-3px);
   box-shadow:
     0 4px 12px 0 rgb(0 0 0 / 0.06),
-    0 12px 32px -4px rgb(0 0 0 / 0.10),
-    0 24px 64px -8px rgb(0 0 0 / 0.08),
-    inset 0 2px 8px -2px rgb(0 0 0 / 0.04),
-    inset 0 0.5px 0 0 rgb(255 255 255 / 0.5),
-    inset 0 -0.5px 0 0 rgb(255 255 255 / 0.08);
-  border-color: rgb(var(--glass-border) / 0.25);
+    0 12px 32px -4px rgb(0 0 0 / 0.12),
+    0 28px 72px -8px rgb(0 0 0 / 0.10),
+    inset 0 0 14px 2px rgb(0 0 0 / 0.06),
+    inset 0 3px 10px -4px rgb(0 0 0 / 0.06),
+    inset 0 0.5px 0 0 rgb(255 255 255 / 0.45),
+    inset 0 -0.5px 0 0 rgb(255 255 255 / 0.06);
 }
 .dark .card-cream:hover {
   box-shadow:
     0 4px 12px 0 rgb(0 0 0 / 0.18),
-    0 12px 32px -4px rgb(0 0 0 / 0.3),
-    0 24px 64px -8px rgb(0 0 0 / 0.35),
-    inset 0 2px 8px -2px rgb(0 0 0 / 0.15),
+    0 12px 32px -4px rgb(0 0 0 / 0.30),
+    0 28px 72px -8px rgb(0 0 0 / 0.38),
+    inset 0 0 14px 2px rgb(0 0 0 / 0.18),
+    inset 0 3px 10px -4px rgb(0 0 0 / 0.18),
     inset 0 0.5px 0 0 rgb(255 255 255 / 0.06),
     inset 0 -0.5px 0 0 rgb(255 255 255 / 0.02);
-  border-color: rgb(var(--glass-border) / 0.3);
 }
 
-/* ═══ 棱镜色散边缘微光（Prismatic Bevel Edge）═══
-   模拟光线穿过玻璃切面边缘时的色散（Chromatic Dispersion）：
-   - 极低透明度的彩虹渐变沿 135° 分布
-   - 1px 向外扩展模拟玻璃厚度斜切面（Bevel）
-   - 光到暗到光的过渡模拟折射率变化（IOR-like）
-   - 暗色下微光更克制，不破坏整体感
+/* ═══ 厚玻璃切面斜边（Thick Glass Bevel Edge）═══
+   模拟 8-12mm 厚玻璃的切割边缘光学行为：
+   - 4px 向外扩展模拟玻璃的实际厚度斜切面
+   - 三层渐变模拟光在玻璃边缘的入射/出射（全反射 + 色散）
+   - 青色/品红色差在左右边缘分色（Chromatic Dispersion）
+   - 暗色下保持可见但更克制
 */
 .card-cream::before {
   content: '';
   position: absolute;
-  inset: -1px;
-  border-radius: 15px;
+  inset: -4px;
+  border-radius: 18px;
   z-index: -1;
   pointer-events: none;
-  background: linear-gradient(
-    135deg,
-    rgb(255 255 255 / 0.10) 0%,
-    rgb(180 210 255 / 0.06) 15%,
-    rgb(200 230 255 / 0.04) 30%,
-    rgb(255 220 240 / 0.04) 50%,
-    rgb(200 255 220 / 0.04) 70%,
-    rgb(255 230 200 / 0.06) 85%,
-    rgb(255 255 255 / 0.10) 100%
-  );
-  border: 0.5px solid rgb(255 255 255 / 0.06);
-  transition: opacity 0.4s ease;
+
+  /* 
+    三层边缘光效叠加：
+    ① 主斜面渐变 — 模拟光线在玻璃切面的折射亮斑
+    ② 色差青色偏移 — 光进入玻璃时短波长（蓝）弯曲更多
+    ③ 色差品红偏移 — 光离开玻璃时长波长（红）弯曲不同
+  */
+  background:
+    /* 主斜面亮边 */
+    linear-gradient(
+      135deg,
+      rgb(255 255 255 / 0.35) 0%,
+      rgb(255 255 255 / 0.06) 25%,
+      rgb(255 255 255 / 0.01) 45%,
+      rgb(255 255 255 / 0) 50%,
+      rgb(255 255 255 / 0.01) 55%,
+      rgb(255 230 255 / 0.08) 70%,
+      rgb(255 240 220 / 0.15) 85%,
+      rgb(255 255 255 / 0.30) 100%
+    );
+
+  --chroma-cyan: rgb(80 180 255 / 0.10);
+  --chroma-magenta: rgb(255 100 200 / 0.08);
+
+  /* 色差边框 — 左右分色模拟三棱镜色散 */
+  box-shadow:
+    -1.5px 0 4px -2px var(--chroma-cyan),
+    1.5px 0 4px -2px var(--chroma-magenta),
+    0 -1px 4px -2px rgb(100 255 180 / 0.06),
+    0 1px 4px -2px rgb(200 100 255 / 0.06);
+
+  transition: opacity 0.35s ease;
 }
 .dark .card-cream::before {
   background: linear-gradient(
     135deg,
-    rgb(255 255 255 / 0.06) 0%,
-    rgb(100 150 220 / 0.04) 20%,
-    rgb(200 120 200 / 0.03) 50%,
-    rgb(120 200 150 / 0.03) 70%,
-    rgb(255 255 255 / 0.06) 100%
+    rgb(255 255 255 / 0.12) 0%,
+    rgb(255 255 255 / 0.04) 25%,
+    rgb(255 255 255 / 0.01) 45%,
+    rgb(255 255 255 / 0) 50%,
+    rgb(255 255 255 / 0.01) 55%,
+    rgb(200 150 220 / 0.05) 70%,
+    rgb(220 180 150 / 0.08) 85%,
+    rgb(255 255 255 / 0.12) 100%
   );
-  border-color: rgb(255 255 255 / 0.03);
-}
-.card-cream:hover::before {
-  opacity: 1;
+  --chroma-cyan: rgb(60 120 200 / 0.08);
+  --chroma-magenta: rgb(200 80 150 / 0.06);
 }
 
-/* ═══ 动态镜面高光（Specular Sweep Highlight）═══
-   双层高光系统：
-   1. 径向高光跟随鼠标（`--hl-x` / `--hl-y` CSS 变量）
-   2. 135° 斜向静态扫光模拟定向光源
-   — hover 时淡入，营造玻璃镜面反射的物理反馈
+/* ═══ 径向透镜折射 + 动态镜面高光 ═══
+   ::after 兼具两个角色：
+   1. 透镜折射层 — 径向渐变改变玻璃局部透明度，模拟透镜光弯曲
+   2. 鼠标追踪高光 — radial-gradient 跟随 --hl-x / --hl-y
+   — hover 时淡入，模拟人靠近玻璃观察时的视角变化
 */
 .card-cream::after {
   content: '';
@@ -1025,26 +1059,35 @@
   pointer-events: none;
   opacity: 0;
 
-  /* 双层高光叠加 */
+  /* 透镜折射 + 镜面高光 双层叠加 */
   background:
-    /* 层①：鼠标追踪径向聚光 — 模拟局部镜面反射 */
+    /* 层①：透镜折射 — 径向透明度变化模拟玻璃透镜曲率 */
     radial-gradient(
-      circle at var(--hl-x, 50%) var(--hl-y, 0%),
-      rgb(255 255 255 / 0.25) 0%,
-      rgb(255 255 255 / 0.10) 25%,
-      rgb(255 255 255 / 0.04) 45%,
-      transparent 65%
+      ellipse at var(--hl-x, 50%) var(--hl-y, 0%),
+      rgb(255 255 255 / 0.06) 0%,
+      rgb(255 255 255 / 0.02) 30%,
+      transparent 60%
     ),
-    /* 层②：45° 斜向扫光 — 模拟定向光源划过玻璃表面 */
+    /* 层②：45° 斜向扫光 — 模拟定向光源在厚玻璃表面的反光条纹 */
     linear-gradient(
       135deg,
-      transparent 25%,
-      rgb(255 255 255 / 0.03) 33%,
-      rgb(255 255 255 / 0.08) 38%,
-      rgb(255 255 255 / 0.12) 41%,
-      rgb(255 255 255 / 0.08) 44%,
-      rgb(255 255 255 / 0.03) 49%,
+      transparent 20%,
+      rgb(255 255 255 / 0.02) 28%,
+      rgb(255 255 255 / 0.06) 33%,
+      rgb(255 255 255 / 0.10) 36%,
+      rgb(255 255 255 / 0.16) 38%,
+      rgb(255 255 255 / 0.10) 40%,
+      rgb(255 255 255 / 0.06) 43%,
+      rgb(255 255 255 / 0.02) 48%,
       transparent 58%
+    ),
+    /* 层③：鼠标追踪镜面高光 — 跟随鼠标的高亮聚光反射 */
+    radial-gradient(
+      circle 40px at var(--hl-x, 50%) var(--hl-y, 0%),
+      rgb(255 255 255 / 0.30) 0%,
+      rgb(255 255 255 / 0.12) 30%,
+      rgb(255 255 255 / 0.04) 55%,
+      transparent 80%
     );
 
   transition: opacity 0.3s ease;
@@ -1052,21 +1095,29 @@
 .dark .card-cream::after {
   background:
     radial-gradient(
-      circle at var(--hl-x, 50%) var(--hl-y, 0%),
-      rgb(255 255 255 / 0.10) 0%,
-      rgb(255 255 255 / 0.04) 25%,
-      rgb(255 255 255 / 0.02) 45%,
-      transparent 65%
+      ellipse at var(--hl-x, 50%) var(--hl-y, 0%),
+      rgb(255 255 255 / 0.03) 0%,
+      rgb(255 255 255 / 0.01) 30%,
+      transparent 60%
     ),
     linear-gradient(
       135deg,
-      transparent 25%,
-      rgb(255 255 255 / 0.02) 33%,
-      rgb(255 255 255 / 0.05) 38%,
-      rgb(255 255 255 / 0.08) 41%,
-      rgb(255 255 255 / 0.05) 44%,
-      rgb(255 255 255 / 0.02) 49%,
+      transparent 20%,
+      rgb(255 255 255 / 0.01) 28%,
+      rgb(255 255 255 / 0.03) 33%,
+      rgb(255 255 255 / 0.05) 36%,
+      rgb(255 255 255 / 0.08) 38%,
+      rgb(255 255 255 / 0.05) 40%,
+      rgb(255 255 255 / 0.03) 43%,
+      rgb(255 255 255 / 0.01) 48%,
       transparent 58%
+    ),
+    radial-gradient(
+      circle 40px at var(--hl-x, 50%) var(--hl-y, 0%),
+      rgb(255 255 255 / 0.12) 0%,
+      rgb(255 255 255 / 0.05) 30%,
+      rgb(255 255 255 / 0.02) 55%,
+      transparent 80%
     );
 }
 .card-cream:hover::after {
