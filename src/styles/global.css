@@ -747,7 +747,7 @@
       padding: 0;
     }
     .featured-card:hover {
-      transform: translateY(-2px) !important;
+      transform: translateY(-2px) translateZ(0) !important;
     }
 
   /* ============= 主题切换图标按钮 ============= */
@@ -896,6 +896,7 @@
   flex-direction: column;
   transform: translateZ(0);
   will-change: transform;
+  backface-visibility: hidden;             /* [修复] 防 Safari 合并合成层 */
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.35),
     0 1px 3px 0 rgb(0 0 0 / 0.06),
@@ -944,7 +945,7 @@
 }
 
 .liquid-glass:hover {
-  transform: translateY(-3px);
+  transform: translateY(-3px) translateZ(0);   /* [修复] hover 态保留 GPU 合成层，避免 backdrop-filter 重绘扩散 */
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.35),
     0 4px 12px 0 rgb(0 0 0 / 0.08),
@@ -962,33 +963,50 @@
   padding: 0;
 }
 .featured-card:hover {
-  transform: translateY(-2px) !important;
+  transform: translateY(-2px) translateZ(0) !important;   /* [修复] 保留 GPU 合成层 */
 }
 
-/* 卡片内部统一内边距 */
+/* ============= 卡片网格容器 [修复] =============
+   隔离卡片间的 backdrop-filter 重绘污染
+   ================================================================ */
+.post-grid {
+  isolation: isolate;                     /* [修复] 建立独立层叠上下文，阻断 backdrop-filter 泄漏 */
+  contain: layout style paint;            /* [修复] 限制重绘边界，单个卡片 hover 变换不扩散到容器外 */
+  transform-style: flat;                  /* 明确 2D 渲染，稳定合成层 */
+}
+
+/* ============= 卡片封面图容器 [修复] =============
+   - 移除固定 height，改用 aspect-ratio 等比约束
+   - overflow: hidden 确保图片不超出圆角
+   - 无左右 margin，与卡片 overflow:hidden + border-radius 配合
+   ================================================================ */
+.card-cream-cover {
+  position: relative;                      /* 为伪元素或 z-index 提供锚点 */
+  width: 100%;
+  aspect-ratio: 16 / 9;                   /* [修复] 等比容器，取代固定 height */
+  flex-shrink: 0;
+  overflow: hidden;                       /* [修复] 确保图片不超出容器边界 */
+  border-radius: 0;                       /* 由卡片外层 .liquid-glass 统一切圆角 */
+}
+.card-cream-cover img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;                      /* [修复] 等比裁剪填充，不变形 */
+  object-position: center;                /* 居中裁剪保留视觉焦点 */
+  transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+}
+.card-cream:hover .card-cream-cover img,
+.liquid-glass:hover .card-cream-cover img {
+  transform: scale(1.04);                 /* 保留原有 hover 放大动效 */
+}
+
+/* --- 卡片内容区：统一内部间距 --- */
 .card-cream-body {
-  padding: 20px;
+  padding: 16px 20px 20px;                /* [修复] 保留顶部间距，替代原先 mx 的作用 */
   flex: 1 0 auto;
   display: flex;
   flex-direction: column;
-}
-
-/* ============= 卡片封面图容器 ============= */
-.card-cream-cover {
-  width: 100%;
-  height: 140px;
-  border-radius: 8px;
-  overflow: hidden;
-  flex-shrink: 0;
-}
-.card-cream-cover img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-}
-.card-cream:hover .card-cream-cover img {
-  transform: scale(1.04);
 }
 
 /* ============= 卡片标签色块（低饱和区分色） ============= */
