@@ -189,6 +189,35 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
 
       // 鼠标追踪高光由 <liquid-glass> web component 内部处理
 
+      // 液态玻璃卡片暗色模式适配 — 监听 <html> 的 .dark 切换
+      function updateLiquidGlassTheme() {
+        const isDark = document.documentElement.classList.contains('dark');
+        document.querySelectorAll('liquid-glass.card-cream').forEach(el => {
+          if (isDark) {
+            el.setAttribute('lightness', '14');
+            el.setAttribute('alpha', '0.35');
+            el.setAttribute('frost', '0.15');
+            el.setAttribute('border-color', 'rgba(255,255,255,0.15)');
+            el.setAttribute('saturation', '140');
+          } else {
+            el.setAttribute('lightness', '72');
+            el.setAttribute('alpha', '0.25');
+            el.setAttribute('frost', '0.22');
+            el.setAttribute('border-color', 'rgba(255,255,255,0.45)');
+            el.setAttribute('saturation', '180');
+          }
+        });
+      }
+      // 初始执行（等 web component 加载完）
+      if (document.querySelector('liquid-glass')) {
+        updateLiquidGlassTheme();
+      } else {
+        // 动态搜索结果的卡片稍后由主题切换处理
+      }
+      // 监听 class 变化（主题切换按钮改了 <html> 的 dark class）
+      const themeObserver = new MutationObserver(updateLiquidGlassTheme);
+      themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+
       // 滚动入场动画（IntersectionObserver，仅非 reduced-motion 用户）
       if (!prefersReduced) {
         // iOS 交错入场：.onload-animation 元素在页面加载后依次显现

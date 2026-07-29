@@ -84,7 +84,7 @@ const index = allPosts.map(p => ({
     const readTime = Math.max(1, Math.floor((post.body || '').length / 500));
 
     return `
-      <liquid-glass class="card-cream" radius="14" frost="0.15" saturation="200" alpha="0.13" lightness="53" border-color="rgba(255,255,255,0.38)">
+      <liquid-glass class="card-cream" radius="14" frost="0.22" saturation="180" alpha="0.25" lightness="72" border-color="rgba(255,255,255,0.45)" scale="160" displace="5">
         <a href="/posts/${post.slug}/" class="block h-full flex flex-col">
           ${coverHtml}
           <div class="card-cream-body">

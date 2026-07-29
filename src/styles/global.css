@@ -1019,16 +1019,31 @@ liquid-glass.card-cream:hover {
   border-color: rgb(var(--primary) / 0.2);
 }
 
-/* ============= 侧边栏统一模块（由 <liquid-glass> web component 提供玻璃效果）============= */
-liquid-glass.sidebar-section-glass {
-  position: relative;
+/* ============= 侧边栏统一模块（毛玻璃 — CSS backdrop-filter） ============= */
+.sidebar-section {
+  background: rgba(255, 255, 255, 0.13);
+  -webkit-backdrop-filter: blur(26px) saturate(200%);
+  backdrop-filter: blur(26px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.38);
   border-radius: 14px;
-  display: block;
+  padding: 20px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
   transition:
-    transform 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+    box-shadow 0.25s cubic-bezier(0.23, 1, 0.32, 1),
+    border-color 0.25s cubic-bezier(0.23, 1, 0.32, 1),
+    background 0.3s cubic-bezier(0.23, 1, 0.32, 1);
 }
-liquid-glass.sidebar-section-glass:hover {
-  transform: translateY(-2px);
+.dark .sidebar-section {
+  background: rgba(20, 25, 50, 0.20);
+  border-color: rgba(255, 255, 255, 0.20);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+.sidebar-section:hover {
+  transform: translateY(-1px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
+}
+.dark .sidebar-section:hover {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
 }
 
 .sidebar-section-title {
