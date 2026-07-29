@@ -27,7 +27,7 @@ const tagSlice = hasTags ? data.tags.slice(0, 3) : [];
 
 {featured ? (
   /* ═══════ Featured：横向大卡（液态玻璃）═══════ */
-  <liquid-glass class="card-cream featured-card" radius="14" frost="0.22" saturation="180" alpha="0.25" lightness="72" border-color="rgba(255,255,255,0.45)" scale="160" displace="5">
+  <liquid-glass class="card-cream featured-card" radius="14" frost="0.22" saturation="180" alpha="0.25" lightness="72" border-color="rgba(180,160,145,0.35)" scale="160" displace="5">
     <a href={url} class="block h-full">
       <div class="flex flex-col md:flex-row">
         {hasCover ? (
@@ -75,7 +75,7 @@ const tagSlice = hasTags ? data.tags.slice(0, 3) : [];
   </liquid-glass>
 ) : (
   /* ═══════ 普通卡片：液态玻璃纵向标准卡片 ═══════ */
-  <liquid-glass class="card-cream" radius="14" frost="0.22" saturation="180" alpha="0.25" lightness="72" border-color="rgba(255,255,255,0.45)" scale="160" displace="5">
+  <liquid-glass class="card-cream" radius="14" frost="0.22" saturation="180" alpha="0.25" lightness="72" border-color="rgba(180,160,145,0.35)" scale="160" displace="5">
     <a href={url} class="block h-full flex flex-col">
       {hasCover && (
         <div class="card-cream-cover mx-[20px] mt-[20px]">
