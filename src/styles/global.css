@@ -922,6 +922,8 @@
 .card-cream:hover {
   transform: translateY(-3px);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  filter: url(#liquid-glass-edge);
+  -webkit-filter: url(#liquid-glass-edge);
 }
 .dark .card-cream:hover {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
@@ -969,6 +971,8 @@
     );
 
   transition: opacity 0.25s ease;
+  filter: url(#liquid-glass-chromatic);
+  -webkit-filter: url(#liquid-glass-chromatic);
 }
 .dark .card-cream::after {
   background:
@@ -1128,13 +1132,19 @@
   transition:
     box-shadow 0.25s cubic-bezier(0.23, 1, 0.32, 1),
     border-color 0.25s cubic-bezier(0.23, 1, 0.32, 1),
-    background 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+    background 0.3s cubic-bezier(0.23, 1, 0.32, 1),
+    filter 0.3s cubic-bezier(0.23, 1, 0.32, 1);
 }
 .dark .sidebar-section {
   background: rgba(20, 25, 50, 0.20);
   border-color: rgba(255, 255, 255, 0.20);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
 }
+.sidebar-section:hover {
+  filter: url(#liquid-glass-edge);
+  -webkit-filter: url(#liquid-glass-edge);
+}
+
 .sidebar-section-title {
   font-size: 11px;
   font-weight: 600;
