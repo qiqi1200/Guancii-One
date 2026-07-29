@@ -36,109 +36,119 @@ const archives = [...archiveMap.entries()].slice(0, 8);
 
 <div id="sidebar" class="w-full flex flex-col gap-5">
   <!-- 个人信息卡片 -->
-  <div class="sidebar-section onload-animation">
-    <a href="/about" class="group block relative overflow-hidden rounded-xl mb-4">
-      <img
-        src={SITE.avatar}
-        alt={SITE.author}
-        class="w-full h-auto rounded-xl"
-      />
-    </a>
-    <div class="text-center">
-      <div class="font-semibold text-base text-cream-heading mb-1">{SITE.author}</div>
-      <div class="h-[3px] w-8 bg-[#c46010] mx-auto rounded-full mb-3"></div>
-      <div class="text-xs text-cream-body mb-3 leading-relaxed">{SITE.description}</div>
-      <div class="flex justify-center gap-2">
-        <a href={SITE.links.github} target="_blank" rel="noopener"
-           class="w-8 h-8 rounded-lg flex items-center justify-center text-cream-soft hover:text-cream-link hover:bg-[#c46010]/10 transition-all">
-          <span class="material-symbols-outlined text-base">code</span>
-        </a>
-        <a href={SITE.links.email}
-           class="w-8 h-8 rounded-lg flex items-center justify-center text-cream-soft hover:text-cream-link hover:bg-[#c46010]/10 transition-all">
-          <span class="material-symbols-outlined text-base">mail</span>
-        </a>
-        <a href="/rss.xml"
-           class="w-8 h-8 rounded-lg flex items-center justify-center text-cream-soft hover:text-cream-link hover:bg-[#c46010]/10 transition-all">
-          <span class="material-symbols-outlined text-base">rss_feed</span>
-        </a>
+  <liquid-glass class="sidebar-section-glass" radius="14" frost="0.15" saturation="200" alpha="0.13" lightness="53" border-color="rgba(255,255,255,0.38)">
+    <div class="onload-animation">
+      <a href="/about" class="group block relative overflow-hidden rounded-xl mb-4">
+        <img
+          src={SITE.avatar}
+          alt={SITE.author}
+          class="w-full h-auto rounded-xl"
+        />
+      </a>
+      <div class="text-center px-5 pb-4">
+        <div class="font-semibold text-base text-cream-heading mb-1">{SITE.author}</div>
+        <div class="h-[3px] w-8 bg-[#c46010] mx-auto rounded-full mb-3"></div>
+        <div class="text-xs text-cream-body mb-3 leading-relaxed">{SITE.description}</div>
+        <div class="flex justify-center gap-2">
+          <a href={SITE.links.github} target="_blank" rel="noopener"
+             class="w-8 h-8 rounded-lg flex items-center justify-center text-cream-soft hover:text-cream-link hover:bg-[#c46010]/10 transition-all">
+            <span class="material-symbols-outlined text-base">code</span>
+          </a>
+          <a href={SITE.links.email}
+             class="w-8 h-8 rounded-lg flex items-center justify-center text-cream-soft hover:text-cream-link hover:bg-[#c46010]/10 transition-all">
+            <span class="material-symbols-outlined text-base">mail</span>
+          </a>
+          <a href="/rss.xml"
+             class="w-8 h-8 rounded-lg flex items-center justify-center text-cream-soft hover:text-cream-link hover:bg-[#c46010]/10 transition-all">
+            <span class="material-symbols-outlined text-base">rss_feed</span>
+          </a>
+        </div>
       </div>
     </div>
-  </div>
+  </liquid-glass>
 
   <!-- 侧边栏粘性区域 -->
   <div id="sidebar-sticky" class="flex flex-col gap-5 sticky top-24 transition-all duration-700">
     <!-- 搜索 -->
-    <section class="sidebar-section onload-animation" style="animation-delay: 100ms">
-      <div class="sidebar-section-title">
-        <span class="material-symbols-outlined text-sm">search</span>
-        搜索
+    <liquid-glass class="sidebar-section-glass" radius="14" frost="0.15" saturation="200" alpha="0.13" lightness="53" border-color="rgba(255,255,255,0.38)">
+      <div class="onload-animation" style="animation-delay: 100ms; padding: 20px;">
+        <div class="sidebar-section-title">
+          <span class="material-symbols-outlined text-sm">search</span>
+          搜索
+        </div>
+        <form action="/search" method="get" class="relative mt-2">
+          <input
+            type="search"
+            name="q"
+            placeholder="搜索文章..."
+            class="w-full pl-9 pr-3 py-2 rounded-lg bg-cream-search border border-cream text-cream-heading placeholder:text-cream-soft focus:outline-none focus:border-cream-link focus:ring-1 focus:ring-[#c46010]/20 transition-colors text-sm"
+          />
+          <span class="material-symbols-outlined absolute left-2.5 top-2 text-sm text-cream-soft">search</span>
+        </form>
       </div>
-      <form action="/search" method="get" class="relative">
-        <input
-          type="search"
-          name="q"
-          placeholder="搜索文章..."
-          class="w-full pl-9 pr-3 py-2 rounded-lg bg-cream-search border border-cream text-cream-heading placeholder:text-cream-soft focus:outline-none focus:border-cream-link focus:ring-1 focus:ring-[#c46010]/20 transition-colors text-sm"
-        />
-        <span class="material-symbols-outlined absolute left-2.5 top-2 text-sm text-cream-soft">search</span>
-      </form>
-    </section>
+    </liquid-glass>
 
     <!-- 标签云 -->
     {tags.length > 0 && (
-      <section class="sidebar-section onload-animation" style="animation-delay: 150ms">
-        <div class="sidebar-section-title">
-          <span class="material-symbols-outlined text-sm">local_offer</span>
-          标签
+      <liquid-glass class="sidebar-section-glass" radius="14" frost="0.15" saturation="200" alpha="0.13" lightness="53" border-color="rgba(255,255,255,0.38)">
+        <div class="onload-animation" style="animation-delay: 150ms; padding: 20px;">
+          <div class="sidebar-section-title">
+            <span class="material-symbols-outlined text-sm">local_offer</span>
+            标签
+          </div>
+          <div class="flex flex-wrap gap-2" style="gap: 8px 8px; row-gap: 10px;">
+            {tags.map(([tag, count]) => (
+              <a href={`/tags/${tag}`} class="tag-chip-cream">
+                #{tag} <span class="opacity-50 ml-0.5">{count}</span>
+              </a>
+            ))}
+          </div>
         </div>
-        <div class="flex flex-wrap gap-2" style="gap: 8px 8px; row-gap: 10px;">
-          {tags.map(([tag, count]) => (
-            <a href={`/tags/${tag}`} class="tag-chip-cream">
-              #{tag} <span class="opacity-50 ml-0.5">{count}</span>
-            </a>
-          ))}
-        </div>
-      </section>
+      </liquid-glass>
     )}
 
     <!-- 最新文章 -->
     {recent.length > 0 && (
-      <section class="sidebar-section onload-animation" style="animation-delay: 200ms">
-        <div class="sidebar-section-title">
-          <span class="material-symbols-outlined text-sm">article</span>
-          最新
+      <liquid-glass class="sidebar-section-glass" radius="14" frost="0.15" saturation="200" alpha="0.13" lightness="53" border-color="rgba(255,255,255,0.38)">
+        <div class="onload-animation" style="animation-delay: 200ms; padding: 20px;">
+          <div class="sidebar-section-title">
+            <span class="material-symbols-outlined text-sm">article</span>
+            最新
+          </div>
+          <div class="flex flex-col gap-0">
+            {recent.map(p => (
+              <div class="sidebar-recent-item">
+                <a href={`/posts/${p.slug}/`}>
+                  {p.data.title}
+                </a>
+                <span class="text-xs text-cream-soft ml-2 shrink-0">
+                  {p.data.date.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' })}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
-        <div class="flex flex-col gap-0">
-          {recent.map(p => (
-            <div class="sidebar-recent-item">
-              <a href={`/posts/${p.slug}/`}>
-                {p.data.title}
-              </a>
-              <span class="text-xs text-cream-soft ml-2 shrink-0">
-                {p.data.date.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' })}
-              </span>
-            </div>
-          ))}
-        </div>
-      </section>
+      </liquid-glass>
     )}
 
     <!-- 归档 -->
     {archives.length > 0 && (
-      <section class="sidebar-section onload-animation" style="animation-delay: 250ms">
-        <div class="sidebar-section-title">
-          <span class="material-symbols-outlined text-sm">archive</span>
-          归档
+      <liquid-glass class="sidebar-section-glass" radius="14" frost="0.15" saturation="200" alpha="0.13" lightness="53" border-color="rgba(255,255,255,0.38)">
+        <div class="onload-animation" style="animation-delay: 250ms; padding: 20px;">
+          <div class="sidebar-section-title">
+            <span class="material-symbols-outlined text-sm">archive</span>
+            归档
+          </div>
+          <div class="flex flex-col gap-0">
+            {archives.map(([month, count]) => (
+              <div class="sidebar-archive-item">
+                <span>{month}</span>
+                <span class="count">{count}</span>
+              </div>
+            ))}
+          </div>
         </div>
-        <div class="flex flex-col gap-0">
-          {archives.map(([month, count]) => (
-            <div class="sidebar-archive-item">
-              <span>{month}</span>
-              <span class="count">{count}</span>
-            </div>
-          ))}
-        </div>
-      </section>
+      </liquid-glass>
     )}
   </div>
 </div>

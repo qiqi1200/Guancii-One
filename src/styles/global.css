@@ -882,122 +882,25 @@
    🍮 奶油风重构 — 极简柔和卡片体系
    ================================================================ */
 
-/* ============= 液态玻璃卡片（统一玻璃折射参数） =============
-    统一规范：blur(26px) saturate(200%) · 通透 ≤15% · 单层柔和阴影
+/* ============= 液态玻璃卡片（由 <liquid-glass> web component 提供玻璃效果）=============
+    卡片布局 + 悬浮动效，玻璃背景/边框/高光由 simple-liquid-glass 处理
     ================================================================ */
-.card-cream {
-  position: relative;
-  background: rgba(255, 255, 255, 0.13);
-  -webkit-backdrop-filter: blur(26px) saturate(200%);
-  backdrop-filter: blur(26px) saturate(200%);
-  border: 1px solid rgba(255, 255, 255, 0.38);
-  border-radius: 14px;
-
-  /* 鼠标追踪坐标 — JS 动态更新 */
-  --hl-x: 50%;
-  --hl-y: 0%;
-
-  /* 仅保留玻璃边缘高光，不设外部阴影，杜绝黑框 */
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
-
+liquid-glass.card-cream {
   display: flex;
   flex-direction: column;
-
-  /* 硬件加速 */
+  border-radius: 14px;
+  overflow: hidden;
   transform: translateZ(0);
   will-change: transform;
 
   transition:
-    transform 0.25s cubic-bezier(0.23, 1, 0.32, 1),
-    box-shadow 0.25s cubic-bezier(0.23, 1, 0.32, 1),
-    background 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+    transform 0.25s cubic-bezier(0.23, 1, 0.32, 1);
 }
-.dark .card-cream {
-  background: rgba(20, 25, 50, 0.20);
-  -webkit-backdrop-filter: blur(26px) saturate(200%);
-  backdrop-filter: blur(26px) saturate(200%);
-  border: 1px solid rgba(255, 255, 255, 0.20);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
-}
-.card-cream:hover {
+liquid-glass.card-cream:hover {
   transform: translateY(-3px);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
-}
-.dark .card-cream:hover {
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
 }
 
-/* 卡片自带 1px 高光边框，::before 不再需要额外边缘 */
-
-/* ═══ 径向透镜折射 + 动态镜面高光 ═══
-   双层光滑高光系统 — 模拟抛光光学玻璃的镜面反射：
-   1. 45° 连续光滑扫光带（像玻璃窗上的宽反光带）
-   2. 鼠标追踪锐利聚光点（抛光表面的点反射）
-   — 无多余纹理、无杂色、保持干净
-*/
-.card-cream::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 14px;
-  z-index: 1;
-  pointer-events: none;
-  opacity: 0;
-
-  background:
-    /* 层①：宽幅光滑扫光带 — 45° 连续反射，像抛光玻璃表面的漫反光 */
-    linear-gradient(
-      135deg,
-      transparent 18%,
-      rgb(255 255 255 / 0.03) 26%,
-      rgb(255 255 255 / 0.10) 33%,
-      rgb(255 255 255 / 0.20) 37%,
-      rgb(255 255 255 / 0.25) 39%,
-      rgb(255 255 255 / 0.20) 41%,
-      rgb(255 255 255 / 0.10) 45%,
-      rgb(255 255 255 / 0.03) 52%,
-      transparent 60%
-    ),
-    /* 层②：鼠标追踪聚光 — 小半径锐利反射，像抛光玻璃的点高光 */
-    radial-gradient(
-      circle 30px at var(--hl-x, 50%) var(--hl-y, 0%),
-      rgb(255 255 255 / 0.40) 0%,
-      rgb(255 255 255 / 0.18) 30%,
-      rgb(255 255 255 / 0.06) 50%,
-      rgb(255 255 255 / 0.02) 65%,
-      transparent 80%
-    );
-
-  transition: opacity 0.25s ease;
-}
-.dark .card-cream::after {
-  background:
-    linear-gradient(
-      135deg,
-      transparent 18%,
-      rgb(255 255 255 / 0.02) 26%,
-      rgb(255 255 255 / 0.05) 33%,
-      rgb(255 255 255 / 0.10) 37%,
-      rgb(255 255 255 / 0.14) 39%,
-      rgb(255 255 255 / 0.10) 41%,
-      rgb(255 255 255 / 0.05) 45%,
-      rgb(255 255 255 / 0.02) 52%,
-      transparent 60%
-    ),
-    radial-gradient(
-      circle 30px at var(--hl-x, 50%) var(--hl-y, 0%),
-      rgb(255 255 255 / 0.18) 0%,
-      rgb(255 255 255 / 0.08) 30%,
-      rgb(255 255 255 / 0.03) 50%,
-      rgb(255 255 255 / 0.01) 65%,
-      transparent 80%
-    );
-}
-.card-cream:hover::after {
-  opacity: 1;
-}
-
-/* ============= 卡片内部统一内边距 ============= */
+/* 卡片内部统一内边距 */
 .card-cream-body {
   padding: 20px;
   flex: 1 0 auto;
@@ -1116,25 +1019,18 @@
   border-color: rgb(var(--primary) / 0.2);
 }
 
-/* ============= 侧边栏统一模块（统一玻璃折射参数） ============= */
-.sidebar-section {
-  background: rgba(255, 255, 255, 0.13);
-  -webkit-backdrop-filter: blur(26px) saturate(200%);
-  backdrop-filter: blur(26px) saturate(200%);
-  border: 1px solid rgba(255, 255, 255, 0.38);
+/* ============= 侧边栏统一模块（由 <liquid-glass> web component 提供玻璃效果）============= */
+liquid-glass.sidebar-section-glass {
+  position: relative;
   border-radius: 14px;
-  padding: 20px;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  display: block;
   transition:
-    box-shadow 0.25s cubic-bezier(0.23, 1, 0.32, 1),
-    border-color 0.25s cubic-bezier(0.23, 1, 0.32, 1),
-    background 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+    transform 0.25s cubic-bezier(0.23, 1, 0.32, 1);
 }
-.dark .sidebar-section {
-  background: rgba(20, 25, 50, 0.20);
-  border-color: rgba(255, 255, 255, 0.20);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+liquid-glass.sidebar-section-glass:hover {
+  transform: translateY(-2px);
 }
+
 .sidebar-section-title {
   font-size: 11px;
   font-weight: 600;

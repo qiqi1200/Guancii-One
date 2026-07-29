@@ -84,7 +84,7 @@ const index = allPosts.map(p => ({
     const readTime = Math.max(1, Math.floor((post.body || '').length / 500));
 
     return `
-      <article class="card-cream">
+      <liquid-glass class="card-cream" radius="14" frost="0.15" saturation="200" alpha="0.13" lightness="53" border-color="rgba(255,255,255,0.38)">
         <a href="/posts/${post.slug}/" class="block h-full flex flex-col">
           ${coverHtml}
           <div class="card-cream-body">
@@ -103,7 +103,7 @@ const index = allPosts.map(p => ({
             </div>
           </div>
         </a>
-      </article>`;
+      </liquid-glass>`;
   }
 
   function handleSearch(e) {
