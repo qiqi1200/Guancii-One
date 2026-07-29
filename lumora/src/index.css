@@ -1,0 +1,110 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============= Base ============= */
+html {
+  scroll-behavior: smooth;
+}
+
+/* ============= Aurora Orbs ============= */
+.aurora-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(120px);
+  pointer-events: none;
+}
+
+/* ============= Glass card ============= */
+.glass-card {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* ============= CTA Button ============= */
+.lumora-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 36px;
+  border-radius: 9999px;
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.15px;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  isolation: isolate;
+}
+
+.lumora-btn-primary {
+  background: linear-gradient(135deg, #6b6bfa, #8759e0);
+  color: #fff;
+  border: none;
+  box-shadow: 0 4px 24px rgba(107, 107, 250, 0.35);
+}
+.lumora-btn-primary:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 40px rgba(107, 107, 250, 0.5);
+}
+
+.lumora-btn-ghost {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+.lumora-btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+/* ============= Nav link hover ============= */
+.nav-link {
+  position: relative;
+  color: rgba(255, 255, 255, 0.65);
+  transition: color 0.3s ease;
+}
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.5);
+  transform: scaleX(0);
+  transform-origin: right center;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.nav-link:hover {
+  color: #fff;
+}
+.nav-link:hover::after {
+  transform: scaleX(1);
+  transform-origin: left center;
+}
+
+/* ============= Scroll indicator bounce ============= */
+@keyframes scrollBounce {
+  0%, 100% { transform: translateY(0); opacity: 0.6; }
+  50% { transform: translateY(6px); opacity: 1; }
+}
+.scroll-indicator {
+  animation: scrollBounce 2.2s ease-in-out infinite;
+}
+
+/* ============= Gradient text ============= */
+.gradient-text {
+  background: linear-gradient(135deg, #bdbdff, #8759e0, #6b6bfa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
