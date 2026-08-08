@@ -882,80 +882,119 @@
    🍮 奶油风重构 — 极简柔和卡片体系
    ================================================================ */
 
-/* ============= 液态玻璃卡片（Stillmind 风格） =============
-    backdrop-blur + ::before 渐变边框
-    ================================================================ */
+/* ============= 液态玻璃卡片（纯 CSS 无 SVG 滤镜） =============
+   基于 Stillmind 风格：双实线边框 + 多层阴影模拟真实玻璃折射
+   ================================================================ */
 .liquid-glass {
+  --glass-radius: 14px;
+  --glass-border-alpha: 0.08;
+  --glass-highlight: 0.9;
+
   position: relative;
-  background: rgba(255, 255, 255, 0.04);
-  backdrop-filter: blur(8px) saturate(160%);
-  -webkit-backdrop-filter: blur(8px) saturate(160%);
-  border-radius: 14px;
+  background: transparent;
+  border-radius: var(--glass-radius);
+  border: 1px double rgba(51, 51, 51, var(--glass-border-alpha));
+  box-shadow:
+    inset 2px -2px 1px -1px rgba(255, 255, 255, var(--glass-highlight)),
+    inset -2px 2px 1px -1px rgba(255, 255, 255, var(--glass-highlight)),
+    inset 6px -6px 1px -6px rgba(255, 255, 255, 0.55),
+    inset -6px 6px 1px -6px rgba(255, 255, 255, 0.55),
+    inset 0 0 2px rgba(0, 0, 0, 0.8),
+    0 4px 8px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(2px);
+  filter: brightness(0.9);
   overflow: hidden;
   display: flex;
   flex-direction: column;
   transform: translateZ(0);
   will-change: transform;
-  backface-visibility: hidden;             /* [修复] 防 Safari 合并合成层 */
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.35),
-    0 1px 3px 0 rgb(0 0 0 / 0.06),
-    0 4px 12px -4px rgb(0 0 0 / 0.04);
-
+  backface-visibility: hidden;
   transition:
-    transform 0.25s cubic-bezier(0.23, 1, 0.32, 1),
-    box-shadow 0.25s cubic-bezier(0.23, 1, 0.32, 1);
-}
-.dark .liquid-glass {
-  background: rgba(20, 25, 50, 0.25);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.10),
-    0 1px 3px 0 rgb(0 0 0 / 0.15),
-    0 4px 12px -4px rgb(0 0 0 / 0.12);
+    transform 0.3s cubic-bezier(0.23, 1, 0.32, 1),
+    box-shadow 0.3s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
-/* 渐变边框 — ::before 伪元素（参考 Stillmind） */
+/* 内部模糊黑边 */
 .liquid-glass::before {
   content: '';
   position: absolute;
-  inset: 0;
-  border-radius: 14px;
-  padding: 1.2px;
-  background: linear-gradient(180deg,
-    rgba(255, 255, 255, 0.35) 0%,
-    rgba(255, 255, 255, 0.12) 25%,
-    rgba(255, 255, 255, 0) 50%,
-    rgba(255, 255, 255, 0) 75%,
-    rgba(255, 255, 255, 0.12) 90%,
-    rgba(255, 255, 255, 0.25) 100%);
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
   z-index: 1;
-}
-.dark .liquid-glass::before {
-  background: linear-gradient(180deg,
-    rgba(255, 255, 255, 0.15) 0%,
-    rgba(255, 255, 255, 0.05) 25%,
-    rgba(255, 255, 255, 0) 50%,
-    rgba(255, 255, 255, 0) 75%,
-    rgba(255, 255, 255, 0.05) 90%,
-    rgba(255, 255, 255, 0.12) 100%);
+  top: 35%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 16px);
+  height: calc(100% - 16px);
+  border-radius: calc(var(--glass-radius) - 4px);
+  border: 1px solid rgba(0, 0, 0, 0.9);
+  filter: blur(8px);
+  pointer-events: none;
 }
 
-.liquid-glass:hover {
-  transform: translateY(-3px) translateZ(0);   /* [修复] hover 态保留 GPU 合成层，避免 backdrop-filter 重绘扩散 */
+/* 渐变高光层 */
+.liquid-glass::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: var(--glass-radius);
+  filter: blur(3px);
+  background: linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.8) 0%,
+    transparent 25%,
+    transparent 75%,
+    rgba(255, 255, 255, 0.8) 100%
+  );
+  pointer-events: none;
+}
+
+/* 暗色模式 */
+.dark .liquid-glass {
+  --glass-border-alpha: 0.12;
+  --glass-highlight: 0.7;
+  border-color: rgba(255, 255, 255, 0.15);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.35),
-    0 4px 12px 0 rgb(0 0 0 / 0.08),
-    0 12px 32px -8px rgb(0 0 0 / 0.06);
+    inset 2px -2px 1px -1px rgba(255, 255, 255, 0.5),
+    inset -2px 2px 1px -1px rgba(255, 255, 255, 0.5),
+    inset 6px -6px 1px -6px rgba(255, 255, 255, 0.3),
+    inset -6px 6px 1px -6px rgba(255, 255, 255, 0.3),
+    inset 0 0 2px rgba(0, 0, 0, 0.9),
+    0 4px 12px rgba(0, 0, 0, 0.4);
+  filter: brightness(1.05);
+}
+.dark .liquid-glass::before {
+  border-color: rgba(255, 255, 255, 0.15);
+  filter: blur(10px);
+}
+.dark .liquid-glass::after {
+  background: linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.4) 0%,
+    transparent 25%,
+    transparent 75%,
+    rgba(255, 255, 255, 0.4) 100%
+  );
+}
+
+/* hover 效果 */
+.liquid-glass:hover {
+  transform: translateY(-3px) translateZ(0);
+  box-shadow:
+    inset 2px -2px 1px -1px rgba(255, 255, 255, var(--glass-highlight)),
+    inset -2px 2px 1px -1px rgba(255, 255, 255, var(--glass-highlight)),
+    inset 6px -6px 1px -6px rgba(255, 255, 255, 0.6),
+    inset -6px 6px 1px -6px rgba(255, 255, 255, 0.6),
+    inset 0 0 2px rgba(0, 0, 0, 0.8),
+    0 8px 24px rgba(0, 0, 0, 0.15);
 }
 .dark .liquid-glass:hover {
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.10),
-    0 4px 12px 0 rgb(0 0 0 / 0.2),
-    0 12px 32px -8px rgb(0 0 0 / 0.18);
+    inset 2px -2px 1px -1px rgba(255, 255, 255, 0.6),
+    inset -2px 2px 1px -1px rgba(255, 255, 255, 0.6),
+    inset 6px -6px 1px -6px rgba(255, 255, 255, 0.35),
+    inset -6px 6px 1px -6px rgba(255, 255, 255, 0.35),
+    inset 0 0 2px rgba(0, 0, 0, 0.9),
+    0 8px 24px rgba(0, 0, 0, 0.5);
 }
 
 /* Featured 卡片专属 */
@@ -963,7 +1002,7 @@
   padding: 0;
 }
 .featured-card:hover {
-  transform: translateY(-2px) translateZ(0) !important;   /* [修复] 保留 GPU 合成层 */
+  transform: translateY(-2px) translateZ(0) !important;
 }
 
 /* ============= 卡片网格容器 [修复] =============
@@ -981,12 +1020,13 @@
    - 无左右 margin，与卡片 overflow:hidden + border-radius 配合
    ================================================================ */
 .card-cream-cover {
-  position: relative;                      /* 为伪元素或 z-index 提供锚点 */
+  position: relative;
   width: 100%;
-  aspect-ratio: 16 / 9;                   /* [修复] 等比容器，取代固定 height */
+  aspect-ratio: 16 / 9;
   flex-shrink: 0;
-  overflow: hidden;                       /* [修复] 确保图片不超出容器边界 */
-  border-radius: 0;                       /* 由卡片外层 .liquid-glass 统一切圆角 */
+  overflow: hidden;
+  border-radius: 0;
+  z-index: 10;              /* 确保内容在玻璃效果层之上 */
 }
 .card-cream-cover img {
   display: block;
@@ -1003,10 +1043,12 @@
 
 /* --- 卡片内容区：统一内部间距 --- */
 .card-cream-body {
-  padding: 16px 20px 20px;                /* [修复] 保留顶部间距，替代原先 mx 的作用 */
+  padding: 16px 20px 20px;
   flex: 1 0 auto;
   display: flex;
   flex-direction: column;
+  position: relative;
+  z-index: 10;              /* 确保内容在玻璃效果层之上 */
 }
 
 /* ============= 卡片标签色块（低饱和区分色） ============= */
@@ -1102,31 +1144,233 @@
   border-color: rgb(var(--primary) / 0.2);
 }
 
-/* ============= 侧边栏统一模块（毛玻璃 — CSS backdrop-filter） ============= */
-.sidebar-section {
-  background: rgba(255, 255, 255, 0.13);
-  -webkit-backdrop-filter: blur(26px) saturate(200%);
-  backdrop-filter: blur(26px) saturate(200%);
-  border: 1px solid rgba(255, 255, 255, 0.38);
-  border-radius: 14px;
-  padding: 20px;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
-  transition:
-    box-shadow 0.25s cubic-bezier(0.23, 1, 0.32, 1),
-    border-color 0.25s cubic-bezier(0.23, 1, 0.32, 1),
-    background 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+/* ============= 纯 CSS 液态玻璃（无 SVG 滤镜）= ============
+   基于 Stillmind 风格：双实线边框 + 多层阴影模拟真实玻璃折射
+   关键点：
+   ① ::after 渐变延伸高光  ② 内阴影制造边缘光  ③ 双实线边框
+   ④ ::before 内部模糊黑边  ⑤ 外层 contrast 滤镜提高清晰度
+*/
+.liquid-glass-pure {
+  --glass-radius: 14px;
+  --glass-border-alpha: 0.08;
+  --glass-highlight: 0.9;
+
+  position: relative;
+  border-radius: var(--glass-radius);
+  background: transparent;
+  /* 双实线边框 - 视觉上更像玻璃 */
+  border: 1px double rgba(51, 51, 51, var(--glass-border-alpha));
+  /* 多层内阴影：白色边缘光（上）+ 黑色（下） */
+  box-shadow:
+    /* 右上和左下的白色边缘光 */
+    inset 2px -2px 1px -1px rgba(255, 255, 255, var(--glass-highlight)),
+    inset -2px 2px 1px -1px rgba(255, 255, 255, var(--glass-highlight)),
+    /* 白色延伸，提亮和衔接渐变 */
+    inset 6px -6px 1px -6px rgba(255, 255, 255, 0.55),
+    inset -6px 6px 1px -6px rgba(255, 255, 255, 0.55),
+    /* 一层黑色内阴影 */
+    inset 0 0 2px rgba(0, 0, 0, 0.8),
+    /* 外阴影提高清晰度 */
+    0 4px 8px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(2px);
+  filter: brightness(0.9);
+  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
 }
+/* 内部模糊黑边 */
+.liquid-glass-pure::before {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  top: 35%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 16px);
+  height: calc(100% - 16px);
+  border-radius: calc(var(--glass-radius) - 4px);
+  border: 1px solid rgba(0, 0, 0, 0.9);
+  filter: blur(8px);
+  pointer-events: none;
+}
+/* 渐变高光层 */
+.liquid-glass-pure::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: var(--glass-radius);
+  filter: blur(3px);
+  background: linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.8) 0%,
+    transparent 25%,
+    transparent 75%,
+    rgba(255, 255, 255, 0.8) 100%
+  );
+  pointer-events: none;
+}
+/* 暗色模式适配 */
+.dark .liquid-glass-pure {
+  --glass-border-alpha: 0.12;
+  --glass-highlight: 0.7;
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow:
+    inset 2px -2px 1px -1px rgba(255, 255, 255, 0.5),
+    inset -2px 2px 1px -1px rgba(255, 255, 255, 0.5),
+    inset 6px -6px 1px -6px rgba(255, 255, 255, 0.3),
+    inset -6px 6px 1px -6px rgba(255, 255, 255, 0.3),
+    inset 0 0 2px rgba(0, 0, 0, 0.9),
+    0 4px 12px rgba(0, 0, 0, 0.4);
+  filter: brightness(1.05);
+}
+.dark .liquid-glass-pure::before {
+  border-color: rgba(255, 255, 255, 0.15);
+  filter: blur(10px);
+}
+.dark .liquid-glass-pure::after {
+  background: linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.4) 0%,
+    transparent 25%,
+    transparent 75%,
+    rgba(255, 255, 255, 0.4) 100%
+  );
+}
+/* hover 效果 */
+.liquid-glass-pure:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    inset 2px -2px 1px -1px rgba(255, 255, 255, var(--glass-highlight)),
+    inset -2px 2px 1px -1px rgba(255, 255, 255, var(--glass-highlight)),
+    inset 6px -6px 1px -6px rgba(255, 255, 255, 0.6),
+    inset -6px 6px 1px -6px rgba(255, 255, 255, 0.6),
+    inset 0 0 2px rgba(0, 0, 0, 0.8),
+    0 8px 24px rgba(0, 0, 0, 0.15);
+}
+.dark .liquid-glass-pure:hover {
+  box-shadow:
+    inset 2px -2px 1px -1px rgba(255, 255, 255, 0.6),
+    inset -2px 2px 1px -1px rgba(255, 255, 255, 0.6),
+    inset 6px -6px 1px -6px rgba(255, 255, 255, 0.35),
+    inset -6px 6px 1px -6px rgba(255, 255, 255, 0.35),
+    inset 0 0 2px rgba(0, 0, 0, 0.9),
+    0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+/* ============= 液态玻璃容器（提高清晰度） ============= */
+.liquid-glass-container {
+  filter: contrast(3);
+}
+.liquid-glass-container .liquid-glass-pure {
+  filter: brightness(0.9);
+}
+.dark .liquid-glass-container .liquid-glass-pure {
+  filter: brightness(1.05);
+}
+
+/* ============= 侧边栏统一模块（纯 CSS 液态玻璃版） ============= */
+.sidebar-section {
+  /* 继承 liquid-glass-pure 样式 */
+  --glass-radius: 14px;
+  --glass-border-alpha: 0.08;
+  --glass-highlight: 0.9;
+
+  position: relative;
+  border-radius: var(--glass-radius);
+  background: transparent;
+  border: 1px double rgba(51, 51, 51, var(--glass-border-alpha));
+  box-shadow:
+    inset 2px -2px 1px -1px rgba(255, 255, 255, var(--glass-highlight)),
+    inset -2px 2px 1px -1px rgba(255, 255, 255, var(--glass-highlight)),
+    inset 6px -6px 1px -6px rgba(255, 255, 255, 0.55),
+    inset -6px 6px 1px -6px rgba(255, 255, 255, 0.55),
+    inset 0 0 2px rgba(0, 0, 0, 0.8),
+    0 4px 8px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(2px);
+  filter: brightness(0.9);
+  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+  padding: 20px;
+  overflow: hidden;
+}
+.sidebar-section::before {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  top: 35%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 16px);
+  height: calc(100% - 16px);
+  border-radius: calc(var(--glass-radius) - 4px);
+  border: 1px solid rgba(0, 0, 0, 0.9);
+  filter: blur(8px);
+  pointer-events: none;
+}
+.sidebar-section::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: var(--glass-radius);
+  filter: blur(3px);
+  background: linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.8) 0%,
+    transparent 25%,
+    transparent 75%,
+    rgba(255, 255, 255, 0.8) 100%
+  );
+  pointer-events: none;
+}
+/* 暗色模式侧边栏 */
 .dark .sidebar-section {
-  background: rgba(20, 25, 50, 0.20);
-  border-color: rgba(255, 255, 255, 0.20);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  --glass-border-alpha: 0.12;
+  --glass-highlight: 0.7;
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow:
+    inset 2px -2px 1px -1px rgba(255, 255, 255, 0.5),
+    inset -2px 2px 1px -1px rgba(255, 255, 255, 0.5),
+    inset 6px -6px 1px -6px rgba(255, 255, 255, 0.3),
+    inset -6px 6px 1px -6px rgba(255, 255, 255, 0.3),
+    inset 0 0 2px rgba(0, 0, 0, 0.9),
+    0 4px 12px rgba(0, 0, 0, 0.4);
+  filter: brightness(1.05);
+}
+.dark .sidebar-section::before {
+  border-color: rgba(255, 255, 255, 0.15);
+  filter: blur(10px);
+}
+.dark .sidebar-section::after {
+  background: linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.4) 0%,
+    transparent 25%,
+    transparent 75%,
+    rgba(255, 255, 255, 0.4) 100%
+  );
+}
+/* 侧边栏内容在伪元素之上 */
+.sidebar-section > * {
+  position: relative;
+  z-index: 10;
 }
 .sidebar-section:hover {
-  transform: translateY(-1px);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  transform: translateY(-2px);
+  box-shadow:
+    inset 2px -2px 1px -1px rgba(255, 255, 255, var(--glass-highlight)),
+    inset -2px 2px 1px -1px rgba(255, 255, 255, var(--glass-highlight)),
+    inset 6px -6px 1px -6px rgba(255, 255, 255, 0.6),
+    inset -6px 6px 1px -6px rgba(255, 255, 255, 0.6),
+    inset 0 0 2px rgba(0, 0, 0, 0.8),
+    0 8px 24px rgba(0, 0, 0, 0.15);
 }
 .dark .sidebar-section:hover {
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  box-shadow:
+    inset 2px -2px 1px -1px rgba(255, 255, 255, 0.6),
+    inset -2px 2px 1px -1px rgba(255, 255, 255, 0.6),
+    inset 6px -6px 1px -6px rgba(255, 255, 255, 0.35),
+    inset -6px 6px 1px -6px rgba(255, 255, 255, 0.35),
+    inset 0 0 2px rgba(0, 0, 0, 0.9),
+    0 8px 24px rgba(0, 0, 0, 0.5);
 }
 
 .sidebar-section-title {
