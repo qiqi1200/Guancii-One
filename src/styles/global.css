@@ -1018,12 +1018,31 @@ article.liquid-glass {
     0 4px 16px rgba(0, 0, 0, 0.25),
     0 12px 32px -8px rgba(0, 0, 0, 0.35);
 }
-article.liquid-glass::before,
-article.liquid-glass::after {
+article.liquid-glass::before {
   display: none;
 }
+/* 底部增强毛玻璃：让卡片下缘的模糊/磨砂更明显 */
+article.liquid-glass::after {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 45%;
+  border-radius: 0 0 14px 14px;
+  background: linear-gradient(to top, rgba(255, 255, 255, 0.10), transparent);
+  -webkit-backdrop-filter: blur(28px) saturate(180%) brightness(1.05);
+  backdrop-filter: blur(28px) saturate(180%) brightness(1.05);
+  pointer-events: none;
+}
+.dark article.liquid-glass::after {
+  background: linear-gradient(to top, rgba(20, 25, 50, 0.14), transparent);
+  -webkit-backdrop-filter: blur(28px) saturate(160%) brightness(1.1);
+  backdrop-filter: blur(28px) saturate(160%) brightness(1.1);
+}
 article.liquid-glass:hover {
-  transform: translateY(-3px) translateZ(0);
+  transform: translateY(-3px) scale(1.02) translateZ(0);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.45),
     0 8px 24px rgba(0, 0, 0, 0.1),
@@ -1041,7 +1060,7 @@ article.liquid-glass:hover {
   padding: 0;
 }
 .featured-card:hover {
-  transform: translateY(-2px) translateZ(0) !important;
+  transform: translateY(-2px) scale(1.01) translateZ(0) !important;
 }
 
 /* ============= 卡片网格容器 [修复] =============
@@ -1077,7 +1096,7 @@ article.liquid-glass:hover {
 }
 .card-cream:hover .card-cream-cover img,
 .liquid-glass:hover .card-cream-cover img {
-  transform: scale(1.04);                 /* 保留原有 hover 放大动效 */
+  transform: scale(1.05);                 /* hover 封面轻微放大 */
 }
 
 /* --- 卡片内容区：统一内部间距 --- */
