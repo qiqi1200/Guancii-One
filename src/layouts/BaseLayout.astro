@@ -92,6 +92,11 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <script>LA.init({id:"3QTlGG2A1JijpoBK",ck:"3QTlGG2A1JijpoBK"})</script>
   </head>
   <body class="min-h-screen flex flex-col bg-[rgb(var(--bg))] text-[rgb(var(--fg))] transition-colors">
+    <!-- 液态玻璃折射滤镜挂载点（由脚本按元素尺寸动态注入 SDF 位移贴图） -->
+    <svg id="lens-defs" width="0" height="0" style="position:absolute" aria-hidden="true">
+      <defs></defs>
+    </svg>
+
     <!-- 背景图片层（全屏、固定、下层）
          桌面端横版壁纸 / 移动端竖版壁纸 两套独立 -->
     <div id="bg-layer" aria-hidden="true">
@@ -215,6 +220,120 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
           el.classList.add('is-visible');
         });
       }
+    </script>
+
+    <script>
+      /* ============================================================
+         液态玻璃折射引擎
+         为每个 .liquid-glass / .card-base 生成「几何透镜」位移贴图：
+         - 圆角矩形 SDF，边缘沿法线向内折射、平方衰减，中心零畸变
+         - 位移始终指向内部 → 不采样界外像素 → 无黑边杂色
+         - color-interpolation-filters=sRGB → 色彩不发闷
+         - 仅 Chromium 启用；其余浏览器保持 CSS 回退（清透无模糊）
+         - 侧边栏 #sidebar 内的元素不参与，保持毛玻璃材质
+         ============================================================ */
+      const SVGNS = 'http://www.w3.org/2000/svg';
+      const XLINK = 'http://www.w3.org/1999/xlink';
+      const isChromium = !!window.chrome || /Chrom(e|ium)/.test(navigator.userAgent);
+
+      function roundedRectSDF(px: number, py: number, hw: number, hh: number, r: number): number {
+        const qx = Math.abs(px) - hw + r, qy = Math.abs(py) - hh + r;
+        const ax = Math.max(qx, 0), ay = Math.max(qy, 0);
+        return Math.sqrt(ax * ax + ay * ay) + Math.min(Math.max(qx, qy), 0) - r;
+      }
+
+      function makeLensFilter(id: string, w: number, h: number, radius: number): SVGFilterElement {
+        // 低分辨率绘制贴图，放大时自然平滑（连续丝滑的折射）
+        const mw = Math.max(2, Math.round(w / 2)), mh = Math.max(2, Math.round(h / 2));
+        const hw = mw / 2, hh = mh / 2;
+        const rr = Math.min(radius, w / 2, h / 2) / 2;
+        const band = Math.max(7, Math.min(mw, mh) * 0.22);          // 折射带宽度
+        const scale = Math.round(Math.min(60, Math.max(12, Math.min(w, h) * 0.19)));
+
+        const sdf = new Float32Array(mw * mh);
+        let i = 0;
+        for (let y = 0; y < mh; y++)
+          for (let x = 0; x < mw; x++)
+            sdf[i++] = roundedRectSDF(x + .5 - hw, y + .5 - hh, hw, hh, rr);
+
+        const c = document.createElement('canvas');
+        c.width = mw; c.height = mh;
+        const ctx = c.getContext('2d')!;
+        const img = ctx.createImageData(mw, mh), d = img.data;
+        i = 0;
+        for (let y = 0; y < mh; y++) {
+          for (let x = 0; x < mw; x++) {
+            const idx = y * mw + x;
+            const depth = -sdf[idx];                                // 内部深度 ≥ 0
+            const t = Math.min(1, depth / band);
+            const amp = Math.pow(1 - t, 2);                         // 边缘最强，向内平方衰减
+            let nx = 0, ny = 0;
+            if (amp > 0.001) {
+              const xl = sdf[y * mw + Math.max(0, x - 1)], xr = sdf[y * mw + Math.min(mw - 1, x + 1)];
+              const yt = sdf[Math.max(0, y - 1) * mw + x], yb = sdf[Math.min(mh - 1, y + 1) * mw + x];
+              const gx = xr - xl, gy = yb - yt;
+              const len = Math.sqrt(gx * gx + gy * gy) || 1;
+              nx = gx / len; ny = gy / len;                         // 外法线；取样取其反向（向内）
+            }
+            d[i++] = 128 - nx * amp * 127;                          // R → x 位移
+            d[i++] = 128 - ny * amp * 127;                          // G → y 位移
+            d[i++] = 128; d[i++] = 255;
+          }
+        }
+        ctx.putImageData(img, 0, 0);
+
+        const f = document.createElementNS(SVGNS, 'filter');
+        f.setAttribute('id', id);
+        f.setAttribute('x', '0%'); f.setAttribute('y', '0%');
+        f.setAttribute('width', '100%'); f.setAttribute('height', '100%');
+        f.setAttribute('color-interpolation-filters', 'sRGB');
+        const im = document.createElementNS(SVGNS, 'feImage');
+        const url = c.toDataURL('image/png');
+        im.setAttribute('href', url);
+        im.setAttributeNS(XLINK, 'xlink:href', url);
+        im.setAttribute('x', '0'); im.setAttribute('y', '0');
+        im.setAttribute('width', String(w)); im.setAttribute('height', String(h));
+        im.setAttribute('preserveAspectRatio', 'none');
+        im.setAttribute('result', 'map');
+        const dm = document.createElementNS(SVGNS, 'feDisplacementMap');
+        dm.setAttribute('in', 'SourceGraphic');
+        dm.setAttribute('in2', 'map');
+        dm.setAttribute('scale', String(scale));
+        dm.setAttribute('xChannelSelector', 'R');
+        dm.setAttribute('yChannelSelector', 'G');
+        f.appendChild(im); f.appendChild(dm);
+        return f;
+      }
+
+      function applyLens() {
+        if (!isChromium) return;
+        const defs = document.querySelector('#lens-defs defs');
+        if (!defs) return;
+        let seq = 0;
+        document.querySelectorAll<HTMLElement>('.liquid-glass, .card-base').forEach((el) => {
+          if (el.closest('#sidebar')) return;                       // 侧边栏保持毛玻璃
+          const r = el.getBoundingClientRect();
+          const w = Math.round(r.width), h = Math.round(r.height);
+          if (w < 4 || h < 4) return;
+          const rad = parseFloat(getComputedStyle(el).borderTopLeftRadius) || 0;
+          if (!el.dataset.lensId) el.dataset.lensId = `lens-${seq++}-${w}x${h}`;
+          const id = el.dataset.lensId;
+          document.getElementById(id)?.remove();
+          defs.appendChild(makeLensFilter(id, w, h, rad));
+          const val = `url(#${id}) saturate(1.8) brightness(1.07)`;
+          el.style.webkitBackdropFilter = val;
+          el.style.backdropFilter = val;
+        });
+      }
+
+      let resizeTimer: ReturnType<typeof setTimeout>;
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(applyLens, 250);
+      });
+      if (document.readyState === 'complete') applyLens();
+      else window.addEventListener('load', applyLens);
+      setTimeout(applyLens, 600);                                   // 字体/图片加载后校准尺寸
     </script>
   </body>
 </html>
