@@ -253,8 +253,8 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
         const mw = Math.max(2, Math.round(w / 2)), mh = Math.max(2, Math.round(h / 2));
         const hw = mw / 2, hh = mh / 2;
         const rr = Math.min(radius, w / 2, h / 2) / 2;
-        const band = Math.max(7, Math.min(mw, mh) * 0.22);          // 折射带宽度
-        const scale = Math.round(Math.min(68, Math.max(12, Math.min(w, h) * 0.21)));
+        const band = Math.max(8, Math.min(mw, mh) * 0.30);          // 折射带宽度（更宽的透镜环）
+        const scale = Math.round(Math.min(110, Math.max(16, Math.min(w, h) * 0.32)));
 
         const sdf = new Float32Array(mw * mh);
         let i = 0;
@@ -316,7 +316,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
         const defs = document.querySelector('#lens-defs defs');
         if (!defs) return;
         let seq = 0;
-        document.querySelectorAll<HTMLElement>('.liquid-glass, .card-base').forEach((el) => {
+        document.querySelectorAll<HTMLElement>('.liquid-glass, .card-base, .ios-surface, .scrapbook-card, .liquid-glass-vibe, .liquid-glass-pure, [data-lens]').forEach((el) => {
           if (el.closest('#sidebar')) return;                       // 侧边栏保持毛玻璃
           const r = el.getBoundingClientRect();
           const w = Math.round(r.width), h = Math.round(r.height);
@@ -438,25 +438,25 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
   .ab {
     position: absolute;
     border-radius: 50%;
-    filter: blur(72px);
+    filter: blur(56px);
     will-change: transform;
   }
   .ab-1 {
     width: 46vmax; height: 46vmax;
     left: -12vmax; top: -14vmax;
-    background: rgb(255 171 122 / 0.55);
+    background: rgb(255 165 110 / 0.78);
     animation: ab-drift-1 36s ease-in-out infinite alternate;
   }
   .ab-2 {
     width: 40vmax; height: 40vmax;
     right: -10vmax; top: 22vh;
-    background: rgb(140 190 255 / 0.45);
+    background: rgb(120 180 255 / 0.62);
     animation: ab-drift-2 44s ease-in-out infinite alternate;
   }
   .ab-3 {
     width: 34vmax; height: 34vmax;
     left: 24vw; bottom: -14vmax;
-    background: rgb(170 225 185 / 0.45);
+    background: rgb(150 220 170 / 0.62);
     animation: ab-drift-1 40s ease-in-out infinite alternate-reverse;
   }
   @keyframes ab-drift-1 {
