@@ -89,7 +89,14 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
 
     <!-- 51.la 访问统计 -->
     <script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js" async></script>
-    <script>LA.init({id:"3QTlGG2A1JijpoBK",ck:"3QTlGG2A1JijpoBK"})</script>
+    <script>
+      // SDK 为 async 加载，需等其就绪后再初始化，避免 LA is not defined
+      window.addEventListener('load', function () {
+        if (window.LA && typeof window.LA.init === 'function') {
+          LA.init({ id: '3QTlGG2A1JijpoBK', ck: '3QTlGG2A1JijpoBK' });
+        }
+      });
+    </script>
   </head>
   <body class="min-h-screen flex flex-col bg-[rgb(var(--bg))] text-[rgb(var(--fg))] transition-colors">
     <!-- 液态玻璃折射滤镜挂载点（由脚本按元素尺寸动态注入 SDF 位移贴图） -->
@@ -311,24 +318,34 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
         return f;
       }
 
-      function applyLens() {
+      const LENS_SELECTOR =
+        '.liquid-glass, .card-base, .ios-surface, .scrapbook-card, .liquid-glass-vibe, .liquid-glass-pure, [data-lens]';
+      let lensSeq = 0;
+
+      function lensTarget(el: Element): el is HTMLElement {
+        return el instanceof HTMLElement && !el.closest('#sidebar');   // 侧边栏保持毛玻璃
+      }
+
+      function applyLensTo(el: HTMLElement) {
         if (!isChromium) return;
         const defs = document.querySelector('#lens-defs defs');
         if (!defs) return;
-        let seq = 0;
-        document.querySelectorAll<HTMLElement>('.liquid-glass, .card-base, .ios-surface, .scrapbook-card, .liquid-glass-vibe, .liquid-glass-pure, [data-lens]').forEach((el) => {
-          if (el.closest('#sidebar')) return;                       // 侧边栏保持毛玻璃
-          const r = el.getBoundingClientRect();
-          const w = Math.round(r.width), h = Math.round(r.height);
-          if (w < 4 || h < 4) return;
-          const rad = parseFloat(getComputedStyle(el).borderTopLeftRadius) || 0;
-          if (!el.dataset.lensId) el.dataset.lensId = `lens-${seq++}-${w}x${h}`;
-          const id = el.dataset.lensId;
-          document.getElementById(id)?.remove();
-          defs.appendChild(makeLensFilter(id, w, h, rad));
-          const val = `url(#${id}) saturate(1.8) brightness(1.07)`;
-          el.style.webkitBackdropFilter = val;
-          el.style.backdropFilter = val;
+        const r = el.getBoundingClientRect();
+        const w = Math.round(r.width), h = Math.round(r.height);
+        if (w < 4 || h < 4) return;                                    // 不可见/未布局，跳过
+        const rad = parseFloat(getComputedStyle(el).borderTopLeftRadius) || 0;
+        if (!el.dataset.lensId) el.dataset.lensId = `lens-${lensSeq++}-${w}x${h}`;
+        const id = el.dataset.lensId;
+        document.getElementById(id)?.remove();
+        defs.appendChild(makeLensFilter(id, w, h, rad));
+        const val = `url(#${id}) saturate(1.8) brightness(1.07)`;
+        el.style.webkitBackdropFilter = val;
+        el.style.backdropFilter = val;
+      }
+
+      function applyLens() {
+        document.querySelectorAll<HTMLElement>(LENS_SELECTOR).forEach((el) => {
+          if (lensTarget(el)) applyLensTo(el);
         });
       }
 
@@ -340,6 +357,37 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
       applyLens();                                                  // DOM 就绪立即执行
       window.addEventListener('load', applyLens);
       setTimeout(applyLens, 600);                                   // 字体/图片加载后校准尺寸
+
+      /* 延迟显示的元素（如导航下拉、折叠面板）首次可见时补上滤镜 */
+      const lensIO = new IntersectionObserver((entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting && lensTarget(e.target)) {
+            applyLensTo(e.target as HTMLElement);
+            lensIO.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0 });
+      document.querySelectorAll(LENS_SELECTOR).forEach((el) => {
+        if (lensTarget(el)) lensIO.observe(el);
+      });
+
+      /* DOM 变更（动态插入卡片等）后自动重扫；扫描期间暂停观察防止自触发 */
+      let moTimer: ReturnType<typeof setTimeout>;
+      const mo = new MutationObserver(() => {
+        clearTimeout(moTimer);
+        moTimer = setTimeout(() => {
+          mo.disconnect();
+          try {
+            applyLens();
+            document.querySelectorAll(LENS_SELECTOR).forEach((el) => {
+              if (lensTarget(el)) lensIO.observe(el);
+            });
+          } finally {
+            mo.observe(document.body, { childList: true, subtree: true });
+          }
+        }, 350);
+      });
+      mo.observe(document.body, { childList: true, subtree: true });
     </script>
   </body>
 </html>
