@@ -242,6 +242,11 @@
     opacity: 1;
     transform: translateY(0);
   }
+  /* 入场结束后彻底移除 transform，避免任何潜在的
+     backdrop-filter 采样边界问题（视觉状态不变） */
+  .onload-animation.is-visible {
+    transform: none;
+  }
 
   /* iOS 样式 — Spring 感更强的入场（更短、更弹） */
   @keyframes ios-enter {
@@ -916,13 +921,14 @@
    .featured-card 定义已移除——全站统一使用上方「SVG 折射透镜版」
    .liquid-glass 材质；侧边栏 .sidebar-section 保持毛玻璃不变） */
 
-/* ============= 卡片网格容器 [修复] =============
-   隔离卡片间的 backdrop-filter 重绘污染
+/* ============= 卡片网格容器 =============
+   注意：不可使用 isolation / contain:paint —— 二者会形成
+   Backdrop Root 边界，把卡片的 backdrop-filter 采样范围
+   锁死在网格内部，导致折射滤镜拿不到背景壁纸而失效。
+   （旧闪烁问题源于嵌套 backdrop-filter，新材质已不存在）
    ================================================================ */
 .post-grid {
-  isolation: isolate;                     /* [修复] 建立独立层叠上下文，阻断 backdrop-filter 泄漏 */
-  contain: layout style paint;            /* [修复] 限制重绘边界，单个卡片 hover 变换不扩散到容器外 */
-  transform-style: flat;                  /* 明确 2D 渲染，稳定合成层 */
+  display: grid;
 }
 
 /* ============= 卡片封面图容器 [修复] =============
