@@ -1,18 +1,22 @@
 ---
 import site from '../site.json';
+import SocialLinks from './SocialLinks.astro';
 const SITE = site;
 const { current = '' } = Astro.props;
-const navItems = [
-  { href: '/', label: '首页', key: 'home' },
-  { href: '/about', label: '关于', key: 'about' },
-  { href: '/archive', label: '归档', key: 'archive' },
-  { href: '/tags', label: '标签', key: 'tags' }
+
+// 集成面板内的功能磁贴（首页/搜索/标签已上顶栏，避免重复）
+const hubItems = [
+  { href: '/about', label: '关于', icon: 'person' },
+  { href: '/archive', label: '归档', icon: 'archive' },
+  { href: '/links', label: '友链', icon: 'handshake' }
 ];
 const path = current || Astro.url.pathname;
+const isActive = (href: string) =>
+  href === '/' ? path === '/' : path === href || path.startsWith(href);
 ---
 
 <div id="navbar" class="z-50 onload-animation">
-  <div class="card-base !overflow-visible max-w-[var(--page-width,72rem)] h-[4.5rem] !rounded-t-none mx-auto flex items-center justify-between px-4">
+  <div class="card-base !overflow-visible max-w-[var(--page-width,72rem)] h-[4.5rem] !rounded-t-none mx-auto flex items-center justify-between px-4 relative">
     <a href="/" class="flex items-center gap-3 rounded-2xl h-[3.25rem] px-4 hover:bg-[rgb(var(--primary-light)/0.08)] transition-all ios-press">
       <img
         src={SITE.avatar}
@@ -24,85 +28,85 @@ const path = current || Astro.url.pathname;
       </span>
     </a>
 
-    <nav class="hidden md:flex items-center gap-1">
-      {navItems.map(item => {
-        const active = path === item.href || (item.href !== '/' && path.startsWith(item.href));
-        return (
-          <a
-            href={item.href}
-            class={`rounded-2xl h-11 font-bold px-5 transition-all ios-press flex items-center ${
-              active
-                ? 'text-[rgb(var(--primary))] bg-[rgb(var(--primary-light)/0.1)]'
-                : 'text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] hover:bg-[rgb(var(--primary-light)/0.05)]'
-            }`}
-          >
-            {item.label}
-          </a>
-        );
-      })}
-    </nav>
-
+    <!-- 功能入口：首页 / 搜索 / 标签 / 明暗切换（保留原有）+ 集成面板 -->
     <div class="flex items-center gap-1">
-      <!-- 搜索 -->
-      <a href="/search"
-        class="btn-plain rounded-2xl h-11 w-11 flex items-center justify-center text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] hover:bg-[rgb(var(--primary-light)/0.08)] transition-all ios-press-light"
+      <a
+        href="/"
+        aria-label="首页"
+        class="rounded-2xl h-11 w-11 flex items-center justify-center text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] hover:bg-[rgb(var(--primary-light)/0.08)] transition-all ios-press-light"
+      >
+        <span class="material-symbols-outlined text-xl">home</span>
+      </a>
+      <a
+        href="/search"
         aria-label="搜索"
+        class="rounded-2xl h-11 w-11 flex items-center justify-center text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] hover:bg-[rgb(var(--primary-light)/0.08)] transition-all ios-press-light"
       >
         <span class="material-symbols-outlined text-xl">search</span>
       </a>
+      <a
+        href="/tags"
+        aria-label="标签"
+        class="rounded-2xl h-11 w-11 flex items-center justify-center text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] hover:bg-[rgb(var(--primary-light)/0.08)] transition-all ios-press-light"
+      >
+        <span class="material-symbols-outlined text-xl">sell</span>
+      </a>
 
-      <!-- 主题切换 -->
       <button
         id="theme-toggle"
         aria-label="切换主题"
         class="rounded-2xl h-11 w-11 flex items-center justify-center text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] hover:bg-[rgb(var(--primary-light)/0.08)] transition-all ios-press-light relative"
       >
-        <span class="material-symbols-outlined absolute text-xl transition-all duration-400 dark:rotate-90 dark:opacity-0 rotate-0 opacity-100">light_mode</span>
-        <span class="material-symbols-outlined absolute text-xl transition-all duration-400 dark:rotate-0 dark:opacity-100 rotate-90 opacity-0">dark_mode</span>
+        <span class="material-symbols-outlined absolute text-xl transition-all duration-300 dark:rotate-90 dark:opacity-0 rotate-0 opacity-100">light_mode</span>
+        <span class="material-symbols-outlined absolute text-xl transition-all duration-300 dark:rotate-0 dark:opacity-100 rotate-90 opacity-0">dark_mode</span>
       </button>
 
-      <!-- 移动端菜单 -->
+      <!-- 功能集成按钮：双端唯一入口 -->
       <button
         id="nav-menu-switch"
-        aria-label="菜单"
+        aria-label="打开功能面板"
         aria-expanded="false"
         aria-controls="nav-menu-panel"
-        class="rounded-2xl w-11 h-11 flex items-center justify-center text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] hover:bg-[rgb(var(--primary-light)/0.08)] transition-all ios-press-light md:hidden"
+        class="rounded-2xl w-11 h-11 flex items-center justify-center text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] hover:bg-[rgb(var(--primary-light)/0.08)] transition-all ios-press-light"
       >
-        <span class="material-symbols-outlined text-xl">menu</span>
+        <span class="material-symbols-outlined text-xl">apps</span>
       </button>
     </div>
   </div>
 </div>
 
-<!-- 移动端导航面板 -->
-<div id="nav-menu-panel" class="float-panel-closed fixed inset-0 z-40 md:hidden">
-  <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" id="nav-menu-overlay" style="pointer-events: none;"></div>
-  <div class="absolute right-4 top-20 w-56 card-base rounded-2xl p-3 shadow-xl">
-    <nav class="flex flex-col gap-1">
-      {navItems.map(item => {
-        const active = path === item.href || (item.href !== '/' && path.startsWith(item.href));
-        return (
-          <a
-            href={item.href}
-            class={`block px-4 py-3 rounded-2xl text-sm font-bold transition-all ios-press ${
-              active
-                ? 'text-[rgb(var(--primary))] bg-[rgb(var(--primary-light)/0.1)]'
-                : 'text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] hover:bg-[rgb(var(--primary-light)/0.05)]'
-            }`}
-          >
-            {item.label}
-          </a>
-        );
-      })}
+<!-- 功能面板：绝对定位下拉层（雾化玻璃，避免 fixed 受祖先 backdrop-filter 影响） -->
+<div id="nav-menu-panel" class="float-panel-closed absolute right-4 top-[4.75rem] z-40 w-[18rem]">
+  <div class="rounded-2xl p-3 shadow-xl border border-[rgb(var(--border))]/40 bg-[rgb(var(--bg))]/60 backdrop-blur-xl [backdrop-filter:blur(24px)_saturate(1.6)]">
+    <nav class="grid grid-cols-3 gap-1 auto-rows-fr" aria-label="站点功能">
+      {hubItems.map(item => (
+        <a
+          href={item.href}
+          aria-current={isActive(item.href) ? 'page' : undefined}
+          class:list={[
+            'flex flex-col items-center justify-center gap-1 rounded-xl py-3 text-xs font-bold transition-all ios-press',
+            isActive(item.href)
+              ? 'text-[rgb(var(--primary))] bg-[rgb(var(--primary-light)/0.1)]'
+              : 'text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] hover:bg-[rgb(var(--primary-light)/0.06)]'
+          ]}
+        >
+          <span class="material-symbols-outlined text-xl">{item.icon}</span>
+          {item.label}
+        </a>
+      ))}
     </nav>
+
+    <div class="my-2.5 border-t border-dashed border-[rgb(var(--border))]/40"></div>
+
+    <div class="flex items-center justify-start px-1 py-0.5">
+      <SocialLinks />
+    </div>
   </div>
 </div>
 
 <script is:inline>
   // 主题切换
-  const themeToggle = document.getElementById('theme-toggle');
-  themeToggle?.addEventListener('click', () => {
+  document.getElementById('theme-toggle')?.addEventListener('click', function () {
     document.documentElement.classList.toggle('dark');
     localStorage.setItem(
       'theme',
@@ -110,74 +114,49 @@ const path = current || Astro.url.pathname;
     );
   });
 
-  // 移动端菜单（兼容桌面 click 与移动端 touch）
-  (function() {
-    const menuSwitch = document.getElementById('nav-menu-switch');
-    const menuPanel = document.getElementById('nav-menu-panel');
+  // 功能面板开关（仅 click，避免 touchend 双触发；点外部关闭）
+  (function () {
+    var menuSwitch = document.getElementById('nav-menu-switch');
+    var menuPanel = document.getElementById('nav-menu-panel');
     if (!menuSwitch || !menuPanel) return;
-
-    let navigating = false;
 
     function openMenu() {
       menuPanel.classList.remove('float-panel-closed');
-      document.body.style.overflow = 'hidden';
+      menuSwitch.setAttribute('aria-expanded', 'true');
     }
-
     function closeMenu() {
       menuPanel.classList.add('float-panel-closed');
-      document.body.style.overflow = '';
+      menuSwitch.setAttribute('aria-expanded', 'false');
     }
-
     function toggleMenu() {
-      if (menuPanel.classList.contains('float-panel-closed')) {
-        openMenu();
-      } else {
-        closeMenu();
-      }
+      if (menuPanel.classList.contains('float-panel-closed')) openMenu();
+      else closeMenu();
     }
 
-    // 导航到目标页面
-    function navigateTo(link) {
-      if (!link || navigating) return;
-      const href = link.getAttribute('href');
-      if (!href || href.startsWith('#')) return;
-
-      if (window.location.pathname === href) {
-        closeMenu();
-        return;
-      }
-
-      navigating = true;
-      closeMenu();
-      window.location.href = href;
-    }
-
-    // 事件委托：菜单项点击/触摸 → 导航；空白区域 → 关菜单
-    function handlePanelActivate(e) {
-      const link = e.target.closest('#nav-menu-panel a[href]');
-      if (link) {
-        e.stopPropagation();
-        e.preventDefault();
-        navigateTo(link);
-      } else {
-        closeMenu();
-      }
-    }
-
-    // 开关按钮
-    function handleSwitch(e) {
+    menuSwitch.addEventListener('click', function (e) {
       e.stopPropagation();
       toggleMenu();
-    }
+    });
 
-    menuSwitch.addEventListener('click', handleSwitch);
-    menuSwitch.addEventListener('touchend', handleSwitch);
+    // 点击面板内非主题按钮区域即关闭；链接由默认行为跳转
+    menuPanel.addEventListener('click', function (e) {
+      if (e.target.closest('#theme-toggle')) return;
+      closeMenu();
+    });
 
-    menuPanel.addEventListener('click', handlePanelActivate);
-    menuPanel.addEventListener('touchend', handlePanelActivate, { passive: false });
+    // 点击面板外关闭
+    document.addEventListener('click', function (e) {
+      if (
+        !menuPanel.classList.contains('float-panel-closed') &&
+        !menuPanel.contains(e.target) &&
+        !menuSwitch.contains(e.target)
+      ) {
+        closeMenu();
+      }
+    });
 
-    // 键盘 ESC 关闭
-    document.addEventListener('keydown', function(e) {
+    // ESC 关闭
+    document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape' && !menuPanel.classList.contains('float-panel-closed')) {
         closeMenu();
       }

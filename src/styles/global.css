@@ -778,7 +778,43 @@
     visibility: hidden;
   }
 
-  /* ============= prefers-reduced-motion ============= */
+  /* ============= 代码块复制按钮 ============= */
+.prose pre {
+  position: relative;
+}
+.code-copy-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgb(var(--fg-soft) / 0.85);
+  background: rgb(var(--surface) / 0.88);
+  border: 1px solid rgb(var(--border) / 0.35);
+  opacity: 0;
+  cursor: pointer;
+  transition:
+    opacity 0.25s var(--ease-smooth),
+    color 0.25s var(--ease-smooth),
+    border-color 0.25s var(--ease-smooth);
+}
+.code-copy-btn .material-symbols-outlined {
+  font-size: 16px;
+}
+.prose pre:hover .code-copy-btn,
+.code-copy-btn:focus-visible {
+  opacity: 1;
+}
+.code-copy-btn.copied {
+  opacity: 1;
+  color: rgb(var(--secondary));
+}
+
+/* ============= prefers-reduced-motion ============= */
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
       animation-duration: 0.01ms !important;

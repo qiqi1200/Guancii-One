@@ -20,6 +20,11 @@ const dateStr = data.date.toLocaleDateString('zh-CN', {
   day: 'numeric'
 });
 
+// 无封面 Featured 卡片右侧的日期块
+const dayStr = String(data.date.getDate()).padStart(2, '0');
+const monthStr = String(data.date.getMonth() + 1).padStart(2, '0');
+const yearStr = String(data.date.getFullYear());
+
 const hasCover = !!data.cover;
 const hasTags = data.tags && data.tags.length > 0;
 const tagSlice = hasTags ? data.tags.slice(0, 3) : [];

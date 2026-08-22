@@ -1,0 +1,89 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Sidebar from '../components/Sidebar.astro';
+import { getCollection } from 'astro:content';
+import friends from '../data/friends.json';
+import site from '../site.json';
+const SITE = site;
+
+// 收集全部文章（给 Sidebar）
+const allPosts = (await getCollection('posts')).filter(p => !p.data.draft);
+---
+
+<BaseLayout title="友链" current="/links">
+  <div slot="sidebar">
+    <Sidebar posts={allPosts} />
+  </div>
+
+  <article class="pb-8 onload-animation">
+    <header class="mb-10">
+      <div class="text-sm text-[rgb(var(--fg-soft))] mb-2 font-handwritten">友情链接</div>
+      <h1 class="text-4xl md:text-5xl font-bold tracking-tight text-[rgb(var(--fg))]">
+        友链
+      </h1>
+      <p class="mt-4 text-lg text-[rgb(var(--fg-soft))] leading-relaxed font-body">
+        常去的一些角落，都值得慢慢逛。
+      </p>
+    </header>
+
+    <div class="grid sm:grid-cols-2 gap-4">
+      {friends.map(f => (
+        <a
+          href={f.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="liquid-glass group rounded-2xl p-5 flex items-start gap-4 hover:-translate-y-0.5 transition-transform duration-300"
+        >
+          <div class="relative w-14 h-14 rounded-full overflow-hidden shrink-0 flex items-center justify-center bg-[rgb(var(--primary-container))]">
+            <span class="font-handwritten text-xl text-[rgb(var(--primary))]">{f.name.slice(0, 1)}</span>
+            {f.avatar && (
+              <img
+                src={f.avatar}
+                alt={f.name}
+                loading="lazy"
+                class="absolute inset-0 w-full h-full object-cover"
+                onerror="this.style.display='none'"
+              />
+            )}
+          </div>
+          <div class="min-w-0">
+            <div class="font-semibold text-[rgb(var(--fg))] group-hover:text-[rgb(var(--primary))] transition-colors">
+              {f.name}
+            </div>
+            <div class="text-sm text-[rgb(var(--fg-soft))] mt-1 leading-relaxed line-clamp-2">
+              {f.description}
+            </div>
+            <div class="text-xs text-[rgb(var(--fg-soft))]/60 mt-1.5 truncate">
+              {f.url.replace(/^https?:\/\//, '')}
+            </div>
+          </div>
+        </a>
+      ))}
+    </div>
+
+    {friends.length === 0 && (
+      <div class="text-center py-16 text-[rgb(var(--fg-soft))] font-body">
+        友链虚位以待，欢迎交换～
+      </div>
+    )}
+
+    <!-- 申请友链 -->
+    <section class="mt-10 liquid-glass rounded-2xl p-6 scroll-reveal">
+      <h2 class="text-lg font-bold text-[rgb(var(--fg))] mb-3 flex items-center gap-2 font-headline">
+        <span class="material-symbols-outlined text-[rgb(var(--primary))]">handshake</span>
+        申请友链
+      </h2>
+      <p class="text-sm text-[rgb(var(--fg-soft))] leading-relaxed font-body">
+        欢迎交换友链！在任意文章下留言或发邮件给我，附上你的：
+        <strong class="text-[rgb(var(--fg))]">站点名称 / 链接 / 一句话介绍 / 头像地址</strong>。
+      </p>
+      <div class="mt-4 pt-4 border-t border-dashed border-[rgb(var(--border))]/40 text-sm text-[rgb(var(--fg-soft))] space-y-1.5 font-body">
+        <div class="font-label text-xs uppercase tracking-widest text-[rgb(var(--fg-soft))] mb-2">本站信息</div>
+        <div>名称：<span class="text-[rgb(var(--fg))]">{SITE.title}</span></div>
+        <div>链接：<a href={SITE.site} class="text-[rgb(var(--primary))] hover:text-[rgb(var(--primary-light))] transition-colors">{SITE.site}</a></div>
+        <div>介绍：{SITE.description}</div>
+        <div>头像：<a href={`${SITE.site}${SITE.avatar}`} class="text-[rgb(var(--primary))] hover:text-[rgb(var(--primary-light))] transition-colors break-all">{SITE.site}{SITE.avatar}</a></div>
+      </div>
+    </section>
+  </article>
+</BaseLayout>

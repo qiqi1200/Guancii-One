@@ -37,6 +37,9 @@ const { data, slug } = post;
 
 // 按中文字数+英文词数精确估算阅读时间
 const readTime = getReadingTime(post.body);
+// 正文字数（去空白）
+const wordCount = (post.body || '').replace(/\s/g, '').length;
+const wordCountText = wordCount >= 10000 ? `${(wordCount / 1000).toFixed(1)}k` : String(wordCount);
 
 const dateStr = data.date.toLocaleDateString('zh-CN', {
   year: 'numeric',
@@ -72,7 +75,7 @@ const similarPosts = allPosts
   .map(p => p.post);
 ---
 
-<BaseLayout title={data.title} description={data.description} current={`/posts/${slug}/`} veil={true}>
+<BaseLayout title={data.title} description={data.description} ogImage={data.cover} current={`/posts/${slug}/`} veil={true}>
   <div slot="sidebar">
     <Sidebar posts={allPosts} />
   </div>
@@ -101,6 +104,11 @@ const similarPosts = allPosts
             <span class="flex items-center gap-1">
               <span class="material-symbols-outlined text-sm">schedule</span>
               {readTime} 分钟阅读
+            </span>
+            <span>·</span>
+            <span class="flex items-center gap-1">
+              <span class="material-symbols-outlined text-sm">notes</span>
+              {wordCountText} 字
             </span>
             {hasUpdate && (
               <>
@@ -472,6 +480,26 @@ const similarPosts = allPosts
       } catch {
         copyLabel.textContent = '复制失败';
       }
+    });
+
+    // 代码块复制按钮
+    document.querySelectorAll('.prose pre').forEach(function (pre) {
+      var cBtn = document.createElement('button');
+      cBtn.className = 'code-copy-btn';
+      cBtn.type = 'button';
+      cBtn.setAttribute('aria-label', '复制代码');
+      cBtn.innerHTML = '<span class="material-symbols-outlined">content_copy</span>';
+      cBtn.addEventListener('click', function () {
+        navigator.clipboard.writeText(pre.innerText.trim()).then(function () {
+          cBtn.classList.add('copied');
+          cBtn.querySelector('span').textContent = 'check';
+          setTimeout(function () {
+            cBtn.classList.remove('copied');
+            cBtn.querySelector('span').textContent = 'content_copy';
+          }, 1500);
+        });
+      });
+      pre.appendChild(cBtn);
     });
   </script>
 

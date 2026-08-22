@@ -1,0 +1,14 @@
+[
+  {
+    "name": "示例朋友 · 替换我",
+    "url": "https://example.com",
+    "avatar": "",
+    "description": "这里写一句话介绍 TA 的博客，把这条换成真实站点"
+  },
+  {
+    "name": "再加一个示例",
+    "url": "https://example.org",
+    "avatar": "",
+    "description": "头像留空会自动显示名字首字，欢迎交换友链"
+  }
+]
