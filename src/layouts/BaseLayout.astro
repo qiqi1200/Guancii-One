@@ -3,6 +3,7 @@ import site from '../site.json';
 const SITE = site;
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import EntryAnimation from '../components/EntryAnimation.astro';
 import '../styles/global.css';
 
 interface Props {
@@ -10,13 +11,15 @@ interface Props {
   description?: string;
   ogImage?: string;
   current?: string;
+  veil?: boolean;
 }
 
 const {
   title,
   description = SITE.description,
   ogImage = SITE.avatar,
-  current
+  current,
+  veil = false
 } = Astro.props;
 
 const fullTitle = title ? `${title} · ${SITE.title}` : SITE.title;
@@ -62,7 +65,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
 
     <!-- 字体：Montserrat + 手写体 Architects Daughter + Material Symbols -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&family=Architects+Daughter&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&family=Architects+Daughter&family=Ma+Shan+Zheng&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap"
       rel="stylesheet"
     />
 
@@ -94,7 +97,10 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
       });
     </script>
   </head>
-  <body class="min-h-screen flex flex-col bg-[rgb(var(--bg))] text-[rgb(var(--fg))] transition-colors">
+  <body class:list={['min-h-screen flex flex-col bg-[rgb(var(--bg))] text-[rgb(var(--fg))] transition-colors', veil && 'bg-veil']}>
+    <!-- 入场动画：手写「Guancii的秘密基地」（每会话一次，≤2s） -->
+    <EntryAnimation />
+
     <!-- 液态玻璃折射滤镜挂载点（由脚本按元素尺寸动态注入 SDF 位移贴图） -->
     <svg id="lens-defs" width="0" height="0" style="position:absolute" aria-hidden="true">
       <defs></defs>
@@ -439,8 +445,16 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     background: rgb(var(--bg) / 0.08);
     transition: background 0.9s cubic-bezier(0.23, 1, 0.32, 1);
   }
-  .dark #bg-overlay {
+  :global(.dark) #bg-overlay {
     background: rgb(17 19 28 / 0.28);
+  }
+
+  /* ── 文章页背景遮盖（veil）— 壁纸隐约可见，长文阅读更专注 ── */
+  body.bg-veil #bg-overlay {
+    background: rgb(var(--bg) / 0.55);
+  }
+  :global(html.dark) body.bg-veil #bg-overlay {
+    background: rgb(17 19 28 / 0.66);
   }
 
   /* ── 移动端（≤768px）：切换竖版壁纸 + iOS 优化 ── */

@@ -1,0 +1,282 @@
+---
+// EntryAnimation.astro — 入场动画 · 手写「Guancii的小角落」
+// 毛玻璃薄纱透出壁纸 + 液态玻璃卡片（站内 liquid-glass-vibe 同配方）
+// 逐字手写 → 波浪下划线描边 → 小星星收尾 → 整体淡出
+// 每个会话仅播放一次（sessionStorage，?ea=1 强制重播），尊重 prefers-reduced-motion，总时长 ≤ 2s
+---
+<div id="entry-animation" hidden aria-hidden="true">
+  <div class="ea-card">
+    <div class="ea-title-wrap">
+      <p class="ea-title"><span class="ea-en"><span class="ea-ch" style="--i:0">G</span><span class="ea-ch" style="--i:1">u</span><span class="ea-ch" style="--i:2">a</span><span class="ea-ch" style="--i:3">n</span><span class="ea-ch" style="--i:4">c</span><span class="ea-ch" style="--i:5">i</span><span class="ea-ch" style="--i:6">i</span></span><span class="ea-zh"><span class="ea-ch" style="--i:7">的</span><span class="ea-ch" style="--i:8">小</span><span class="ea-ch" style="--i:9">角</span><span class="ea-ch" style="--i:10">落</span></span></p>
+      <svg class="ea-line" viewBox="0 0 340 16" fill="none" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M6 10 C 48 4, 92 14, 138 8 C 184 2, 228 13, 272 8 C 300 5, 320 8, 334 7"></path>
+      </svg>
+      <svg class="ea-spark" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M12 3 L13.6 9.4 L20 12 L13.6 14.6 L12 21 L10.4 14.6 L4 12 L10.4 9.4 Z" stroke-linejoin="round"></path>
+      </svg>
+    </div>
+    <p class="ea-sub">Welcome to my little corner</p>
+  </div>
+</div>
+
+<script is:inline>
+  (function () {
+    var el = document.getElementById('entry-animation');
+    if (!el) return;
+    var force = location.search.indexOf('ea=1') !== -1;
+    if (!force && sessionStorage.getItem('guancii-entry')) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    try { sessionStorage.setItem('guancii-entry', '1'); } catch (e) {}
+    el.hidden = false;
+    document.documentElement.classList.add('ea-lock');
+
+    var started = false;
+    var start = function () {
+      if (started) return;
+      started = true;
+      // 双 rAF 确保初始隐藏态先完成绘制，再触发写入动画
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          el.classList.add('ea-play');
+          // 卡片弹入 0–400ms，字符至 ~1160ms，下划线至 1420ms；
+          // 1600ms 起整体退场，约 2s 收尾
+          setTimeout(function () { el.classList.add('ea-done'); }, 1600);
+          setTimeout(forceHide, 2250);
+        });
+      });
+    };
+
+    // 等手写字体就绪再开写（最多等 900ms，避免回退字体闪现）
+    if (document.fonts && document.fonts.load) {
+      Promise.race([
+        Promise.all([
+          document.fonts.load('1em "Architects Daughter"', 'Guancii'),
+          document.fonts.load('1em "Ma Shan Zheng"', '的小角落')
+        ]),
+        new Promise(function (r) { setTimeout(r, 900); })
+      ]).then(start, start);
+    } else {
+      setTimeout(start, 60);
+    }
+
+    function forceHide() {
+      if (el.hidden) return;
+      el.hidden = true;
+      document.documentElement.classList.remove('ea-lock');
+    }
+
+    // 退场淡出动画结束即卸载 overlay
+    el.addEventListener('animationend', function (e) {
+      if (e.target === el) forceHide();
+    });
+  })();
+</script>
+
+<style>
+  /* ═══ 全屏毛玻璃薄纱 — 透出壁纸，材质对齐站内玻璃体系 ═══ */
+  #entry-animation {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: grid;
+    place-items: center;
+    padding: 1.5rem;
+    background: rgb(var(--bg) / 0.42);
+    -webkit-backdrop-filter: blur(18px) saturate(1.6) brightness(1.05);
+    backdrop-filter: blur(18px) saturate(1.6) brightness(1.05);
+    overflow: hidden;
+  }
+  #entry-animation[hidden] {
+    display: none;
+  }
+  :global(html.ea-lock) {
+    overflow: hidden;
+  }
+  @supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+    #entry-animation {
+      background: rgb(var(--bg) / 0.92);
+    }
+  }
+
+  /* ═══ 液态玻璃卡片 — 照抄 .liquid-glass-vibe 配方 ═══ */
+  .ea-card {
+    position: relative;
+    border-radius: 24px;
+    background: rgb(var(--glass-bg) / 0.35);
+    -webkit-backdrop-filter: blur(16px) saturate(1.6) brightness(1.1);
+    backdrop-filter: blur(16px) saturate(1.6) brightness(1.1);
+    border: 1px solid rgb(var(--glass-border) / 0.15);
+    box-shadow:
+      0 4px 16px -4px rgb(0 0 0 / 0.06),
+      0 12px 40px -8px rgb(0 0 0 / 0.05),
+      inset 0 0.5px 0 0 rgb(255 255 255 / 0.5),
+      inset 0 -0.5px 0 0 rgb(255 255 255 / 0.08);
+    padding: clamp(1.9rem, 6vw, 3rem) clamp(2.2rem, 7vw, 3.6rem);
+
+    opacity: 0;
+    transform: translateY(14px) scale(0.94);
+  }
+  :global(.dark) .ea-card {
+    background: rgb(var(--glass-bg) / 0.45);
+    -webkit-backdrop-filter: blur(16px) saturate(1.4) brightness(1.15);
+    backdrop-filter: blur(16px) saturate(1.4) brightness(1.15);
+    border-color: rgb(var(--glass-border) / 0.2);
+    box-shadow:
+      0 4px 16px -4px rgb(0 0 0 / 0.15),
+      0 12px 40px -8px rgb(0 0 0 / 0.25),
+      inset 0 0.5px 0 0 rgb(255 255 255 / 0.06),
+      inset 0 -0.5px 0 0 rgb(255 255 255 / 0.02);
+  }
+  @supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+    .ea-card {
+      background: rgb(var(--surface) / 0.9);
+    }
+  }
+  .ea-play .ea-card {
+    animation: ea-card-in 420ms var(--ease-smooth) forwards;
+  }
+  @keyframes ea-card-in {
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  .ea-title-wrap {
+    position: relative;
+  }
+
+  /* 手写标题：英文用 Architects Daughter，中文回退到马善政楷书 */
+  .ea-title {
+    margin: 0;
+    font-family: 'Architects Daughter', 'Ma Shan Zheng', cursive;
+    font-weight: 400;
+    font-size: clamp(1.8rem, 6.8vw, 3.8rem);
+    letter-spacing: 0.04em;
+    line-height: 1.25;
+    white-space: nowrap;
+    color: rgb(var(--fg));
+  }
+  .ea-en {
+    color: rgb(var(--primary-light));
+  }
+  .ea-zh {
+    margin-left: 0.08em;
+  }
+
+  /* 逐字「手写」：clip-path 从右往左揭开 + 轻微落笔位移 */
+  .ea-ch {
+    display: inline-block;
+    opacity: 0;
+    will-change: clip-path, transform, opacity;
+  }
+  .ea-play .ea-ch {
+    animation: ea-char 300ms var(--ease-smooth) both;
+    animation-delay: calc(220ms + var(--i) * 58ms);
+  }
+  @keyframes ea-char {
+    0% {
+      opacity: 0;
+      -webkit-clip-path: inset(-18% 103% -18% -8%);
+      clip-path: inset(-18% 103% -18% -8%);
+      transform: translateY(0.14em) rotate(5deg);
+    }
+    45% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 1;
+      -webkit-clip-path: inset(-18% -12% -18% -8%);
+      clip-path: inset(-18% -12% -18% -8%);
+      transform: translateY(0) rotate(0deg);
+    }
+  }
+
+  /* 手绘波浪下划线 — 描边绘制，呼应站内 doodle-underline */
+  .ea-line {
+    position: absolute;
+    left: 50%;
+    bottom: -0.42em;
+    width: min(94%, 30rem);
+    height: auto;
+    transform: translateX(-50%);
+    color: rgb(var(--primary-light));
+  }
+  .ea-line path {
+    stroke: currentColor;
+    stroke-width: 2.6;
+    stroke-linecap: round;
+    stroke-dasharray: 370;
+    stroke-dashoffset: 370;
+  }
+  .ea-play .ea-line path {
+    animation: ea-draw 400ms var(--ease-smooth) forwards;
+    animation-delay: 1020ms;
+  }
+  @keyframes ea-draw {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  /* 小星星涂鸦 — 弹性收尾 */
+  .ea-spark {
+    position: absolute;
+    top: -0.66em;
+    right: -0.34em;
+    width: clamp(13px, 2.4vw, 20px);
+    height: auto;
+    color: rgb(var(--primary-light));
+    opacity: 0;
+    transform: scale(0.3) rotate(-30deg);
+  }
+  .ea-play .ea-spark {
+    animation: ea-pop 360ms cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+    animation-delay: 1220ms;
+  }
+  @keyframes ea-pop {
+    to {
+      opacity: 0.85;
+      transform: scale(1) rotate(0deg);
+    }
+  }
+
+  /* 副标 — Montserrat 小字标签，呼应按钮/芯片字体 */
+  .ea-sub {
+    margin: 1.1rem 0 0;
+    text-align: center;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: rgb(var(--fg-soft));
+    opacity: 0;
+  }
+  .ea-play .ea-sub {
+    animation: ea-sub-in 320ms var(--ease-smooth) forwards;
+    animation-delay: 1320ms;
+  }
+  @keyframes ea-sub-in {
+    to {
+      opacity: 0.72;
+    }
+  }
+
+  /* 整体退场：薄纱连同卡片淡出交还页面 */
+  #entry-animation.ea-done {
+    animation: ea-fade 460ms var(--ease-smooth) forwards;
+  }
+  @keyframes ea-fade {
+    to {
+      opacity: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #entry-animation {
+      display: none !important;
+    }
+  }
+</style>

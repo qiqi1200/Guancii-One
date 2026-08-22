@@ -72,7 +72,7 @@ const similarPosts = allPosts
   .map(p => p.post);
 ---
 
-<BaseLayout title={data.title} description={data.description} current={`/posts/${slug}/`}>
+<BaseLayout title={data.title} description={data.description} current={`/posts/${slug}/`} veil={true}>
   <div slot="sidebar">
     <Sidebar posts={allPosts} />
   </div>
