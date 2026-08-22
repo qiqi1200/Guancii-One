@@ -17,15 +17,12 @@ const isActive = (href: string) =>
 
 <div id="navbar" class="z-50 onload-animation">
   <div class="card-base !overflow-visible max-w-[var(--page-width,72rem)] h-[4.5rem] !rounded-t-none mx-auto flex items-center justify-between px-4 relative">
-    <a href="/" class="flex items-center gap-3 rounded-2xl h-[3.25rem] px-4 hover:bg-[rgb(var(--primary-light)/0.08)] transition-all ios-press">
+    <a href="/" class="flex items-center rounded-2xl h-[3.25rem] px-2 hover:bg-[rgb(var(--primary-light)/0.08)] transition-all ios-press">
       <img
         src={SITE.avatar}
         alt={SITE.author}
         class="w-8 h-8 rounded-full object-cover shadow-sm"
       />
-      <span class="font-headline font-bold tracking-tight text-base text-[rgb(var(--fg))]">
-        {SITE.shortTitle}
-      </span>
     </a>
 
     <!-- 功能入口：首页 / 搜索 / 标签 / 明暗切换（保留原有）+ 集成面板 -->
@@ -98,8 +95,8 @@ const isActive = (href: string) =>
 
     <div class="my-2.5 border-t border-dashed border-[rgb(var(--border))]/40"></div>
 
-    <div class="flex items-center justify-start px-1 py-0.5">
-      <SocialLinks />
+    <div class="flex items-center px-2 py-0.5">
+      <SocialLinks class="flex-1" />
     </div>
   </div>
 </div>

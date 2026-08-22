@@ -2,7 +2,7 @@
 // EntryAnimation.astro — 入场动画 · 手写「Guancii的小角落」
 // 毛玻璃薄纱透出壁纸 + 液态玻璃卡片（站内 liquid-glass-vibe 同配方）
 // 逐字手写 → 波浪下划线描边 → 小星星收尾 → 整体淡出
-// 每个会话仅播放一次（sessionStorage，?ea=1 强制重播），尊重 prefers-reduced-motion，总时长 ≤ 2s
+// 每个浏览器仅首次访问播放（localStorage 记录，?ea=1 可强制重播），尊重 prefers-reduced-motion
 ---
 <div id="entry-animation" hidden aria-hidden="true">
   <div class="ea-card">
@@ -24,10 +24,10 @@
     var el = document.getElementById('entry-animation');
     if (!el) return;
     var force = location.search.indexOf('ea=1') !== -1;
-    if (!force && sessionStorage.getItem('guancii-entry')) return;
+    if (!force && localStorage.getItem('guancii-entry')) return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-    try { sessionStorage.setItem('guancii-entry', '1'); } catch (e) {}
+    try { localStorage.setItem('guancii-entry', '1'); } catch (e) {}
     el.hidden = false;
     document.documentElement.classList.add('ea-lock');
 

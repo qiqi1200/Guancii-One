@@ -10,7 +10,7 @@ const SITE = site;
 const allPosts = (await getCollection('posts')).filter(p => !p.data.draft);
 ---
 
-<BaseLayout title="友链" current="/links">
+<BaseLayout title="友链" current="/links" veil={true}>
   <div slot="sidebar">
     <Sidebar posts={allPosts} />
   </div>

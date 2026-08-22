@@ -20,7 +20,7 @@ const timeline = [
 const allPosts = (await getCollection('posts')).filter(p => !p.data.draft);
 ---
 
-<BaseLayout title="关于" current="/about">
+<BaseLayout title="关于" current="/about" veil={true}>
   <div slot="sidebar">
     <Sidebar posts={allPosts} />
   </div>
