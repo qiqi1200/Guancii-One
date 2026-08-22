@@ -5,11 +5,15 @@ const SITE = site;
 const { current = '' } = Astro.props;
 
 // 集成面板内的功能磁贴（首页/搜索/标签已上顶栏，避免重复）
-const hubItems = [
+// 开往 Travellings：随机跳转到其他成员博客的外部链接
+const TRAVELLINGS_URL = 'https://www.travellings.cn/go.html';
+const hubItems: { href: string; label: string; icon: string; ext?: boolean }[] = [
   { href: '/about', label: '关于', icon: 'person' },
   { href: '/archive', label: '归档', icon: 'archive' },
   { href: '/links', label: '友链', icon: 'handshake' },
-  { href: '/moments', label: '说说', icon: 'forum' }
+  { href: '/moments', label: '说说', icon: 'forum' },
+  { href: '/gallery', label: '相册', icon: 'image' },
+  { href: TRAVELLINGS_URL, label: '开往', icon: 'directions_subway', ext: true }
 ];
 const path = current || Astro.url.pathname;
 const isActive = (href: string) =>
@@ -76,11 +80,14 @@ const isActive = (href: string) =>
 <!-- 功能面板：绝对定位下拉层（雾化玻璃，避免 fixed 受祖先 backdrop-filter 影响） -->
 <div id="nav-menu-panel" class="float-panel-closed absolute right-4 top-[4.75rem] z-40 w-[18rem]">
   <div class="rounded-2xl p-3 shadow-xl border border-[rgb(var(--border))]/40 bg-[rgb(var(--bg))]/60 backdrop-blur-xl [backdrop-filter:blur(24px)_saturate(1.6)]">
-    <nav class="grid grid-cols-2 gap-1 auto-rows-fr" aria-label="站点功能">
+    <nav class="grid grid-cols-3 gap-1 auto-rows-fr" aria-label="站点功能">
       {hubItems.map(item => (
         <a
           href={item.href}
-          aria-current={isActive(item.href) ? 'page' : undefined}
+          target={item.ext ? '_blank' : undefined}
+          rel={item.ext ? 'noopener noreferrer' : undefined}
+          title={item.ext ? '开往 · 随机前往另一个成员博客' : undefined}
+          aria-current={!item.ext && isActive(item.href) ? 'page' : undefined}
           class:list={[
             'flex flex-col items-center justify-center gap-1 rounded-xl py-3 text-xs font-bold transition-all ios-press',
             isActive(item.href)
