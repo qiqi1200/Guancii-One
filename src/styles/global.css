@@ -1301,6 +1301,7 @@
 
 .text-cream-body {
   color: #24366b;                 /* 浅色：克莱因系加深，照片上依然清晰 */
+  text-shadow: 0 1px 10px rgb(255 255 255 / 0.5);
 }
 .dark .text-cream-body {
   color: #a9b2d0;
@@ -1308,6 +1309,7 @@
 
 .text-cream-soft {
   color: #3f5090;                 /* 浅色：克莱因系加深，小字号可读 */
+  text-shadow: 0 1px 10px rgb(255 255 255 / 0.55);
 }
 .dark .text-cream-soft {
   color: #7e88ad;

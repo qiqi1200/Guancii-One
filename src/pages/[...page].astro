@@ -104,7 +104,7 @@ function pageUrl(n: number): string {
   {allTags.length > 0 && isFirstPage && (
     <section class="mb-6">
       <div class="flex items-center gap-2 overflow-x-auto scrollbar-none pb-1">
-        <span class="text-xs text-cream-soft font-medium shrink-0">筛选</span>
+        <span class="on-wall text-xs text-cream-soft font-medium shrink-0">筛选</span>
         <div class="h-4 w-px bg-cream shrink-0"></div>
         <button data-tag="all" class="tag-filter-cream active shrink-0 text-xs">
           全部
@@ -197,11 +197,14 @@ function pageUrl(n: number): string {
 
 <style>
   /* 浅色模式：hero 文字直接落在壁纸上，
-     加一圈柔和白色光晕提升可读性（暗色模式不启用） */
+     加一圈柔和白色背光晕提升可读性（暗色模式不启用）
+     多层阴影：贴字白边做"贴纸"分离 + 外圈柔光，亮底/杂景下字依然清晰 */
   html:not(.dark) .on-wall {
     text-shadow:
-      0 1px 12px rgb(255 255 255 / 0.55),
-      0 0 4px rgb(255 255 255 / 0.35);
+      0 1px 2px rgb(255 255 255 / 0.92),
+      0 2px 6px rgb(255 255 255 / 0.72),
+      0 0 14px rgb(255 255 255 / 0.62),
+      0 6px 26px rgb(255 255 255 / 0.5);
   }
 </style>
 
