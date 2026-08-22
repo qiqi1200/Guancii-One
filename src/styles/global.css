@@ -1291,8 +1291,23 @@
   gap: 8px;
 }
 
-/* ============= 奶油风文字颜色（适配暗色模式） ============= */
-.text-cream-heading {
+/* ============= 文章页可读性（浅色：正文/标题直接落在壁纸上，加柔白背光） ============= */
+html:not(.dark) .article-readable header h1 {
+  text-shadow:
+    0 1px 2px rgb(255 255 255 / 0.92),
+    0 2px 8px rgb(255 255 255 / 0.7);
+}
+html:not(.dark) .article-readable header p,
+html:not(.dark) .article-readable header div,
+html:not(.dark) .article-readable .prose p,
+html:not(.dark) .article-readable .prose li,
+html:not(.dark) .article-readable .prose h2,
+html:not(.dark) .article-readable .prose h3,
+html:not(.dark) .article-readable .prose h4 {
+  text-shadow: 0 1px 10px rgb(255 255 255 / 0.6);
+}
+
+/* ============= 奶油风文字颜色（适配暗色模式） ============= */.text-cream-heading {
   color: #16224a;
 }
 .dark .text-cream-heading {
