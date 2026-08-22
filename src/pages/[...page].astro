@@ -43,14 +43,14 @@ function pageUrl(n: number): string {
       <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6 md:gap-12">
         <!-- 左侧：文字区 -->
         <div class="flex-1 max-w-xl">
-          <p class="text-sm font-handwritten text-[rgb(var(--fg-soft))] mb-3 tracking-wide">
+          <p class="on-wall text-sm font-handwritten text-[rgb(var(--fg-soft))] mb-3 tracking-wide">
             来自吉林四平，在天津读交通工程
           </p>
-          <h1 class="text-3xl md:text-4xl lg:text-5xl font-headline font-bold tracking-tight text-[rgb(var(--fg))] leading-[1.1]">
+          <h1 class="on-wall text-3xl md:text-4xl lg:text-5xl font-headline font-bold tracking-tight text-[rgb(var(--fg))] leading-[1.1]">
             你好，我是<br/>
             <span class="doodle-underline text-[rgb(var(--primary))]">{SITE.author}</span>
           </h1>
-          <p class="mt-4 text-base md:text-lg text-[rgb(var(--fg-soft))] leading-relaxed font-handwritten">
+          <p class="on-wall mt-4 text-base md:text-lg text-[rgb(var(--fg-soft))] leading-relaxed font-handwritten">
             记点生活里的小事、读过的书、学过的东西。<br class="hidden md:block"/>
             没什么宏大叙事，就是一些安静的思考和日常。
           </p>
@@ -194,6 +194,16 @@ function pageUrl(n: number): string {
     )}
   </div>
 </BaseLayout>
+
+<style>
+  /* 浅色模式：hero 文字直接落在壁纸上，
+     加一圈柔和白色光晕提升可读性（暗色模式不启用） */
+  html:not(.dark) .on-wall {
+    text-shadow:
+      0 1px 12px rgb(255 255 255 / 0.55),
+      0 0 4px rgb(255 255 255 / 0.35);
+  }
+</style>
 
 <script is:inline>
   // 标签筛选（同时作用于 featured 和普通卡片，带平滑过渡）

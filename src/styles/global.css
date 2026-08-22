@@ -17,7 +17,7 @@
 
     /* 文字色 */
     --fg: 12 26 74;                  /* #0C1A4A 克莱因墨色 */
-    --fg-soft: 58 74 120;            /* #3A4A78 */
+    --fg-soft: 30 44 96;             /* #1E2C60 深克莱因灰（浅色模式提对比） */
     --fg-on-primary: 255 255 255;    /* 主色按钮上的文字 */
 
     /* 主色调（primary）— 克莱因蓝 */
@@ -1300,14 +1300,14 @@
 }
 
 .text-cream-body {
-  color: #46527e;
+  color: #24366b;                 /* 浅色：克莱因系加深，照片上依然清晰 */
 }
 .dark .text-cream-body {
   color: #a9b2d0;
 }
 
 .text-cream-soft {
-  color: #7180a8;
+  color: #3f5090;                 /* 浅色：克莱因系加深，小字号可读 */
 }
 .dark .text-cream-soft {
   color: #7e88ad;
