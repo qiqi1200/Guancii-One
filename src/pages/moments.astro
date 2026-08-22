@@ -1,0 +1,57 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Sidebar from '../components/Sidebar.astro';
+import { getCollection } from 'astro:content';
+
+// 说说按时间倒序
+const moments = (await getCollection('moments'))
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+// 收集全部文章（给 Sidebar）
+const allPosts = (await getCollection('posts')).filter(p => !p.data.draft);
+
+function fmt(d: Date) {
+  return d.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
+}
+---
+
+<BaseLayout title="说说" current="/moments" veil={true}>
+  <div slot="sidebar">
+    <Sidebar posts={allPosts} />
+  </div>
+
+  <article class="pb-8 onload-animation">
+    <header class="mb-10">
+      <div class="text-sm text-[rgb(var(--fg-soft))] mb-2 font-handwritten">碎碎念</div>
+      <h1 class="text-4xl md:text-5xl font-bold tracking-tight text-[rgb(var(--fg))]">
+        说说
+      </h1>
+      <p class="mt-4 text-lg text-[rgb(var(--fg-soft))] leading-relaxed font-body">
+        不成文章的片段，都留在这里。
+      </p>
+    </header>
+
+    {moments.length > 0 ? (
+      <div class="relative ml-2 border-l-2 border-dashed border-[rgb(var(--border))]/50 pl-6 space-y-6">
+        {moments.map(m => (
+          <div class="relative scroll-reveal">
+            <!-- 时间轴圆点 -->
+            <span class="absolute top-6 -left-[1.9rem] w-2.5 h-2.5 rounded-full bg-[rgb(var(--primary-light))] ring-4 ring-[rgb(var(--bg))]/70"></span>
+            <div class="liquid-glass rounded-2xl p-5">
+              <time datetime={m.data.date.toISOString()} class="text-xs text-[rgb(var(--fg-soft))] font-handwritten">
+                {fmt(m.data.date)}
+              </time>
+              <p class="mt-2 text-[rgb(var(--fg))] leading-relaxed font-body whitespace-pre-line">
+                {m.body.trim()}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+    ) : (
+      <div class="text-center py-16 text-[rgb(var(--fg-soft))] font-body">
+        还没有说过什么，先去写第一条吧
+      </div>
+    )}
+  </article>
+</BaseLayout>

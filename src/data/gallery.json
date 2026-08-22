@@ -1,0 +1,15 @@
+{
+  "note": "往 photos 数组添加照片即可；src 支持外链或放入 public 后用 / 绝对路径。alt 为说明，location 可选。",
+  "photos": [
+    {
+      "src": "https://img.260607.best/i/20260822051329_tik6.jpg",
+      "alt": "桌面壁纸 · 横版",
+      "location": "天津"
+    },
+    {
+      "src": "https://img.260607.best/i/20260822082649_vwh9.jpg",
+      "alt": "手机壁纸 · 竖版",
+      "location": "天津"
+    }
+  ]
+}

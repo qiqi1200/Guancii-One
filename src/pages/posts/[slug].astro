@@ -83,6 +83,39 @@ const similarPosts = allPosts
   <!-- 阅读进度条 -->
   <div id="reading-progress" class="reading-progress no-print"></div>
 
+  <!-- 移动端目录抽屉（<2xl 屏；宽屏用右侧常驻目录） -->
+  {toc.length > 0 && (
+    <div class="no-print 2xl:hidden">
+      <button
+        id="toc-fab"
+        aria-label="文章目录"
+        aria-expanded="false"
+        aria-controls="toc-drawer"
+        class="fixed right-5 bottom-24 z-40 w-11 h-11 rounded-full flex items-center justify-center border border-[rgb(var(--border))]/40 bg-[rgb(var(--bg))]/70 backdrop-blur-md text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] shadow-lg transition-all"
+      >
+        <span class="material-symbols-outlined text-xl">toc</span>
+      </button>
+      <div
+        id="toc-drawer"
+        class="float-panel-closed fixed right-5 bottom-[9.25rem] z-40 w-64 max-w-[calc(100vw-2.5rem)] max-h-[55vh] overflow-y-auto hide-scrollbar rounded-2xl p-3 shadow-xl border border-[rgb(var(--border))]/40 bg-[rgb(var(--bg))]/80 backdrop-blur-xl"
+      >
+        <div class="text-xs font-bold text-[rgb(var(--primary))] uppercase tracking-wider mb-2 px-1">目录</div>
+        <ul class="space-y-0.5 text-sm">
+          {toc.map(h => (
+            <li class={h.depth === 3 ? 'pl-4' : ''}>
+              <a
+                href={`#${h.slug}`}
+                class="block py-1.5 px-2 rounded-lg text-[rgb(var(--fg-soft))] hover:text-[rgb(var(--primary))] hover:bg-[rgb(var(--primary-light)/0.08)] transition-colors truncate"
+              >
+                {h.text}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  )}
+
   <article class="article-readable pb-8 onload-animation">
     <a
       href="/"
@@ -501,6 +534,43 @@ const similarPosts = allPosts
       });
       pre.appendChild(cBtn);
     });
+
+    // 移动端目录抽屉
+    (function () {
+      var fab = document.getElementById('toc-fab');
+      var drawer = document.getElementById('toc-drawer');
+      if (!fab || !drawer) return;
+
+      function closeDrawer() {
+        drawer.classList.add('float-panel-closed');
+        fab.setAttribute('aria-expanded', 'false');
+      }
+
+      fab.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var opened = drawer.classList.toggle('float-panel-closed');
+        fab.setAttribute('aria-expanded', String(!opened));
+      });
+
+      // 点目录项跳转后自动收起
+      drawer.addEventListener('click', function (e) {
+        if (e.target.closest('a')) closeDrawer();
+      });
+
+      // 点外部 / ESC 关闭
+      document.addEventListener('click', function (e) {
+        if (
+          !drawer.classList.contains('float-panel-closed') &&
+          !drawer.contains(e.target) &&
+          !fab.contains(e.target)
+        ) {
+          closeDrawer();
+        }
+      });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeDrawer();
+      });
+    })();
   </script>
 
   <!-- 配置注入已交由 TwikooComments 组件处理 -->

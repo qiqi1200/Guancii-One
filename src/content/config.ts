@@ -13,4 +13,11 @@ const posts = defineCollection({
   })
 });
 
-export const collections = { posts };
+const moments = defineCollection({
+  type: 'content',
+  schema: z.object({
+    date: z.coerce.date()
+  })
+});
+
+export const collections = { posts, moments };

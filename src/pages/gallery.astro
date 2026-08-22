@@ -1,0 +1,87 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Sidebar from '../components/Sidebar.astro';
+import { getCollection } from 'astro:content';
+import galleryData from '../data/gallery.json';
+
+const photos = galleryData.photos || [];
+
+// 收集全部文章（给 Sidebar）
+const allPosts = (await getCollection('posts')).filter(p => !p.data.draft);
+---
+
+<BaseLayout title="相册" current="/gallery" veil={true}>
+  <div slot="sidebar">
+    <Sidebar posts={allPosts} />
+  </div>
+
+  <article class="pb-8 onload-animation">
+    <header class="mb-10">
+      <div class="text-sm text-[rgb(var(--fg-soft))] mb-2 font-handwritten">光影集</div>
+      <h1 class="text-4xl md:text-5xl font-bold tracking-tight text-[rgb(var(--fg))]">
+        相册
+      </h1>
+      <p class="mt-4 text-lg text-[rgb(var(--fg-soft))] leading-relaxed font-body">
+        快门按下的瞬间，时间就停在那里。点击图片可放大。
+      </p>
+    </header>
+
+    {photos.length > 0 ? (
+      <div class="columns-2 md:columns-3 gap-4">
+        {photos.map(p => (
+          <a
+            href={p.src}
+            data-fancybox="site-gallery"
+            class="block mb-4 break-inside-avoid group relative overflow-hidden rounded-2xl scroll-reveal"
+          >
+            <img
+              src={p.src}
+              alt={p.alt}
+              loading="lazy"
+              class="w-full transition-transform duration-500 ease-[var(--ease-smooth)] group-hover:scale-[1.03]"
+            />
+            {(p.alt || p.location) && (
+              <div class="absolute inset-x-0 bottom-0 pt-10 pb-3 px-4 bg-gradient-to-t from-black/55 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <div class="text-sm text-white font-medium truncate">{p.alt}</div>
+                {p.location && (
+                  <div class="text-xs text-white/70 mt-0.5 flex items-center gap-1">
+                    <span class="material-symbols-outlined text-sm">location_on</span>
+                    {p.location}
+                  </div>
+                )}
+              </div>
+            )}
+          </a>
+        ))}
+      </div>
+    ) : (
+      <div class="text-center py-16 text-[rgb(var(--fg-soft))] font-body">
+        相册还是空的，去 src/data/gallery.json 加几张照片吧
+      </div>
+    )}
+  </article>
+</BaseLayout>
+
+<script is:inline>
+  // Fancybox：相册图片点击放大（按需加载，与文章页同款）
+  (function () {
+    var s = document.createElement('script');
+    s.src = '/fancybox/fancybox.umd.js';
+    s.onload = function () {
+      if (window.Fancybox) {
+        Fancybox.bind('[data-fancybox="site-gallery"]', {
+          Carousel: { infinite: false },
+          Toolbar: {
+            display: {
+              left: [],
+              middle: ['infobar'],
+              right: ['slideshow', 'download', 'close']
+            }
+          },
+          Thumbs: { autoStart: false }
+        });
+      }
+    };
+    document.head.appendChild(s);
+  })();
+</script>

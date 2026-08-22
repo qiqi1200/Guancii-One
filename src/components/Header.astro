@@ -8,7 +8,8 @@ const { current = '' } = Astro.props;
 const hubItems = [
   { href: '/about', label: '关于', icon: 'person' },
   { href: '/archive', label: '归档', icon: 'archive' },
-  { href: '/links', label: '友链', icon: 'handshake' }
+  { href: '/links', label: '友链', icon: 'handshake' },
+  { href: '/moments', label: '说说', icon: 'forum' }
 ];
 const path = current || Astro.url.pathname;
 const isActive = (href: string) =>
@@ -75,7 +76,7 @@ const isActive = (href: string) =>
 <!-- 功能面板：绝对定位下拉层（雾化玻璃，避免 fixed 受祖先 backdrop-filter 影响） -->
 <div id="nav-menu-panel" class="float-panel-closed absolute right-4 top-[4.75rem] z-40 w-[18rem]">
   <div class="rounded-2xl p-3 shadow-xl border border-[rgb(var(--border))]/40 bg-[rgb(var(--bg))]/60 backdrop-blur-xl [backdrop-filter:blur(24px)_saturate(1.6)]">
-    <nav class="grid grid-cols-3 gap-1 auto-rows-fr" aria-label="站点功能">
+    <nav class="grid grid-cols-2 gap-1 auto-rows-fr" aria-label="站点功能">
       {hubItems.map(item => (
         <a
           href={item.href}

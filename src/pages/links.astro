@@ -3,11 +3,39 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Sidebar from '../components/Sidebar.astro';
 import { getCollection } from 'astro:content';
 import friends from '../data/friends.json';
+import { fetchFeed, type FeedItem } from '../utils/rss';
 import site from '../site.json';
 const SITE = site;
 
 // 收集全部文章（给 Sidebar）
 const allPosts = (await getCollection('posts')).filter(p => !p.data.draft);
+
+// 友链朋友圈：构建期抓取各友链 RSS，聚合最新文章
+interface FriendItem {
+  name: string;
+  url: string;
+  avatar?: string;
+  description?: string;
+  feed?: string;
+}
+const list = friends as FriendItem[];
+const circles: FeedItem[] = (await Promise.all(
+  list.filter(f => f.feed).map(f => fetchFeed(f.feed as string, f.name))
+))
+  .flat()
+  .sort((a, b) => {
+    const ta = new Date(a.date || 0).getTime() || 0;
+    const tb = new Date(b.date || 0).getTime() || 0;
+    return tb - ta;
+  })
+  .slice(0, 12);
+
+function fmtDate(s: string) {
+  const t = new Date(s);
+  return isNaN(t.getTime())
+    ? ''
+    : t.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' });
+}
 ---
 
 <BaseLayout title="友链" current="/links" veil={true}>
@@ -65,6 +93,35 @@ const allPosts = (await getCollection('posts')).filter(p => !p.data.draft);
       <div class="text-center py-16 text-[rgb(var(--fg-soft))] font-body">
         友链虚位以待，欢迎交换～
       </div>
+    )}
+
+    <!-- 友链朋友圈：聚合友链最新文章 -->
+    {circles.length > 0 && (
+      <section class="mt-10 scroll-reveal">
+        <h2 class="text-lg font-bold text-[rgb(var(--fg))] mb-4 flex items-center gap-2 font-headline">
+          <span class="material-symbols-outlined text-[rgb(var(--primary))]">rss_feed</span>
+          朋友圈
+        </h2>
+        <div class="liquid-glass rounded-2xl divide-y divide-[rgb(var(--border))]/25 overflow-hidden">
+          {circles.map(c => (
+            <a
+              href={c.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="group flex items-center gap-3 px-5 py-3 hover:bg-[rgb(var(--primary-light)/0.06)] transition-colors"
+            >
+              <span class="w-1.5 h-1.5 rounded-full bg-[rgb(var(--primary-light))] shrink-0"></span>
+              <span class="flex-1 min-w-0 truncate text-sm text-[rgb(var(--fg))] group-hover:text-[rgb(var(--primary))] transition-colors">
+                {c.title}
+              </span>
+              <span class="text-xs text-[rgb(var(--fg-soft))] shrink-0 hidden sm:inline truncate max-w-[10rem]">
+                {c.source}
+              </span>
+              <span class="text-xs text-[rgb(var(--fg-soft))] shrink-0">{fmtDate(c.date)}</span>
+            </a>
+          ))}
+        </div>
+      </section>
     )}
 
     <!-- 申请友链 -->
