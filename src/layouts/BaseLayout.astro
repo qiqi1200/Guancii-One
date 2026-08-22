@@ -54,15 +54,11 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
-    <link rel="preconnect" href="https://pic.224418.xyz" />
+    <link rel="preconnect" href="https://img.260607.best" />
 
-    <!-- 预加载深浅模式背景图（桌面端+移动端各两张） -->
-    <!-- 桌面端壁纸（横版） -->
-    <link rel="preload" as="image" href="https://pic.224418.xyz/file/archive/pic/1785320160376_b5378fd4acf00d188ab14910c2727972.jpg" />
-    <link rel="preload" as="image" href="https://pic.224418.xyz/file/archive/pic/1785320202429_87104cd495db5b96fc5a6f7666aa367a.jpg" />
-    <!-- 移动端壁纸（竖版）— TODO: 替换为你自己的竖版壁纸地址 -->
-    <link rel="preload" as="image" href="https://pic.224418.xyz/file/archive/pic/1784824832785_25045e9d346642940d6dc2e4f8ce4f2b.jpg" />
-    <link rel="preload" as="image" href="https://pic.224418.xyz/file/archive/pic/1784824863422_e0e3e2b57e219b203dc2ea7d6b542c25.jpg" />
+    <!-- 预加载壁纸（桌面端+移动端各一张，不随主题切换） -->
+    <link rel="preload" as="image" href="https://img.260607.best/i/20260822051329_tik6.jpg" />
+    <link rel="preload" as="image" href="https://img.260607.best/i/20260822050650_2hy0.jpg" />
 
     <!-- 字体：Montserrat + 手写体 Architects Daughter + Material Symbols -->
     <link
@@ -105,14 +101,10 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     </svg>
 
     <!-- 背景图片层（全屏、固定、下层）
-         桌面端横版壁纸 / 移动端竖版壁纸 两套独立 -->
+         单壁纸方案：不随明暗切换，主题切换只改变遮罩与卡片颜色 -->
     <div id="bg-layer" aria-hidden="true">
-      <!-- 桌面端壁纸（横版）— 屏幕宽度 >768px 时显示 -->
-      <img id="bg-light" class="bg-desktop" src="https://pic.224418.xyz/file/archive/pic/1785320160376_b5378fd4acf00d188ab14910c2727972.jpg" alt="" />
-      <img id="bg-dark" class="bg-desktop" src="https://pic.224418.xyz/file/archive/pic/1785320202429_87104cd495db5b96fc5a6f7666aa367a.jpg" alt="" />
-      <!-- 移动端壁纸（竖版）— 屏幕宽度 ≤768px 时显示 — TODO: 替换为竖版壁纸 -->
-      <img id="bg-light-mobile" class="bg-mobile" src="https://pic.224418.xyz/file/archive/pic/1784824832785_25045e9d346642940d6dc2e4f8ce4f2b.jpg" alt="" />
-      <img id="bg-dark-mobile" class="bg-mobile" src="https://pic.224418.xyz/file/archive/pic/1784824863422_e0e3e2b57e219b203dc2ea7d6b542c25.jpg" alt="" />
+      <img id="bg-desktop" class="bg-desktop" src="https://img.260607.best/i/20260822051329_tik6.jpg" alt="" />
+      <img id="bg-mobile" class="bg-mobile" src="https://img.260607.best/i/20260822050650_2hy0.jpg" alt="" />
       <div id="bg-overlay"></div>
       <!-- 环境彩色光斑：为液态玻璃折射提供可见的色彩边界 -->
       <div class="ambient-blobs" aria-hidden="true">
@@ -416,13 +408,10 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
   }
 
   /* ════════════════════════════════════════════
-     背景图层 — 全屏固定，桌面端 + 移动端双壁纸切换
+     背景图层 — 全屏固定，单壁纸常驻
      
-     两套独立壁纸：
-     - 桌面端（>768px）：横版壁纸，原样保留
-     - 移动端（≤768px）：竖版壁纸，居中顶部对齐
-     
-     亮/暗模式通过 .dark 类切换 opacity 实现
+     桌面端（>768px）与移动端（≤768px）各一张壁纸，
+     不随明暗主题切换；主题切换只改变遮罩与卡片颜色。
      全屏 position: fixed，背景永不滚动
      ════════════════════════════════════════════ */
   #bg-layer {
@@ -437,19 +426,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     width: 100%;
     height: 100%;
     object-fit: cover;
-    will-change: opacity;
-    transition: opacity 0.9s cubic-bezier(0.23, 1, 0.32, 1);
   }
-
-  /* ── 亮/暗主题切换（桌面端 + 移动端统一规则）── */
-  #bg-light,
-  #bg-light-mobile { opacity: 1; }
-  #bg-dark,
-  #bg-dark-mobile { opacity: 0; }
-  .dark #bg-light,
-  .dark #bg-light-mobile { opacity: 0; }
-  .dark #bg-dark,
-  .dark #bg-dark-mobile { opacity: 1; }
 
   /* ── 默认：桌面端显示横版，隐藏竖版 ── */
   .bg-desktop { display: block; }
