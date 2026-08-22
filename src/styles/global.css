@@ -4,102 +4,106 @@
 
 @layer base {
   /* ─────────────────────────────────────────
-     浅色模式（默认）— Material 3 Light + 暖橙
+     浅色模式（默认）— 艾绿主体 + 克莱因蓝点缀
+     主体：艾绿 #A4E2C6（背景/表面取其浅色调）
+     点缀：克莱因蓝 #012696（主色、链接、按钮）
      ───────────────────────────────────────── */
   :root {
     /* 主背景与表面 */
-    --bg: 255 248 241;               /* #fff8f1 暖米白 */
-    --bg-soft: 255 241 227;          /* #fff1e3 */
-    --surface: 255 255 255;          /* 纯白卡片 */
-    --surface-variant: 244 212 190;  /* #f4d4be */
+    --bg: 236 246 241;               /* #ECF6F1 艾绿浅底 */
+    --bg-soft: 220 238 229;          /* #DCEEE5 */
+    --surface: 248 252 250;          /* 绿调近白卡片 */
+    --surface-variant: 201 234 217;  /* #C9EAD9 艾绿浅一档 */
 
     /* 文字色 */
-    --fg: 35 25 21;                  /* #231915 深棕黑 */
-    --fg-soft: 83 67 60;             /* #53433c */
+    --fg: 12 26 74;                  /* #0C1A4A 克莱因墨色 */
+    --fg-soft: 58 74 120;            /* #3A4A78 */
     --fg-on-primary: 255 255 255;    /* 主色按钮上的文字 */
 
-    /* 主色调（primary）— 焦糖/暖橙 */
-    --primary: 156 63 0;             /* #9c3f00 深焦糖 */
-    --primary-container: 255 220 200;/* #ffdcc8 暖粉容器 */
-    --primary-light: 255 107 0;      /* #ff6b00 强调亮橙 */
+    /* 主色调（primary）— 克莱因蓝 */
+    --primary: 0 26 110;             /* #001A6E 深克莱因（hover/深色态） */
+    --primary-container: 214 224 252;/* #D6E0FC 浅克莱因容器 */
+    --primary-light: 1 38 150;       /* #012696 克莱因蓝 · 点缀主色 */
 
-    /* 次色调 — 蓝 */
-    --secondary: 0 26 65;            /* #001a41 */
-    --secondary-container: 221 225 255;/* #dde1ff */
+    /* 次色调 — 艾绿深阶 */
+    --secondary: 42 107 84;          /* #2A6B54 */
+    --secondary-container: 196 234 216;/* #C4EAD8 */
 
-    /* 第三色 — 绿 */
-    --tertiary: 29 54 26;            /* #1d361a */
-    --tertiary-container: 204 235 194;/* #ccebc2 */
-    --sage: 58 107 53;               /* #3a6b35 */
+    /* 第三色 — 浅艾绿体系 */
+    --tertiary: 29 80 56;            /* #1D5038 */
+    --tertiary-container: 204 235 218;/* #CCEBDA */
+    --sage: 74 138 106;              /* #4A8A6A */
 
     /* 描边与分割线 */
-    --border: 215 195 184;           /* #d7c3b8 */
-    --outline: 133 115 107;          /* #85736b */
+    --border: 188 214 200;           /* #BCD6C8 */
+    --outline: 96 122 108;           /* #607A6C */
 
     /* 液态玻璃 (浅色) */
     --glass-bg: 255 255 255;
-    --glass-border: 215 195 184;
-    --glass-shadow: 0 8px 32px 0 rgba(156, 63, 0, 0.08);
+    --glass-border: 188 214 200;
+    --glass-shadow: 0 8px 32px 0 rgba(1, 38, 150, 0.08);
     /* 玻璃可调参数：饱和度倍率、亮度倍率 */
     --glass-sat: 1.8;
     --glass-bright: 1.08;
 
-    /* 鼠标光晕色 (浅色：暖橙) */
-    --blob-color: 255 182 147;
+    /* 鼠标光晕色 (浅色：克莱因蓝) */
+    --blob-color: 1 38 150;
 
     /* doodle 下划线色（与 primary-light 一致）*/
-    --doodle-color: 255 107 0;
+    --doodle-color: 1 38 150;
 
     /* prose 主题 */
-    --prose-fg: 35 25 21;
-    --prose-soft: 83 67 60;
-    --prose-pre-bg: 255 241 227;
-    --prose-code-bg: 255 230 209;
-    --prose-border: 244 212 190;
+    --prose-fg: 12 26 74;
+    --prose-soft: 58 74 120;
+    --prose-pre-bg: 228 240 233;
+    --prose-code-bg: 209 232 219;
+    --prose-border: 201 234 217;
   }
 
   /* ─────────────────────────────────────────
-     暗色模式 — UniVibe Material 3 Dark
+     暗色模式 — 深蓝主体 + 爱马仕橙点缀
+     主体：深蓝色 #000026（背景/表面）
+     点缀：爱马仕橙 #FF770F（主色、链接、按钮）
      ───────────────────────────────────────── */
   .dark {
-    --bg: 17 19 28;                  /* #11131c */
-    --bg-soft: 29 31 41;             /* #1d1f29 */
-    --surface: 29 31 41;
-    --surface-variant: 50 52 62;     /* #32343e */
+    --bg: 0 0 38;                    /* #000026 深蓝色 */
+    --bg-soft: 10 12 54;             /* #0A0C36 */
+    --surface: 14 16 62;
+    --surface-variant: 28 32 88;     /* #1C2058 */
 
-    --fg: 225 225 239;               /* #e1e1ef */
-    --fg-soft: 226 191 176;          /* #e2bfb0 */
-    --fg-on-primary: 86 31 0;        /* #561f00 */
+    --fg: 240 240 245;               /* #F0F0F5 */
+    --fg-soft: 230 195 172;          /* #E6C3AC 暖橙灰 */
+    --fg-on-primary: 0 0 38;         /* 橙色按钮上用深蓝字 */
 
-    --primary: 255 182 147;          /* #ffb693 */
-    --primary-container: 87 32 0;    /* #572000 */
-    --primary-light: 255 182 147;
+    --primary: 255 119 15;           /* #FF770F 爱马仕橙 */
+    --primary-container: 86 36 2;    /* #562402 */
+    --primary-light: 255 119 15;
 
-    --secondary: 184 195 255;        /* #b8c3ff */
-    --secondary-container: 0 67 235; /* #0043eb */
+    --secondary: 150 165 255;        /* #96A5FF 夜蓝高光 */
+    --secondary-container: 16 32 128;/* #102080 */
 
     --tertiary: 177 207 167;         /* #b1cfa7 */
     --tertiary-container: 132 161 124;/* #84a17c */
     --sage: 177 207 167;
 
-    --border: 90 65 54;              /* #5a4136 */
-    --outline: 169 138 125;          /* #a98a7d */
+    --border: 38 44 100;             /* #262C64 */
+    --outline: 130 142 190;          /* #828EBE */
 
-    --glass-bg: 29 31 41;
-    --glass-border: 90 65 54;
-    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    --glass-bg: 14 16 62;
+    --glass-border: 38 44 100;
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.35);
     --glass-sat: 1.6;
     --glass-bright: 1.15;
 
-    --blob-color: 255 182 147;
+    --blob-color: 255 119 15;
 
-    --doodle-color: 255 182 147;
+    --doodle-color: 255 119 15;
 
-    --prose-fg: 225 225 239;
-    --prose-soft: 226 191 176;
-    --prose-pre-bg: 29 31 41;
-    --prose-code-bg: 50 52 62;
-    --prose-border: 50 52 62;
+    --prose-fg: 240 240 245;
+    --prose-soft: 230 195 172;
+    --prose-pre-bg: 10 12 54;
+    --prose-code-bg: 28 32 88;
+    --prose-border: 28 32 88;
     --radius-large: 1rem;
     --content-delay: 150ms;
     --page-width: 72rem;
@@ -539,12 +543,12 @@
     left: 0;
     width: 100%;
     height: 8px;
-    background-image: url("data:image/svg+xml,%3Csvg width='100' height='8' viewBox='0 0 100 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M2 6C20 3 40 7 60 4C80 1 98 5 98 5' stroke='%23ff6b00' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg width='100' height='8' viewBox='0 0 100 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M2 6C20 3 40 7 60 4C80 1 98 5 98 5' stroke='%23012696' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-size: 100% 100%;
   }
   .dark .doodle-underline::after {
-    background-image: url("data:image/svg+xml,%3Csvg width='100' height='8' viewBox='0 0 100 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M2 6C20 3 40 7 60 4C80 1 98 5 98 5' stroke='%23ffb693' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg width='100' height='8' viewBox='0 0 100 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M2 6C20 3 40 7 60 4C80 1 98 5 98 5' stroke='%23ff770f' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
   }
 
   /* ============= 磁吸悬浮 ============= */
@@ -1205,7 +1209,7 @@
 .sidebar-section-title {
   font-size: 11px;
   font-weight: 600;
-  color: #999999;
+  color: #7180a8;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   margin-bottom: 14px;
@@ -1240,7 +1244,7 @@
   transition: color 0.2s ease;
 }
 .sidebar-recent-item a:hover {
-  color: #c46010;
+  color: rgb(var(--primary));
 }
 .dark .sidebar-recent-item a {
   color: rgb(200 185 175);
@@ -1253,7 +1257,7 @@
   justify-content: space-between;
   min-height: 32px;
   font-size: 13px;
-  color: #666666;
+  color: #46527e;
   border-bottom: 1px solid rgba(215, 195, 184, 0.08);
   transition: color 0.2s ease;
   cursor: default;
@@ -1262,11 +1266,11 @@
   border-bottom: none;
 }
 .sidebar-archive-item:hover {
-  color: #c46010;
+  color: rgb(var(--primary));
 }
 .sidebar-archive-item .count {
   font-size: 12px;
-  color: #999999;
+  color: #7180a8;
 }
 .dark .sidebar-archive-item {
   color: rgb(180 165 155);
@@ -1279,7 +1283,7 @@
   gap: 4px;
   font-size: 13px;
   font-weight: 600;
-  color: #c46010;
+  color: rgb(var(--primary));
   text-decoration: none;
   transition: gap 0.2s ease;
 }
@@ -1289,31 +1293,31 @@
 
 /* ============= 奶油风文字颜色（适配暗色模式） ============= */
 .text-cream-heading {
-  color: #2a2a2a;
+  color: #16224a;
 }
 .dark .text-cream-heading {
-  color: #e8ddd0;
+  color: #eef0f8;
 }
 
 .text-cream-body {
-  color: #666666;
+  color: #46527e;
 }
 .dark .text-cream-body {
-  color: #b8a89a;
+  color: #a9b2d0;
 }
 
 .text-cream-soft {
-  color: #999999;
+  color: #7180a8;
 }
 .dark .text-cream-soft {
-  color: #8a7a6a;
+  color: #7e88ad;
 }
 
 .text-cream-link {
-  color: #c46010;
+  color: rgb(var(--primary));
 }
 .dark .text-cream-link {
-  color: #ffb693;
+  color: rgb(var(--primary-light));
 }
 
 .bg-cream-search {

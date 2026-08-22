@@ -501,19 +501,19 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
   .ab-1 {
     width: 46vmax; height: 46vmax;
     left: -12vmax; top: -14vmax;
-    background: rgb(255 165 110 / 0.78);
+    background: rgb(164 226 198 / 0.72);   /* 艾绿主体 */
     animation: ab-drift-1 36s ease-in-out infinite alternate;
   }
   .ab-2 {
     width: 40vmax; height: 40vmax;
     right: -10vmax; top: 22vh;
-    background: rgb(120 180 255 / 0.62);
+    background: rgb(70 105 235 / 0.42);    /* 克莱因蓝浅光点缀 */
     animation: ab-drift-2 44s ease-in-out infinite alternate;
   }
   .ab-3 {
     width: 34vmax; height: 34vmax;
     left: 24vw; bottom: -14vmax;
-    background: rgb(150 220 170 / 0.62);
+    background: rgb(150 218 186 / 0.58);   /* 淺艾绿 */
     animation: ab-drift-1 40s ease-in-out infinite alternate-reverse;
   }
   @keyframes ab-drift-1 {
@@ -522,9 +522,9 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
   @keyframes ab-drift-2 {
     to { transform: translate(-5vmax, 6vmax) scale(0.94); }
   }
-  .dark .ab-1 { background: rgb(255 140 90 / 0.28); }
-  .dark .ab-2 { background: rgb(90 130 220 / 0.25); }
-  .dark .ab-3 { background: rgb(110 180 140 / 0.22); }
+  .dark .ab-1 { background: rgb(255 119 15 / 0.26); }   /* 爱马仕橙点缀 */
+  .dark .ab-2 { background: rgb(60 80 200 / 0.28); }    /* 夜蓝高光 */
+  .dark .ab-3 { background: rgb(90 160 125 / 0.18); }   /* 暗艾绿 */
   @media (prefers-reduced-motion: reduce) {
     .ab { animation: none; }
   }

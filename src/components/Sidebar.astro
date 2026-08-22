@@ -46,19 +46,19 @@ const archives = [...archiveMap.entries()].slice(0, 8);
     </a>
     <div class="text-center">
       <div class="font-semibold text-base text-cream-heading mb-1">{SITE.author}</div>
-      <div class="h-[3px] w-8 bg-[#c46010] mx-auto rounded-full mb-3"></div>
+      <div class="h-[3px] w-8 bg-[rgb(var(--primary))] mx-auto rounded-full mb-3"></div>
       <div class="text-xs text-cream-body mb-3 leading-relaxed">{SITE.description}</div>
       <div class="flex justify-center gap-2">
         <a href={SITE.links.github} target="_blank" rel="noopener"
-           class="w-8 h-8 rounded-lg flex items-center justify-center text-cream-soft hover:text-cream-link hover:bg-[#c46010]/10 transition-all">
+           class="w-8 h-8 rounded-lg flex items-center justify-center text-cream-soft hover:text-cream-link hover:bg-[rgb(var(--primary))]/10 transition-all">
           <span class="material-symbols-outlined text-base">code</span>
         </a>
         <a href={SITE.links.email}
-           class="w-8 h-8 rounded-lg flex items-center justify-center text-cream-soft hover:text-cream-link hover:bg-[#c46010]/10 transition-all">
+           class="w-8 h-8 rounded-lg flex items-center justify-center text-cream-soft hover:text-cream-link hover:bg-[rgb(var(--primary))]/10 transition-all">
           <span class="material-symbols-outlined text-base">mail</span>
         </a>
         <a href="/rss.xml"
-           class="w-8 h-8 rounded-lg flex items-center justify-center text-cream-soft hover:text-cream-link hover:bg-[#c46010]/10 transition-all">
+           class="w-8 h-8 rounded-lg flex items-center justify-center text-cream-soft hover:text-cream-link hover:bg-[rgb(var(--primary))]/10 transition-all">
           <span class="material-symbols-outlined text-base">rss_feed</span>
         </a>
       </div>
@@ -78,7 +78,7 @@ const archives = [...archiveMap.entries()].slice(0, 8);
           type="search"
           name="q"
           placeholder="搜索文章..."
-          class="w-full pl-9 pr-3 py-2 rounded-lg bg-cream-search border border-cream text-cream-heading placeholder:text-cream-soft focus:outline-none focus:border-cream-link focus:ring-1 focus:ring-[#c46010]/20 transition-colors text-sm"
+          class="w-full pl-9 pr-3 py-2 rounded-lg bg-cream-search border border-cream text-cream-heading placeholder:text-cream-soft focus:outline-none focus:border-cream-link focus:ring-1 focus:ring-[rgb(var(--primary))]/20 transition-colors text-sm"
         />
         <span class="material-symbols-outlined absolute left-2.5 top-2 text-sm text-cream-soft">search</span>
       </form>
