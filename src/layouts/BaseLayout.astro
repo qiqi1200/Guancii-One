@@ -106,12 +106,6 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
       <img id="bg-desktop" class="bg-desktop" src="https://img.260607.best/i/20260822051329_tik6.jpg" alt="" />
       <img id="bg-mobile" class="bg-mobile" src="https://img.260607.best/i/20260822050650_2hy0.jpg" alt="" />
       <div id="bg-overlay"></div>
-      <!-- 环境彩色光斑：为液态玻璃折射提供可见的色彩边界 -->
-      <div class="ambient-blobs" aria-hidden="true">
-        <div class="ab ab-1"></div>
-        <div class="ab ab-2"></div>
-        <div class="ab ab-3"></div>
-      </div>
     </div>
     <!-- 鼠标光晕 -->
     <div class="cursor-blob" id="cursor-blob"></div>
@@ -432,15 +426,15 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
   .bg-desktop { display: block; }
   .bg-mobile  { display: none; }
 
-  /* ── 半透明遮罩 — 保证文字始终可读 ── */
+  /* ── 近透明遮罩 — 保持原图清晰，仅留极轻底色保证文字可读 ── */
   #bg-overlay {
     position: absolute;
     inset: 0;
-    background: rgb(var(--bg) / 0.55);
+    background: rgb(var(--bg) / 0.08);
     transition: background 0.9s cubic-bezier(0.23, 1, 0.32, 1);
   }
   .dark #bg-overlay {
-    background: rgb(17 19 28 / 0.6);
+    background: rgb(17 19 28 / 0.28);
   }
 
   /* ── 移动端（≤768px）：切换竖版壁纸 + iOS 优化 ── */
@@ -461,49 +455,6 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
       -webkit-transform: translateZ(0);
       transform: translateZ(0);
     }
-  }
-
-  /* ── 环境彩色光斑：缓慢漂移，让玻璃折射有形可见 ── */
-  .ambient-blobs {
-    position: absolute;
-    inset: 0;
-    overflow: hidden;
-  }
-  .ab {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(56px);
-    will-change: transform;
-  }
-  .ab-1 {
-    width: 46vmax; height: 46vmax;
-    left: -12vmax; top: -14vmax;
-    background: rgb(164 226 198 / 0.72);   /* 艾绿主体 */
-    animation: ab-drift-1 36s ease-in-out infinite alternate;
-  }
-  .ab-2 {
-    width: 40vmax; height: 40vmax;
-    right: -10vmax; top: 22vh;
-    background: rgb(70 105 235 / 0.42);    /* 克莱因蓝浅光点缀 */
-    animation: ab-drift-2 44s ease-in-out infinite alternate;
-  }
-  .ab-3 {
-    width: 34vmax; height: 34vmax;
-    left: 24vw; bottom: -14vmax;
-    background: rgb(150 218 186 / 0.58);   /* 淺艾绿 */
-    animation: ab-drift-1 40s ease-in-out infinite alternate-reverse;
-  }
-  @keyframes ab-drift-1 {
-    to { transform: translate(6vmax, 4vmax) scale(1.08); }
-  }
-  @keyframes ab-drift-2 {
-    to { transform: translate(-5vmax, 6vmax) scale(0.94); }
-  }
-  .dark .ab-1 { background: rgb(255 119 15 / 0.26); }   /* 爱马仕橙点缀 */
-  .dark .ab-2 { background: rgb(60 80 200 / 0.28); }    /* 夜蓝高光 */
-  .dark .ab-3 { background: rgb(90 160 125 / 0.18); }   /* 暗艾绿 */
-  @media (prefers-reduced-motion: reduce) {
-    .ab { animation: none; }
   }
 
   /* 缩短上滑距离，加快入场，更 iOS
