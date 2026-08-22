@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' 'unsafe-eval' cdn.jsdelivr.net cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' cdn.jsdelivr.net cdnjs.cloudflare.com fonts.googleapis.com; connect-src api.github.com; img-src 'self' data: blob: https:; font-src 'self' cdn.jsdelivr.net cdnjs.cloudflare.com fonts.gstatic.com; frame-src 'none';">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' 'unsafe-eval' cdn.jsdelivr.net cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' cdn.jsdelivr.net cdnjs.cloudflare.com fonts.googleapis.com; connect-src api.github.com img.260607.best; img-src 'self' data: blob: https:; font-src 'self' cdn.jsdelivr.net cdnjs.cloudflare.com fonts.gstatic.com; frame-src 'none';">
   <title>博客管理后台 — guancii</title>
   <!-- EasyMDE -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css" integrity="sha256-bu42NAQyd21oLnNy7Ep+spvk/bP/raMsC/peMaXvNKI=" crossorigin="anonymous">
@@ -412,6 +412,56 @@
     .data-footer { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
     .data-status { font-size: .82rem; color: var(--gray-light); }
 
+    /* 深色模式：EasyMDE / CodeMirror 跟随主题，避免白底黑字刺眼 */
+    [data-theme="dark"] .EasyMDEContainer .CodeMirror {
+      background: var(--surface); color: #e6e9f7;
+    }
+    [data-theme="dark"] .EasyMDEContainer .editor-toolbar {
+      background: var(--gray-bg); border-color: var(--border);
+    }
+    [data-theme="dark"] .EasyMDEContainer .editor-toolbar button { color: #aab2d5; }
+    [data-theme="dark"] .EasyMDEContainer .editor-toolbar button:hover { color: var(--green-dark); border-color: var(--border); }
+    [data-theme="dark"] .EasyMDEContainer .editor-statusbar { color: var(--gray-light); }
+    [data-theme="dark"] .CodeMirror-cursor { border-left-color: #ffb066; }
+    [data-theme="dark"] .CodeMirror-selected { background: #20264f; }
+    [data-theme="dark"] .CodeMirror-gutters { background: var(--gray-bg); border-color: var(--border); }
+    [data-theme="dark"] .editor-preview { background: var(--surface) !important; color: #dfe3f5; }
+    [data-theme="dark"] .editor-preview pre { background: var(--gray-bg); }
+    [data-theme="dark"] .editor-preview code { background: var(--cream); }
+
+    /* ====================== 插入图片 ======================== */
+    .media-tabs { display: flex; gap: 6px; margin-bottom: 16px; }
+    .media-tabs .tab-btn { padding: 5px 14px; font-size: .82rem; }
+    #drop-zone {
+      border: 2px dashed var(--border); border-radius: var(--radius-lg);
+      padding: 28px 16px; text-align: center; color: var(--gray);
+      cursor: pointer; transition: all var(--transition); font-size: .9rem;
+      line-height: 1.7;
+    }
+    #drop-zone small { color: var(--gray-light); font-size: .78rem; }
+    #drop-zone:hover, #drop-zone.dragover {
+      border-color: var(--green); background: var(--cream); color: var(--green-dark);
+    }
+    .upload-row {
+      display: flex; align-items: center; gap: 8px;
+      font-size: .82rem; padding: 7px 2px;
+      border-top: 1px dashed var(--border); word-break: break-all;
+    }
+    .upload-row:first-child { border-top: none; }
+    .upload-row .u-ok { color: var(--green-dark); }
+    [data-theme="dark"] .upload-row .u-ok { color: var(--green-dark); }
+    .upload-row .u-err { color: var(--orange); }
+    .upload-row .spinner { width: 12px; height: 12px; border: 2px solid currentColor; border-top-color: transparent; border-radius: 50%; animation: spin .8s linear infinite; flex-shrink: 0; }
+    #mtab-url label { display: block; font-size: .8rem; font-weight: 600; margin: 12px 0 4px; }
+    #btn-insert-url { margin-top: 16px; width: 100%; justify-content: center; }
+
+    .storage-row { display: flex; align-items: center; gap: 14px; margin-bottom: 10px; flex-wrap: wrap; }
+    .storage-label { font-size: .8rem; font-weight: 600; color: var(--gray); }
+    .storage-opt { display: inline-flex; align-items: center; gap: 5px; font-size: .84rem; cursor: pointer; color: var(--fg, inherit); }
+    .storage-opt input { accent-color: var(--green); cursor: pointer; }
+    #imgbed-config { margin-bottom: 12px; }
+    #imgbed-config .f-grid { grid-template-columns: 1fr 1fr; }
+
     /* ====================== Responsive ======================== */
     @media (max-width: 768px) {
       .dashboard-content { padding: 16px; }
@@ -595,6 +645,50 @@
             </div>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================== Insert Image Modal ======================== -->
+  <div class="modal-overlay" id="media-modal">
+    <div class="modal-box" style="max-width:520px;">
+      <h3>🖼️ 插入图片</h3>
+      <p style="margin-bottom:12px;">上传后会插入到编辑器光标所在位置，想放在哪就把光标点在哪。</p>
+      <div class="media-tabs">
+        <button class="tab-btn active" data-mtab="upload">📤 上传本地图片</button>
+        <button class="tab-btn" data-mtab="url">🔗 使用图片链接</button>
+      </div>
+
+      <div id="mtab-upload">
+        <div class="storage-row">
+          <span class="storage-label">上传到</span>
+          <label class="storage-opt"><input type="radio" name="img-target" value="imgbed" checked> ☁️ 个人图床（秒传秒用）</label>
+          <label class="storage-opt"><input type="radio" name="img-target" value="repo"> 📦 博客仓库</label>
+        </div>
+        <div id="imgbed-config">
+          <div class="f-grid">
+            <input id="imgbed-host" class="input" placeholder="https://img.260607.best">
+            <input id="imgbed-key" class="input" type="password" placeholder="图床密钥（X-Auth-Token）">
+          </div>
+        </div>
+        <div id="drop-zone">
+          点击选择图片，或把图片拖到这里<br>
+          <small>支持 JPG / PNG / WebP / GIF，单张 ≤ 20MB，可多选 · 也可以直接在编辑器里 Ctrl+V 粘贴截图 · 上传完成自动变成 URL 插到光标处</small>
+        </div>
+        <input type="file" id="img-file-input" accept="image/*" multiple hidden>
+        <div id="upload-progress"></div>
+      </div>
+
+      <div id="mtab-url" style="display:none;">
+        <label for="media-url">图片地址</label>
+        <input type="text" class="input" id="media-url" placeholder="https://...">
+        <label for="media-alt">描述 alt（可选）</label>
+        <input type="text" class="input" id="media-alt" placeholder="图片说明">
+        <button class="btn btn-primary" id="btn-insert-url">插入到光标处</button>
+      </div>
+
+      <div class="modal-actions" style="margin-top:16px;">
+        <button class="btn btn-ghost" id="media-close">关闭</button>
       </div>
     </div>
   </div>
@@ -1213,6 +1307,7 @@
       $('delete-confirm').checked = false;
       $('btn-delete').disabled = true;
       $('save-status').textContent = '';
+      mediaDirCache = null; // 每篇文章重新归档目录，避免配图串到上一篇
       const coverPreview = $('cover-preview');
       coverPreview.classList.remove('show');
 
@@ -1233,7 +1328,14 @@
               this.element.textContent = `☕ ${min} min read`;
             }
           }],
-          toolbar: ['bold', 'italic', 'heading', '|', 'quote', 'unordered-list', 'ordered-list', '|', 'link', 'image', '|', 'preview', 'side-by-side', 'fullscreen', '|', 'guide'],
+          toolbar: ['bold', 'italic', 'heading', '|', 'quote', 'unordered-list', 'ordered-list', '|',
+            {
+              name: 'insert-image',
+              action: () => openMediaModal(),
+              className: 'fa fa-picture-o',
+              title: '插入图片（上传 / 链接，可粘贴截图）'
+            },
+            'link', '|', 'preview', 'side-by-side', 'fullscreen', '|', 'guide'],
           renderingConfig: { codeSyntaxHighlighting: true },
         });
         // Auto-highlight code in preview
@@ -1243,6 +1345,35 @@
               if (typeof hljs !== 'undefined') hljs.highlightElement(el);
             });
           }, 100);
+        });
+
+        // 粘贴截图 → 自动上传并插入到光标处
+        easyMDE.codemirror.on('paste', (cm, e) => {
+          const items = e.clipboardData && e.clipboardData.items;
+          if (!items) return;
+          const files = [];
+          for (const it of items) {
+            if (it.kind === 'file' && /^image\//.test(it.type)) {
+              const f = it.getAsFile();
+              if (f) {
+                const named = new File([f], f.name || `paste-${Date.now()}.png`, { type: f.type });
+                files.push(named);
+              }
+            }
+          }
+          if (files.length) { e.preventDefault(); openMediaModal(); handleImageFiles(files); }
+        });
+
+        // 拖拽图片进编辑器 → 同上
+        const cmWrap = easyMDE.codemirror.getWrapperElement();
+        cmWrap.addEventListener('dragover', (e) => e.preventDefault());
+        cmWrap.addEventListener('drop', (e) => {
+          const files = [...(e.dataTransfer ? e.dataTransfer.files : [])].filter(f => /^image\//.test(f.type));
+          if (files.length) {
+            e.preventDefault();
+            openMediaModal();
+            handleImageFiles(files);
+          }
         });
       }
 
@@ -1553,7 +1684,11 @@
         if (el) el.classList.toggle('active', s === name);
       });
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.section === name));
-      if (name === 'moments' && !momentsLoaded) loadMoments();
+      if (name === 'moments') {
+        const md = $('moment-date');
+        if (md && !md.value) md.value = new Date().toISOString().substring(0, 10);
+        if (!momentsLoaded) loadMoments();
+      }
       if (name === 'data') {
         if (!dataFiles.gallery.loaded) loadDataFile('gallery');
         if (!dataFiles.friends.loaded) loadDataFile('friends');
@@ -1647,11 +1782,17 @@
       const text = $('moment-text').value.trim();
       if (!text) { toast('写点内容再发布吧', 'error'); return; }
       const dateInput = $('moment-date').value || new Date().toISOString().substring(0, 10);
-      // 文件名冲突：2026-08-23.md → 2026-08-23-2.md → …，永不覆盖已有内容
-      const exists = (f) => (momentsCache || []).some(m => m.file === f);
+      // 文件名冲突：先查内存缓存，再逐个探测远端（缓存可能过期，避免静默覆盖）
+      const existsRemote = async (f) => {
+        try { await apiGet(`contents/src/content/moments/${encodeURIComponent(f)}?ref=${config.branch}`); return true; }
+        catch { return false; }
+      };
       let name = `${dateInput}.md`;
       let n = 2;
-      while (exists(name)) { name = `${dateInput}-${n}.md`; n++; }
+      while ((momentsCache || []).some(m => m.file === name) || await existsRemote(name)) {
+        name = `${dateInput}-${n}.md`;
+        n++;
+      }
       const content = buildFrontmatter({ date: dateInput }) + text + '\n';
       const btn = $('moment-publish');
       btn.disabled = true; btn.textContent = '⏳ 发布中...';
@@ -1734,6 +1875,7 @@
       const base = dataFiles.gallery.json || {};
       if (base.note) out.note = base.note;
       const photos = [];
+      const rowsAll = document.querySelectorAll('#gallery-rows .g-row').length;
       document.querySelectorAll('#gallery-rows .g-row').forEach(row => {
         const src = row.querySelector('.g-src').value.trim();
         if (!src) return;
@@ -1745,7 +1887,7 @@
         photos.push(item);
       });
       out.photos = photos;
-      return out;
+      return { json: out, skipped: rowsAll - photos.length };
     }
 
     function renderFriendRows() {
@@ -1777,6 +1919,7 @@
 
     function collectFriends() {
       const list = [];
+      const rowsAll = document.querySelectorAll('#friends-rows .f-row').length;
       document.querySelectorAll('#friends-rows .f-row').forEach(row => {
         const name = row.querySelector('.f-name').value.trim();
         const url = row.querySelector('.f-url').value.trim();
@@ -1790,12 +1933,13 @@
         if (feed) item.feed = feed;
         list.push(item);
       });
-      return list;
+      return { json: list, skipped: rowsAll - list.length };
     }
 
     async function saveDataFile(kind) {
       const d = dataFiles[kind];
-      const json = kind === 'gallery' ? collectGallery() : collectFriends();
+      const res = kind === 'gallery' ? collectGallery() : collectFriends();
+      const json = res.json;
       const status = $(kind + '-status');
       const btn = $('btn-save-' + kind);
       btn.disabled = true;
@@ -1809,8 +1953,9 @@
         if (d.sha) payload.sha = d.sha;
         const result = await apiPut(d.path, payload);
         if (result.content && result.content.sha) d.sha = result.content.sha;
-        status.textContent = '已保存 ✓';
+        status.textContent = `已保存 ✓${res.skipped ? `（忽略 ${res.skipped} 行缺必填项）` : ''}`;
         toast(`✅ ${d.label}已更新`, 'success');
+        if (res.skipped) toast(`有 ${res.skipped} 行缺少必填项被忽略`, 'info');
         trackDeploy(result.commit ? result.commit.sha : null);
       } catch (err) {
         status.textContent = '保存失败';
@@ -1891,6 +2036,189 @@
 
     $('btn-save-gallery').addEventListener('click', () => saveDataFile('gallery'));
     $('btn-save-friends').addEventListener('click', () => saveDataFile('friends'));
+
+    // ---------- 插入图片：个人图床 / 仓库 / 链接 / 粘贴截图 ----------
+    const IMG_BASE = 'https://blog.260607.best/images/posts';
+    const IMGBED_KEY = 'imgbed-config';
+    let mediaDirCache = null;
+    let mediaUploading = false;
+
+    // 图床配置（域名 + 密钥），存 localStorage
+    function loadImgbedConfig() {
+      try {
+        const c = JSON.parse(localStorage.getItem(IMGBED_KEY) || '{}');
+        $('imgbed-host').value = c.host || 'https://img.260607.best';
+        $('imgbed-key').value = c.key || '';
+      } catch {
+        $('imgbed-host').value = 'https://img.260607.best';
+      }
+    }
+    function saveImgbedConfig() {
+      localStorage.setItem(IMGBED_KEY, JSON.stringify({
+        host: $('imgbed-host').value.trim(),
+        key: $('imgbed-key').value,
+      }));
+    }
+    ['input', 'change'].forEach(ev => {
+      $('imgbed-host').addEventListener(ev, saveImgbedConfig);
+      $('imgbed-key').addEventListener(ev, saveImgbedConfig);
+    });
+    document.querySelectorAll('input[name="img-target"]').forEach(r =>
+      r.addEventListener('change', () => { $('imgbed-config').style.display = imageTarget() === 'imgbed' ? 'block' : 'none'; }));
+    function imageTarget() {
+      const el = document.querySelector('input[name="img-target"]:checked');
+      return el ? el.value : 'imgbed';
+    }
+    loadImgbedConfig();
+
+    function openMediaModal() {
+      $('upload-progress').innerHTML = '';
+      $('media-modal').classList.add('show');
+      switchMediaTab('upload');
+    }
+    function closeMediaModal() { $('media-modal').classList.remove('show'); }
+
+    function switchMediaTab(name) {
+      document.querySelectorAll('[data-mtab]').forEach(b => b.classList.toggle('active', b.dataset.mtab === name));
+      $('mtab-upload').style.display = name === 'upload' ? 'block' : 'none';
+      $('mtab-url').style.display = name === 'url' ? 'block' : 'none';
+    }
+    document.querySelectorAll('[data-mtab]').forEach(b => b.addEventListener('click', () => switchMediaTab(b.dataset.mtab)));
+    $('media-close').addEventListener('click', closeMediaModal);
+    $('media-modal').addEventListener('click', (e) => { if (e.target === $('media-modal')) closeMediaModal(); });
+
+    function mediaDirName() {
+      if (mediaDirCache) return mediaDirCache;
+      const d = ($('editor-date').value || new Date().toISOString().substring(0, 10)).replaceAll('-', '');
+      const slug = ($('editor-slug').value.trim() || generateSlug($('editor-title').value) || 'post')
+        .replace(/[^\w-]+/g, '').slice(0, 40) || 'post';
+      mediaDirCache = `${d}-${slug}`;
+      return mediaDirCache;
+    }
+
+    function insertAtCursor(text) {
+      if (!easyMDE) return;
+      const cm = easyMDE.codemirror;
+      const pos = cm.getCursor();
+      cm.replaceSelection(text);
+      cm.setCursor({ line: pos.line, ch: pos.ch + text.length });
+      cm.focus();
+    }
+
+    async function uploadToImgBed(file) {
+      const host = ($('imgbed-host').value.trim() || 'https://img.260607.best').replace(/\/+$/, '');
+      const key = $('imgbed-key').value.trim();
+      if (!key) throw new Error('请先在上方填写图床密钥');
+      const fd = new FormData();
+      fd.append('file', file);
+      const resp = await fetch(host + '/upload', {
+        method: 'POST',
+        headers: { 'X-Auth-Token': key },
+        body: fd,
+        signal: AbortSignal.timeout(30000), // 防止网络挂起阻塞上传队列
+      });
+      const data = await resp.json().catch(() => ({}));
+      if (!resp.ok || !data.url) throw new Error(data.error || `HTTP ${resp.status}`);
+      return data.url; // Worker 已返回绝对地址
+    }
+
+    async function uploadOneImage(file) {
+      if (!/^image\//.test(file.type)) throw new Error('仅支持图片文件');
+      // ☁️ 个人图床（R2）：秒传秒用，不占仓库体积
+      if (imageTarget() === 'imgbed') return await uploadToImgBed(file);
+
+      // 📦 博客仓库：随文章一起提交部署
+      if (file.size > 4 * 1024 * 1024) throw new Error('超过 4MB（仓库模式限制）');
+      const buf = await file.arrayBuffer();
+      const bytes = new Uint8Array(buf);
+      let bin = '';
+      const CHUNK = 0x8000; // 分段转二进制，避免大图栈溢出
+      for (let i = 0; i < bytes.length; i += CHUNK) {
+        bin += String.fromCharCode.apply(null, bytes.subarray(i, i + CHUNK));
+      }
+      const dir = mediaDirName();
+      const safeName = (file.name || 'img.png').replace(/[^\w.\-]+/g, '-').replace(/^-+|-+$/g, '') || 'img.png';
+      const fname = `${Date.now().toString(36)}-${safeName}`;
+      await apiPut(`contents/public/images/posts/${dir}/${fname}`, {
+        message: `上传配图: ${safeName}`,
+        content: btoa(bin),
+        branch: config.branch,
+      });
+      return { url: `${IMG_BASE}/${dir}/${fname}`, repo: true };
+    }
+
+    async function handleImageFiles(files) {
+      let touchedRepo = false;
+      for (let i = 0; i < files.length; i++) {
+        const f = files[i];
+        const label = f.name || `clipboard-${i + 1}.png`;
+        const uid = `${label}#${Date.now()}-${i}`; // 唯一键：同名文件互不干扰
+        progressRow(uid, label, 'loading');
+        try {
+          const r = await uploadOneImage(f);
+          const url = typeof r === 'string' ? r : r.url;
+          if (typeof r === 'object' && r.repo) touchedRepo = true;
+          const alt = altFromName(f.name) || '图片';
+          insertAtCursor(`![${alt}](${url})\n`);
+          progressRow(uid, label, 'ok', url);
+        } catch (err) {
+          progressRow(uid, label, 'err', err.message);
+        }
+      }
+      if (touchedRepo) trackDeploy(null);
+    }
+
+    function progressRow(uid, label, state, note) {
+      const wrap = $('upload-progress');
+      let row = wrap.querySelector(`[data-name="${CSS.escape(uid)}"]`);
+      if (!row) {
+        row = document.createElement('div');
+        row.className = 'upload-row';
+        row.dataset.name = uid;
+        wrap.appendChild(row);
+      }
+      row.innerHTML = '';
+      if (state === 'loading') {
+        const s = document.createElement('span'); s.className = 'spinner';
+        const t = document.createElement('span'); t.textContent = `${label} 上传中…`;
+        row.append(s, t);
+      } else if (state === 'ok') {
+        const ok = document.createElement('span'); ok.className = 'u-ok'; ok.textContent = '✅ 已插入光标处';
+        row.append(ok, makeLink(note, '查看'));
+      } else if (state === 'err') {
+        const err = document.createElement('span'); err.className = 'u-err';
+        err.textContent = `❌ ${label}：${note}`;
+        row.appendChild(err);
+      }
+    }
+
+    function altFromName(name) {
+      return String(name || '').replace(/\.[^.]+$/, '').replace(/[-_]+/g, ' ').trim().slice(0, 60);
+    }
+
+    // 选择文件 / 拖拽
+    $('drop-zone').addEventListener('click', () => $('img-file-input').click());
+    $('img-file-input').addEventListener('change', (e) => {
+      handleImageFiles([...e.target.files]);
+      e.target.value = '';
+    });
+    ['dragover', 'dragenter'].forEach(ev =>
+      $('drop-zone').addEventListener(ev, (e) => { e.preventDefault(); $('drop-zone').classList.add('dragover'); }));
+    ['dragleave', 'drop'].forEach(ev =>
+      $('drop-zone').addEventListener(ev, (e) => { e.preventDefault(); $('drop-zone').classList.remove('dragover'); }));
+    $('drop-zone').addEventListener('drop', (e) => {
+      const files = [...(e.dataTransfer ? e.dataTransfer.files : [])].filter(f => /^image\//.test(f.type));
+      if (files.length) handleImageFiles(files);
+    });
+
+    // 链接插入
+    $('btn-insert-url').addEventListener('click', () => {
+      const url = $('media-url').value.trim();
+      if (!url) { toast('请填写图片地址', 'error'); return; }
+      insertAtCursor(`![${$('media-alt').value.trim() || '图片'}](${url})\n`);
+      $('media-url').value = ''; $('media-alt').value = '';
+      closeMediaModal();
+    });
 
     // 切换面板时重置懒加载缓存（登出/重新登录用）
     function resetLazyCaches() {
