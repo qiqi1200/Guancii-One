@@ -358,6 +358,15 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
       window.addEventListener('load', applyLens);
       setTimeout(applyLens, 600);                                   // 字体/图片加载后校准尺寸
 
+      /* 入场动画结束后摘除动画类，彻底释放合成层，
+         确保 backdrop-filter 能采样到页面背景（折射生效） */
+      document.querySelectorAll('.page-entrance').forEach((el) => {
+        el.addEventListener('animationend', () => {
+          el.classList.remove('page-entrance');
+          applyLens();
+        }, { once: true });
+      });
+
       /* 延迟显示的元素（如导航下拉、折叠面板）首次可见时补上滤镜 */
       const lensIO = new IntersectionObserver((entries) => {
         entries.forEach((e) => {
@@ -520,9 +529,10 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     .ab { animation: none; }
   }
 
-  /* 缩短上滑距离，加快入场，更 iOS */
+  /* 缩短上滑距离，加快入场，更 iOS
+     backwards：结束后释放关键帧样式，避免合成层驻留切断折射采样 */
   .page-entrance {
-    animation: page-entrance 350ms var(--ease-smooth) both;
+    animation: page-entrance 350ms var(--ease-smooth) backwards;
   }
   @keyframes page-entrance {
     0% {

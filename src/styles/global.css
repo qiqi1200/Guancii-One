@@ -442,9 +442,12 @@
     transition-delay: var(--reveal-delay, 0ms);
   }
 
-  /* ============= 页面内容入场（参考博客的 ai-slide-up 效果） ============= */
+  /* ============= 页面内容入场（参考博客的 ai-slide-up 效果） =============
+     fill-mode 必须用 backwards：both 会把关键帧样式永久留在元素上，
+     使 Chromium 将其保持为合成层（Render Surface），
+     从而切断后代 backdrop-filter 对页面背景的采样（折射失效） */
   .page-entrance {
-    animation: page-entrance 0.5s var(--ease-smooth) both;
+    animation: page-entrance 0.5s var(--ease-smooth) backwards;
   }
 
   @keyframes page-entrance {
