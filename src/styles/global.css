@@ -1291,11 +1291,12 @@
   gap: 8px;
 }
 
-/* ============= 文章页可读性（浅色：正文/标题直接落在壁纸上，加柔白背光） ============= */
+/* ============= 文章页可读性（标题/正文直接落在壁纸上，加背光分离） ============= */
+/* 浅色模式：白背光，深字在亮/杂底上清晰 */
 html:not(.dark) .article-readable header h1 {
   text-shadow:
-    0 1px 2px rgb(255 255 255 / 0.92),
-    0 2px 8px rgb(255 255 255 / 0.7);
+    0 1px 2px rgb(255 255 255 / 0.95),
+    0 2px 8px rgb(255 255 255 / 0.8);
 }
 html:not(.dark) .article-readable header p,
 html:not(.dark) .article-readable header div,
@@ -1304,30 +1305,74 @@ html:not(.dark) .article-readable .prose li,
 html:not(.dark) .article-readable .prose h2,
 html:not(.dark) .article-readable .prose h3,
 html:not(.dark) .article-readable .prose h4 {
-  text-shadow: 0 1px 10px rgb(255 255 255 / 0.6);
+  text-shadow:
+    0 1px 2px rgb(255 255 255 / 0.95),
+    0 0 4px rgb(255 255 255 / 0.85),
+    0 2px 14px rgb(255 255 255 / 0.7);
+}
+/* 暗色模式：深背光，浅字在亮照片上也清晰 */
+html.dark .article-readable header h1 {
+  text-shadow:
+    0 1px 2px rgb(0 0 0 / 0.85),
+    0 2px 8px rgb(0 0 0 / 0.7);
+}
+html.dark .article-readable header p,
+html.dark .article-readable header div,
+html.dark .article-readable .prose p,
+html.dark .article-readable .prose li,
+html.dark .article-readable .prose h2,
+html.dark .article-readable .prose h3,
+html.dark .article-readable .prose h4 {
+  text-shadow:
+    0 1px 2px rgb(0 0 0 / 0.8),
+    0 0 4px rgb(0 0 0 / 0.75),
+    0 2px 14px rgb(0 0 0 / 0.6);
 }
 
-/* ============= 奶油风文字颜色（适配暗色模式） ============= */.text-cream-heading {
+/* ============= 奶油风文字颜色（适配暗色模式，背部加背光分离） ============= */
+.text-cream-heading {
   color: #16224a;
+  text-shadow:
+    0 1px 2px rgb(255 255 255 / 0.9),
+    0 0 6px rgb(255 255 255 / 0.7),
+    0 2px 16px rgb(255 255 255 / 0.6);
 }
 .dark .text-cream-heading {
   color: #eef0f8;
+  text-shadow:
+    0 1px 2px rgb(0 0 0 / 0.8),
+    0 0 6px rgb(0 0 0 / 0.7),
+    0 2px 16px rgb(0 0 0 / 0.6);
 }
 
 .text-cream-body {
   color: #24366b;                 /* 浅色：克莱因系加深，照片上依然清晰 */
-  text-shadow: 0 1px 10px rgb(255 255 255 / 0.5);
+  text-shadow:
+    0 1px 2px rgb(255 255 255 / 0.9),
+    0 0 5px rgb(255 255 255 / 0.75),
+    0 2px 14px rgb(255 255 255 / 0.65);
 }
 .dark .text-cream-body {
   color: #a9b2d0;
+  text-shadow:
+    0 1px 2px rgb(0 0 0 / 0.8),
+    0 0 5px rgb(0 0 0 / 0.7),
+    0 2px 14px rgb(0 0 0 / 0.6);
 }
 
 .text-cream-soft {
   color: #3f5090;                 /* 浅色：克莱因系加深，小字号可读 */
-  text-shadow: 0 1px 10px rgb(255 255 255 / 0.55);
+  text-shadow:
+    0 1px 2px rgb(255 255 255 / 0.85),
+    0 0 4px rgb(255 255 255 / 0.7),
+    0 2px 12px rgb(255 255 255 / 0.6);
 }
 .dark .text-cream-soft {
   color: #7e88ad;
+  text-shadow:
+    0 1px 2px rgb(0 0 0 / 0.75),
+    0 0 4px rgb(0 0 0 / 0.65),
+    0 2px 12px rgb(0 0 0 / 0.55);
 }
 
 .text-cream-link {
