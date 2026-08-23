@@ -305,11 +305,21 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
           parseFloat(cs.borderBottomLeftRadius) || 0,
           parseFloat(cs.borderBottomRightRadius) || 0
         );
+        // 尺寸/圆角没变的元素直接复用已有滤镜（跳过 canvas 重绘与 feImage 解码）
+        const sig = `${w}x${h}x${rad}`;
+        const val = `url(#${el.dataset.lensId}) saturate(1.8) brightness(1.07)`;
+        if (el.dataset.lensId && el.dataset.lensSig === sig) {
+          if (el.style.backdropFilter !== val) {
+            el.style.webkitBackdropFilter = val;
+            el.style.backdropFilter = val;
+          }
+          return;
+        }
         if (!el.dataset.lensId) el.dataset.lensId = `lens-${lensSeq++}-${w}x${h}`;
         const id = el.dataset.lensId;
+        el.dataset.lensSig = sig;
         document.getElementById(id)?.remove();
         defs.appendChild(makeLensFilter(id, w, h, rad));
-        const val = `url(#${id}) saturate(1.8) brightness(1.07)`;
         el.style.webkitBackdropFilter = val;
         el.style.backdropFilter = val;
       }
@@ -351,9 +361,23 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
         if (lensTarget(el)) lensIO.observe(el);
       });
 
-      /* DOM 变更（动态插入卡片等）后自动重扫；扫描期间暂停观察防止自触发 */
+      /* DOM 变更（动态插入卡片等）后自动重扫；扫描期间暂停观察防止自触发。
+         只有当新增节点里确实包含折射目标时才重建（评论加载等普通插入直接跳过） */
       let moTimer: ReturnType<typeof setTimeout>;
-      const mo = new MutationObserver(() => {
+      const mo = new MutationObserver((records) => {
+        let relevant = false;
+        for (const rec of records) {
+          for (const node of rec.addedNodes) {
+            if (node.nodeType !== 1) continue;
+            const el = node as Element;
+            if (el.matches(LENS_SELECTOR) || el.querySelector(LENS_SELECTOR)) {
+              relevant = true;
+              break;
+            }
+          }
+          if (relevant) break;
+        }
+        if (!relevant) return; // 无关变更（评论列表、文本节点等）不触发任何重扫
         clearTimeout(moTimer);
         moTimer = setTimeout(() => {
           mo.disconnect();

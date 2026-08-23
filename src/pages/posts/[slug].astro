@@ -462,19 +462,38 @@ const similarPosts = allPosts
       }
     });
 
-    // 阅读进度条
+    // 阅读进度条：rAF 节流 + 缓存测量值 + transform 合成器路径
+    // （避免每个 scroll 事件都 getBoundingClientRect 强制布局 / 改 width 触发重排）
     const progress = document.getElementById('reading-progress');
-    function updateProgress() {
-      const article = document.querySelector('article');
-      if (!article || !progress) return;
-      const rect = article.getBoundingClientRect();
-      const total = rect.height - window.innerHeight;
-      const scrolled = -rect.top;
-      const percent = Math.max(0, Math.min(100, (scrolled / total) * 100));
-      progress.style.width = `${percent}%`;
+    const articleEl = document.querySelector('article');
+    if (progress && articleEl) {
+      progress.style.transformOrigin = 'left';
+      progress.style.width = '100%';
+      let startTop = 0, total = 1;
+      const measure = function () {
+        var rect = articleEl.getBoundingClientRect();
+        startTop = rect.top + window.scrollY;
+        total = Math.max(1, rect.height - window.innerHeight);
+      };
+      let progTicking = false;
+      const onScrollProg = function () {
+        if (progTicking) return;
+        progTicking = true;
+        requestAnimationFrame(function () {
+          progTicking = false;
+          var p = Math.max(0, Math.min(1, (window.scrollY - startTop) / total));
+          progress.style.transform = 'scaleX(' + p + ')';
+        });
+      };
+      measure();
+      onScrollProg();
+      // 文章高度随图片/评论加载变化时自动重测（ResizeObserver 异步，不阻塞滚动）
+      if (window.ResizeObserver) {
+        new ResizeObserver(measure).observe(articleEl);
+      }
+      window.addEventListener('resize', function () { measure(); onScrollProg(); }, { passive: true });
+      window.addEventListener('scroll', onScrollProg, { passive: true });
     }
-    window.addEventListener('scroll', updateProgress, { passive: true });
-    updateProgress();
 
     // FancyBox：文章内图片点击放大 + 图库导航
     (function() {
