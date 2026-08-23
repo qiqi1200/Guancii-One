@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' 'unsafe-eval' cdn.jsdelivr.net cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' cdn.jsdelivr.net cdnjs.cloudflare.com fonts.googleapis.com; connect-src api.github.com img.260607.best; img-src 'self' data: blob: https:; font-src 'self' cdn.jsdelivr.net cdnjs.cloudflare.com fonts.gstatic.com; frame-src 'none';">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' 'unsafe-eval' cdn.jsdelivr.net cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' cdn.jsdelivr.net cdnjs.cloudflare.com fonts.googleapis.com; connect-src api.github.com https:; img-src 'self' data: blob: https:; font-src 'self' cdn.jsdelivr.net cdnjs.cloudflare.com fonts.gstatic.com; frame-src 'none';">
   <title>博客管理后台 — guancii</title>
   <!-- EasyMDE -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css" integrity="sha256-bu42NAQyd21oLnNy7Ep+spvk/bP/raMsC/peMaXvNKI=" crossorigin="anonymous">
@@ -624,6 +624,7 @@
           <h2>🖼️ 相册管理 <span class="badge badge-published">gallery.json</span></h2>
           <p class="hint">对应 src/data/gallery.json · src 留空的行保存时会被忽略；改动提交后自动触发部署。</p>
           <div class="data-rows" id="gallery-rows"></div>
+          <input type="file" id="gallery-file-input" accept="image/*" multiple hidden>
           <div class="data-footer">
             <button class="btn btn-ghost btn-sm" id="btn-add-photo">＋ 添加图片</button>
             <div style="display:flex;align-items:center;gap:10px;">
@@ -653,7 +654,7 @@
   <div class="modal-overlay" id="media-modal">
     <div class="modal-box" style="max-width:520px;">
       <h3>🖼️ 插入图片</h3>
-      <p style="margin-bottom:12px;">上传后会插入到编辑器光标所在位置，想放在哪就把光标点在哪。</p>
+      <p style="margin-bottom:12px;">想放在哪就把光标点在哪：上传完成后图片按顺序插入光标所在位置。支持一次选多张 / 拖多张。</p>
       <div class="media-tabs">
         <button class="tab-btn active" data-mtab="upload">📤 上传本地图片</button>
         <button class="tab-btn" data-mtab="url">🔗 使用图片链接</button>
@@ -672,8 +673,8 @@
           </div>
         </div>
         <div id="drop-zone">
-          点击选择图片，或把图片拖到这里<br>
-          <small>支持 JPG / PNG / WebP / GIF，单张 ≤ 20MB，可多选 · 也可以直接在编辑器里 Ctrl+V 粘贴截图 · 上传完成自动变成 URL 插到光标处</small>
+          点击选择图片（可多选），或把图片拖到这里<br>
+          <small>支持 JPG / PNG / WebP / GIF，单张 ≤ 20MB · 也可以直接在编辑器里 Ctrl+V 粘贴截图 · 图床模式一次批量上传，按顺序插入光标处</small>
         </div>
         <input type="file" id="img-file-input" accept="image/*" multiple hidden>
         <div id="upload-progress"></div>
@@ -1847,6 +1848,26 @@
       }
     }
 
+    function galleryRowTemplate(p = {}) {
+      const dims = (p.w && p.h) ? `${p.w}×${p.h}` : '';
+      return `
+        <div class="data-row g-row" ${p.w && p.h ? `data-w="${p.w}" data-h="${p.h}"` : ''}>
+          <img class="g-thumb" src="${escAttr(p.src || '')}" alt="" onerror="this.style.opacity=.25">
+          <div class="row-fields">
+            <input class="input g-src" value="${escAttr(p.src || '')}" placeholder="图片链接 https://...（或点右侧 ☁️ 直接传图床）">
+            <div class="f-grid">
+              <input class="input g-alt" value="${escAttr(p.alt || '')}" placeholder="说明">
+              <input class="input g-loc" value="${escAttr(p.location || '')}" placeholder="地点（可选）">
+            </div>
+            <span class="g-dims" style="font-size:.72rem;color:var(--gray-light);">${dims ? escHtml(dims) + ' · 保存时自动补全' : '保存时自动探测图片尺寸'}</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <button class="btn btn-ghost btn-sm g-up" title="从本机选择图片直接上传到图床">☁️ 传图</button>
+            <button class="btn btn-danger btn-sm g-del">删除</button>
+          </div>
+        </div>`;
+    }
+
     function renderGalleryRows() {
       ensureGalleryShape();
       const photos = dataFiles.gallery.json.photos;
@@ -1855,28 +1876,48 @@
         rows.innerHTML = '<p class="hint" style="padding:8px 0;">暂无图片，点击下方「添加图片」</p>';
         return;
       }
-      rows.innerHTML = photos.map((p, i) => `
-        <div class="data-row g-row" data-i="${i}">
-          <img class="g-thumb" src="${escAttr(p.src || '')}" alt="" onerror="this.style.opacity=.25">
-          <div class="row-fields">
-            <input class="input g-src" value="${escAttr(p.src || '')}" placeholder="图片链接 https://...">
-            <div class="f-grid">
-              <input class="input g-alt" value="${escAttr(p.alt || '')}" placeholder="说明">
-              <input class="input g-loc" value="${escAttr(p.location || '')}" placeholder="地点（可选）">
-            </div>
-          </div>
-          <button class="btn btn-danger btn-sm g-del">删除</button>
-        </div>
-      `).join('');
+      rows.innerHTML = photos.map(p => galleryRowTemplate(p)).join('');
     }
 
-    function collectGallery() {
+    // 探测图片真实宽高（用于相册页预留布局空间，杜绝加载时回流卡顿）
+    function probeImageDims(url) {
+      return new Promise((resolve) => {
+        if (!/^https?:\/\//.test(url)) { resolve(null); return; }
+        const img = new Image();
+        const timer = setTimeout(() => { img.src = ''; resolve(null); }, 15000);
+        img.onload = () => {
+          clearTimeout(timer);
+          resolve(img.naturalWidth > 0 ? { w: img.naturalWidth, h: img.naturalHeight } : null);
+        };
+        img.onerror = () => { clearTimeout(timer); resolve(null); };
+        img.src = url;
+      });
+    }
+
+    function setRowDims(row, w, h) {
+      if (!row) return;
+      if (w && h) { row.dataset.w = String(w); row.dataset.h = String(h); }
+      else { delete row.dataset.w; delete row.dataset.h; }
+      const label = row.querySelector('.g-dims');
+      if (label) label.textContent = (w && h) ? `${w}×${h}` : '保存时自动探测图片尺寸';
+    }
+
+    async function collectGallery() {
       const out = {};
       const base = dataFiles.gallery.json || {};
       if (base.note) out.note = base.note;
+      const rowsAll = document.querySelectorAll('#gallery-rows .g-row');
+      // 逐行补全缺失的宽高（相册页据此预留空间，消除加载回流）
+      for (const row of rowsAll) {
+        const src = row.querySelector('.g-src').value.trim();
+        if (!src) continue;
+        if (!row.dataset.w || !row.dataset.h) {
+          const dims = await probeImageDims(src);
+          if (dims) setRowDims(row, dims.w, dims.h);
+        }
+      }
       const photos = [];
-      const rowsAll = document.querySelectorAll('#gallery-rows .g-row').length;
-      document.querySelectorAll('#gallery-rows .g-row').forEach(row => {
+      rowsAll.forEach(row => {
         const src = row.querySelector('.g-src').value.trim();
         if (!src) return;
         const item = { src };
@@ -1884,10 +1925,12 @@
         const location = row.querySelector('.g-loc').value.trim();
         if (alt) item.alt = alt;
         if (location) item.location = location;
+        const w = parseInt(row.dataset.w, 10), h = parseInt(row.dataset.h, 10);
+        if (w > 0 && h > 0) { item.w = w; item.h = h; }
         photos.push(item);
       });
       out.photos = photos;
-      return { json: out, skipped: rowsAll - photos.length };
+      return { json: out, skipped: rowsAll.length - photos.length };
     }
 
     function renderFriendRows() {
@@ -1938,13 +1981,13 @@
 
     async function saveDataFile(kind) {
       const d = dataFiles[kind];
-      const res = kind === 'gallery' ? collectGallery() : collectFriends();
-      const json = res.json;
       const status = $(kind + '-status');
       const btn = $('btn-save-' + kind);
       btn.disabled = true;
-      status.textContent = '保存中…';
+      status.textContent = kind === 'gallery' ? '探测图片尺寸中…' : '保存中…';
       try {
+        const res = kind === 'gallery' ? await collectGallery() : collectFriends();
+        const json = res.json;
         const payload = {
           message: kind === 'gallery' ? '更新相册数据' : '更新友链数据',
           content: utf8ToB64(JSON.stringify(json, null, 2) + '\n'),
@@ -1971,18 +2014,7 @@
       const rows = $('gallery-rows');
       const hint = rows.querySelector('p.hint');
       if (hint) hint.remove();
-      rows.insertAdjacentHTML('beforeend', `
-        <div class="data-row g-row">
-          <img class="g-thumb" src="" alt="" style="opacity:.35;">
-          <div class="row-fields">
-            <input class="input g-src" value="" placeholder="图片链接 https://...">
-            <div class="f-grid">
-              <input class="input g-alt" value="" placeholder="说明">
-              <input class="input g-loc" value="" placeholder="地点（可选）">
-            </div>
-          </div>
-          <button class="btn btn-danger btn-sm g-del">删除</button>
-        </div>`);
+      rows.insertAdjacentHTML('beforeend', galleryRowTemplate());
       rows.querySelector('.data-row:last-child .g-src').focus();
     });
 
@@ -2010,16 +2042,77 @@
       rows.querySelector('.data-row:last-child .f-name').focus();
     });
 
-    // 行内删除 / 缩略图实时预览
+    // 行内删除 / 缩略图实时预览 / 尺寸自动探测 / ☁️ 传图
     $('gallery-rows').addEventListener('click', (e) => {
-      const b = e.target.closest('.g-del');
-      if (b) b.closest('.data-row').remove();
+      const del = e.target.closest('.g-del');
+      if (del) { del.closest('.data-row').remove(); return; }
+      const up = e.target.closest('.g-up');
+      if (up) {
+        galleryUploadRow = up.closest('.data-row');
+        $('gallery-file-input').click();
+      }
+    });
+    // 相册行：直接上传本机图片到个人图床（多张时第一张填入当前行，其余追加新行）
+    let galleryUploadRow = null;
+    let gProbeTimer = null;
+    $('gallery-file-input').addEventListener('change', async (e) => {
+      const files = [...e.target.files].filter(f => /^image\//.test(f.type));
+      e.target.value = '';
+      if (!files.length) return;
+      const host = ($('imgbed-host').value.trim() || 'https://img.260607.best').replace(/\/+$/, '');
+      const key = $('imgbed-key').value.trim();
+      if (!key) { toast('请先在「文章 → 插入图片」里配置图床密钥', 'error'); return; }
+      const status = $('gallery-status');
+      status.textContent = `☁️ 上传中（0/${files.length}）…`;
+      try {
+        const results = await uploadToImgBed(files);
+        let done = 0, failed = 0;
+        for (let i = 0; i < files.length; i++) {
+          const r = results[i] || {};
+          if (!r.url) { failed++; continue; }
+          let row = (i === 0 && galleryUploadRow && !galleryUploadRow.querySelector('.g-src').value.trim())
+            ? galleryUploadRow : null;
+          if (!row) {
+            ensureGalleryShape();
+            dataFiles.gallery.json.photos.push({});
+            const wrap = $('gallery-rows');
+            const hint = wrap.querySelector('p.hint');
+            if (hint) hint.remove();
+            wrap.insertAdjacentHTML('beforeend', galleryRowTemplate());
+            row = wrap.querySelector('.data-row:last-child');
+          }
+          const srcInput = row.querySelector('.g-src');
+          srcInput.value = r.url;
+          const thumb = row.querySelector('.g-thumb');
+          thumb.src = r.url; thumb.style.opacity = '1';
+          const dims = await probeImageDims(r.url);
+          if (dims) setRowDims(row, dims.w, dims.h);
+          done++;
+          status.textContent = `☁️ 上传中（${done}/${files.length}）…`;
+        }
+        status.textContent = failed ? `${done} 张成功，${failed} 张失败` : `${done} 张已上传 ✓`;
+        toast(failed ? `有 ${failed} 张上传失败` : '✅ 已上传到图床，记得保存相册', failed ? 'error' : 'success');
+      } catch (err) {
+        status.textContent = '上传失败';
+        toast('图床上传失败：' + err.message, 'error');
+      } finally {
+        galleryUploadRow = null;
+      }
     });
     $('gallery-rows').addEventListener('input', (e) => {
       if (e.target.classList.contains('g-src')) {
-        const img = e.target.closest('.data-row').querySelector('.g-thumb');
+        const row = e.target.closest('.data-row');
+        const img = row.querySelector('.g-thumb');
         img.src = e.target.value.trim();
         img.style.opacity = '1';
+        setRowDims(row, null, null); // URL 变了，尺寸待重新探测
+        clearTimeout(gProbeTimer);
+        gProbeTimer = setTimeout(async () => {
+          const url = e.target.value.trim();
+          if (!url || !/^https?:\/\//.test(url)) return;
+          const dims = await probeImageDims(url);
+          if (dims && e.target.value.trim() === url) setRowDims(row, dims.w, dims.h);
+        }, 600);
       }
     });
     $('friends-rows').addEventListener('click', (e) => {
@@ -2105,34 +2198,78 @@
       cm.focus();
     }
 
-    async function uploadToImgBed(file) {
+    // ☁️ 个人图床（img.260607.best Worker）：POST /api/upload，multipart 可带多张，
+    // 返回 { results: [{ name, url, md, ok } | { name, error }] }，顺序与上传一致
+    async function uploadToImgBed(files) {
       const host = ($('imgbed-host').value.trim() || 'https://img.260607.best').replace(/\/+$/, '');
       const key = $('imgbed-key').value.trim();
       if (!key) throw new Error('请先在上方填写图床密钥');
       const fd = new FormData();
-      fd.append('file', file);
-      const resp = await fetch(host + '/upload', {
+      files.forEach(f => fd.append('file', f));
+      const resp = await fetch(host + '/api/upload', {
         method: 'POST',
         headers: { 'X-Auth-Token': key },
         body: fd,
-        signal: AbortSignal.timeout(30000), // 防止网络挂起阻塞上传队列
+        signal: AbortSignal.timeout(120000), // 多张批量给足时间
       });
       const data = await resp.json().catch(() => ({}));
-      if (!resp.ok || !data.url) throw new Error(data.error || `HTTP ${resp.status}`);
-      return data.url; // Worker 已返回绝对地址
+      if (!resp.ok) throw new Error(data.error || `HTTP ${resp.status}`);
+      if (!Array.isArray(data.results)) throw new Error('图床返回格式异常');
+      return data.results;
     }
 
-    async function uploadOneImage(file) {
-      if (!/^image\//.test(file.type)) throw new Error('仅支持图片文件');
-      // ☁️ 个人图床（R2）：秒传秒用，不占仓库体积
-      if (imageTarget() === 'imgbed') return await uploadToImgBed(file);
+    async function handleImageFiles(fileList) {
+      const list = [...fileList];
+      let touchedRepo = false;
+      // 先为每张占一行进度（唯一键：同名文件互不干扰）
+      const rows = list.map((f, i) => {
+        const label = f.name || `clipboard-${i + 1}.png`;
+        const uid = `${label}#${Date.now()}-${i}`;
+        progressRow(uid, label, 'loading');
+        return { uid, label, file: f };
+      });
 
-      // 📦 博客仓库：随文章一起提交部署
+      try {
+        if (imageTarget() === 'imgbed') {
+          // ☁️ 个人图床：一次请求批量上传全部，按原顺序逐张插入光标处
+          const results = await uploadToImgBed(list);
+          for (let i = 0; i < rows.length; i++) {
+            const r = (results || [])[i] || {};
+            const { uid, label } = rows[i];
+            if (r.url) {
+              insertAtCursor(`![${altFromName(label) || '图片'}](${r.url})\n`);
+              progressRow(uid, label, 'ok', r.url);
+            } else {
+              progressRow(uid, label, 'err', r.error || '上传失败');
+            }
+          }
+        } else {
+          // 📦 博客仓库：逐张提交（GitHub API 无批量）
+          for (const { uid, label, file } of rows) {
+            try {
+              const r = await uploadOneImageToRepo(file);
+              touchedRepo = true;
+              insertAtCursor(`![${altFromName(label) || '图片'}](${r})\n`);
+              progressRow(uid, label, 'ok', r);
+            } catch (err) {
+              progressRow(uid, label, 'err', err.message);
+            }
+          }
+        }
+      } catch (err) {
+        // 整批失败（网络/密钥错误等）：所有行标记错误
+        rows.forEach(({ uid, label }) => progressRow(uid, label, 'err', err.message));
+      }
+      if (touchedRepo) trackDeploy(null);
+    }
+
+    async function uploadOneImageToRepo(file) {
+      if (!/^image\//.test(file.type)) throw new Error('仅支持图片文件');
       if (file.size > 4 * 1024 * 1024) throw new Error('超过 4MB（仓库模式限制）');
       const buf = await file.arrayBuffer();
       const bytes = new Uint8Array(buf);
       let bin = '';
-      const CHUNK = 0x8000; // 分段转二进制，避免大图栈溢出
+      const CHUNK = 0x8000;
       for (let i = 0; i < bytes.length; i += CHUNK) {
         bin += String.fromCharCode.apply(null, bytes.subarray(i, i + CHUNK));
       }
@@ -2144,28 +2281,7 @@
         content: btoa(bin),
         branch: config.branch,
       });
-      return { url: `${IMG_BASE}/${dir}/${fname}`, repo: true };
-    }
-
-    async function handleImageFiles(files) {
-      let touchedRepo = false;
-      for (let i = 0; i < files.length; i++) {
-        const f = files[i];
-        const label = f.name || `clipboard-${i + 1}.png`;
-        const uid = `${label}#${Date.now()}-${i}`; // 唯一键：同名文件互不干扰
-        progressRow(uid, label, 'loading');
-        try {
-          const r = await uploadOneImage(f);
-          const url = typeof r === 'string' ? r : r.url;
-          if (typeof r === 'object' && r.repo) touchedRepo = true;
-          const alt = altFromName(f.name) || '图片';
-          insertAtCursor(`![${alt}](${url})\n`);
-          progressRow(uid, label, 'ok', url);
-        } catch (err) {
-          progressRow(uid, label, 'err', err.message);
-        }
-      }
-      if (touchedRepo) trackDeploy(null);
+      return `${IMG_BASE}/${dir}/${fname}`;
     }
 
     function progressRow(uid, label, state, note) {

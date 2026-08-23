@@ -1,30 +1,40 @@
 {
-  "note": "往 photos 数组添加照片即可；src 支持外链或放入 public 后用 / 绝对路径。alt 为说明，location 可选。",
+  "note": "往 photos 数组添加照片即可；src 支持外链或放入 public 后用 / 绝对路径。alt 为说明，location 可选；w/h 为图片原始宽高（后台保存时自动探测），用于相册页预留布局空间防卡顿。",
   "photos": [
     {
       "src": "https://img.260607.best/i/20260822051329_tik6.jpg",
       "alt": "桌面壁纸 · 横版",
-      "location": "天津"
+      "location": "天津",
+      "w": 4096,
+      "h": 2306
     },
     {
       "src": "https://img.260607.best/i/20260822082649_vwh9.jpg",
       "alt": "手机壁纸 · 竖版",
-      "location": "天津"
+      "location": "天津",
+      "w": 2307,
+      "h": 4096
     },
     {
-      "src": "http://img.260607.best/i/20260823033743_jlj2.jpg",
+      "src": "https://img.260607.best/i/20260823033743_jlj2.jpg",
       "alt": "大美宁河",
-      "location": "天津"
+      "location": "天津",
+      "w": 1920,
+      "h": 1080
     },
     {
-      "src": "http://img.260607.best/i/20260823033607_xqas.jpg",
+      "src": "https://img.260607.best/i/20260823033607_xqas.jpg",
       "alt": "姥姥家",
-      "location": "吉林四平梨树县"
+      "location": "吉林四平梨树县",
+      "w": 4096,
+      "h": 3072
     },
     {
-      "src": "http://img.260607.best/i/20260823033751_i2g0.jpg",
+      "src": "https://img.260607.best/i/20260823033751_i2g0.jpg",
       "alt": "天津海河",
-      "location": "天津"
+      "location": "天津",
+      "w": 4096,
+      "h": 3072
     }
   ]
 }

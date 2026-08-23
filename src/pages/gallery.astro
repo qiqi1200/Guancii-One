@@ -36,9 +36,12 @@ const allPosts = (await getCollection('posts')).filter(p => !p.data.draft);
           >
             <img
               src={p.src}
-              alt={p.alt}
+              alt={p.alt || ''}
               loading="lazy"
-              class="w-full transition-transform duration-500 ease-[var(--ease-smooth)] group-hover:scale-[1.03]"
+              decoding="async"
+              width={p.w}
+              height={p.h}
+              class="w-full h-auto transition-[filter] duration-300 ease-[var(--ease-smooth)] group-hover:brightness-110"
             />
             {(p.alt || p.location) && (
               <div class="absolute inset-x-0 bottom-0 pt-10 pb-3 px-4 bg-gradient-to-t from-black/55 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
