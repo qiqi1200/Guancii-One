@@ -179,51 +179,14 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
         window.scrollTo({ top: 0, behavior: 'smooth' });
       });
 
-      // 鼠标光晕（仅在非触控设备上启用）
-      const blob = document.getElementById('cursor-blob');
-      const isTouch = window.matchMedia('(hover: none)').matches;
-      const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if (blob && !isTouch && !prefersReduced) {
-        document.addEventListener('mousemove', (e) => {
-          // 仅写 transform（合成器路径），避免 left/top 触发整页 layout/paint
-          blob.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0) translate(-50%, -50%)`;
-        });
-      } else if (blob) {
-        blob.style.display = 'none';
-      }
-
-      // 鼠标追踪高光由 <liquid-glass> web component 内部处理
-      //（已替换为纯 CSS liquid-glass，鼠标追踪不再需要）
-
-      // 滚动入场动画（IntersectionObserver，仅非 reduced-motion 用户）
-      if (!prefersReduced) {
-        // iOS 交错入场：.onload-animation 元素在页面加载后依次显现
-        const staggerItems = document.querySelectorAll('.onload-animation');
-        staggerItems.forEach((el, i) => {
-          // 使用 data-stagger 或按索引分配延迟（0ms, 50ms, 100ms... 类似 iOS Spring 序列）
-          const delay = parseInt(el.dataset.stagger || '0') || (i * 50);
-          setTimeout(() => {
-            el.classList.add('is-visible');
-          }, delay);
-        });
-
-        const revealObserver = new IntersectionObserver((entries) => {
-          entries.forEach(entry => {
-            if (entry.isIntersecting) {
-              entry.target.classList.add('is-visible');
-              revealObserver.unobserve(entry.target);
-            }
-          });
-        }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
-
-        document.querySelectorAll('.scroll-reveal').forEach(el => {
-          revealObserver.observe(el);
-        });
-      } else {
-        // reduced-motion：直接显示所有
+      // reduced-motion：跳过所有 JS 动画，直接显示全部内容
+      // （正常路径由下方模块脚本用 anime.js 驱动入场/滚动显现）
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
         document.querySelectorAll('.onload-animation, .scroll-reveal').forEach(el => {
           el.classList.add('is-visible');
         });
+        var __blob = document.getElementById('cursor-blob');
+        if (__blob) __blob.style.display = 'none';
       }
     </script>
 
@@ -396,6 +359,74 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
       });
       mo.observe(document.body, { childList: true, subtree: true });
     </script>
+
+    <script>
+      /* ============================================================
+         入场 / 滚动显现动画 — anime.js v4 驱动
+         只动 opacity 与 transform（合成器路径，不触发 layout/paint），
+         spring 曲线让交错入场更顺滑；结束后交还 .is-visible 类，
+         清掉内联样式，保证 backdrop-filter 采样边界干净。
+         （玻璃折射与打字机效果不在此范围内，保持原样）
+         ============================================================ */
+      import { animate } from 'animejs';
+
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      // 鼠标光晕（非触控 & 未开启省流动画时）：合成器路径移动；滚动期间暂停
+      const blob = document.getElementById('cursor-blob');
+      if (blob && !window.matchMedia('(hover: none)').matches && !reduceMotion) {
+        document.addEventListener('mousemove', (e) => {
+          blob.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0) translate(-50%, -50%)`;
+        });
+        let blobTimer: ReturnType<typeof setTimeout>;
+        window.addEventListener('scroll', () => {
+          blob.classList.add('blob-paused');
+          clearTimeout(blobTimer);
+          blobTimer = setTimeout(() => blob.classList.remove('blob-paused'), 180);
+        }, { passive: true });
+      }
+
+      if (!reduceMotion) {
+        // 单元素显现：按变体类选择起始位移，结束后还原为类驱动最终态
+        const revealEl = (el: HTMLElement, delay = 0, fromY = 16) => {
+          el.style.transition = 'none'; // anime.js 全权驱动，避免与 CSS transition 叠加
+          const params: Record<string, unknown> = {
+            opacity: [0, 1],
+            duration: 620,
+            delay,
+            ease: 'out(3)',
+            onComplete: () => {
+              el.style.transition = '';
+              el.style.opacity = '';
+              el.style.transform = '';
+              el.classList.add('is-visible'); // 终态回归 CSS 类，内联样式清零
+            },
+          };
+          if (el.classList.contains('left')) params.x = [-20, 0];
+          else if (el.classList.contains('right')) params.x = [20, 0];
+          else if (el.classList.contains('scale')) { params.y = [8, 0]; params.scale = [0.96, 1]; }
+          else params.y = [fromY, 0];
+          animate(el, params);
+        };
+
+        // 页面加载交错入场
+        document.querySelectorAll<HTMLElement>('.onload-animation').forEach((el, i) => {
+          const custom = parseInt(el.dataset.stagger || '0', 10);
+          revealEl(el, custom || 90 + i * 70, 12);
+        });
+
+        // 滚动显现：同一帧进入的多个元素按顺序微交错
+        const io = new IntersectionObserver((entries) => {
+          const hits = entries.filter(e => e.isIntersecting);
+          if (!hits.length) return;
+          hits.forEach((en, i) => {
+            io.unobserve(en.target);
+            revealEl(en.target as HTMLElement, i * 70);
+          });
+        }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+        document.querySelectorAll('.scroll-reveal').forEach(el => io.observe(el));
+      }
+    </script>
   </body>
 </html>
 
@@ -403,6 +434,14 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
   :root {
     --content-delay: 0ms;
     --page-width: 72rem;
+  }
+
+  /* 鼠标光晕：滚动期间淡出暂停，停止后恢复（减少滚动时的无效重采样） */
+  #cursor-blob {
+    transition: width 0.3s, height 0.3s, opacity 0.22s var(--ease-smooth);
+  }
+  #cursor-blob.blob-paused {
+    opacity: 0;
   }
 
   /* iOS 风格字号相关 tracking — 大字号收紧，正文放松 */
