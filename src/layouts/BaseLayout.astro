@@ -56,16 +56,17 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <!-- 资源预连接（加速第三方资源加载） -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
     <link rel="preconnect" href="https://img.260607.best" />
 
-    <!-- 预加载壁纸（桌面端+移动端各一张，不随主题切换） -->
-    <link rel="preload" as="image" href="https://img.260607.best/i/20260822051329_tik6.jpg" />
-    <link rel="preload" as="image" href="https://img.260607.best/i/20260822082649_vwh9.jpg" />
+    <!-- 预加载壁纸（按设备二选一，不随主题切换；media 确保只下载当前端那张） -->
+    <link rel="preload" as="image" href="https://img.260607.best/i/20260822051329_tik6.jpg" media="(min-width: 769px)" fetchpriority="high" />
+    <link rel="preload" as="image" href="https://img.260607.best/i/20260822082649_vwh9.jpg" media="(max-width: 768px)" fetchpriority="high" />
 
-    <!-- 字体：Montserrat + 手写体 Architects Daughter + Material Symbols -->
+    <!-- 字体：Montserrat + 手写体 Architects Daughter + Material Symbols
+         图标字体轴收窄为实际使用的值（opsz 24 / wght 400 / GRAD 0），
+         仅保留 FILL 0..1（点赞心形填充态），体积从全轴 ~3MB 降至 ~200KB -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&family=Architects+Daughter&family=Ma+Shan+Zheng&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&family=Architects+Daughter&family=Ma+Shan+Zheng&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0&display=swap"
       rel="stylesheet"
     />
 
@@ -107,10 +108,19 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     </svg>
 
     <!-- 背景图片层（全屏、固定、下层）
-         单壁纸方案：不随明暗切换，主题切换只改变遮罩与卡片颜色 -->
+         单壁纸方案：不随明暗切换，主题切换只改变遮罩与卡片颜色。
+         picture+source：桌面端/移动端各只下载一张壁纸 -->
     <div id="bg-layer" aria-hidden="true">
-      <img id="bg-desktop" class="bg-desktop" src="https://img.260607.best/i/20260822051329_tik6.jpg" alt="" />
-      <img id="bg-mobile" class="bg-mobile" src="https://img.260607.best/i/20260822082649_vwh9.jpg" alt="" />
+      <picture>
+        <source srcset="https://img.260607.best/i/20260822082649_vwh9.jpg" media="(max-width: 768px)" />
+        <img
+          class="bg-desktop"
+          src="https://img.260607.best/i/20260822051329_tik6.jpg"
+          alt=""
+          decoding="async"
+          fetchpriority="high"
+        />
+      </picture>
       <div id="bg-overlay"></div>
     </div>
     <!-- 鼠标光晕 -->
@@ -209,10 +219,23 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
          - color-interpolation-filters=sRGB → 色彩不发闷
          - 仅 Chromium 启用；其余浏览器保持 CSS 回退（清透无模糊）
          - 侧边栏 #sidebar 内的元素不参与，保持毛玻璃材质
+
+         性能策略（折射效果全程常开、像素级不变）：
+         1. 首屏只给视口附近的元素生成贴图（屏外本就不可见），
+            其余交给 IntersectionObserver 在滚近时懒加载；
+         2. 相同「尺寸×圆角」签名的元素共享同一枚 SVG 滤镜，
+            网格卡片尺寸一致时只生成/解码一次，输出逐像素相同；
+         3. 仅极低配（内存≤2GB）/省流模式跳过折射走 CSS 回退。
          ============================================================ */
       const SVGNS = 'http://www.w3.org/2000/svg';
       const XLINK = 'http://www.w3.org/1999/xlink';
       const isChromium = !!window.chrome || /Chrom(e|ium)/.test(navigator.userAgent);
+
+      // 极低配 / 省流模式：不注入任何 SVG 折射，保持 CSS 清透玻璃
+      const lowPower =
+        ((navigator as any).deviceMemory !== undefined && (navigator as any).deviceMemory <= 2) ||
+        !!((navigator as any).connection && (navigator as any).connection.saveData);
+      const lensEnabled = isChromium && !lowPower;
 
       function roundedRectSDF(px: number, py: number, hw: number, hh: number, r: number): number {
         const qx = Math.abs(px) - hw + r, qy = Math.abs(py) - hh + r;
@@ -286,13 +309,15 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
       const LENS_SELECTOR =
         '.liquid-glass, .card-base, .ios-surface, .scrapbook-card, .liquid-glass-vibe, .liquid-glass-pure, [data-lens]';
       let lensSeq = 0;
+      // 「尺寸×圆角」签名 → 滤镜 id。同签名元素共享同一枚滤镜，输出逐像素一致
+      const lensCache = new Map<string, string>();
 
       function lensTarget(el: Element): el is HTMLElement {
         return el instanceof HTMLElement && !el.closest('#sidebar');   // 侧边栏保持毛玻璃
       }
 
       function applyLensTo(el: HTMLElement) {
-        if (!isChromium) return;
+        if (!lensEnabled) return;
         const defs = document.querySelector('#lens-defs defs');
         if (!defs) return;
         const r = el.getBoundingClientRect();
@@ -307,37 +332,50 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
         );
         // 尺寸/圆角没变的元素直接复用已有滤镜（跳过 canvas 重绘与 feImage 解码）
         const sig = `${w}x${h}x${rad}`;
-        const val = `url(#${el.dataset.lensId}) saturate(1.8) brightness(1.07)`;
         if (el.dataset.lensId && el.dataset.lensSig === sig) {
+          const val = `url(#${el.dataset.lensId}) saturate(1.8) brightness(1.07)`;
           if (el.style.backdropFilter !== val) {
             el.style.webkitBackdropFilter = val;
             el.style.backdropFilter = val;
           }
           return;
         }
-        if (!el.dataset.lensId) el.dataset.lensId = `lens-${lensSeq++}-${w}x${h}`;
-        const id = el.dataset.lensId;
+        // 相同「尺寸×圆角」签名的元素共享同一枚滤镜：
+        // 网格卡片尺寸一致时只生成/解码一次，渲染输出逐像素相同
+        let id = lensCache.get(sig);
+        if (!id) {
+          id = `lens-${lensSeq++}-${w}x${h}`;
+          lensCache.set(sig, id);
+          defs.appendChild(makeLensFilter(id, w, h, rad));
+        }
+        el.dataset.lensId = id;
         el.dataset.lensSig = sig;
-        document.getElementById(id)?.remove();
-        defs.appendChild(makeLensFilter(id, w, h, rad));
-        el.style.webkitBackdropFilter = val;
-        el.style.backdropFilter = val;
+        el.style.webkitBackdropFilter = `url(#${id}) saturate(1.8) brightness(1.07)`;
+        el.style.backdropFilter = `url(#${id}) saturate(1.8) brightness(1.07)`;
       }
 
-      function applyLens() {
+      // 视口附近判定（含少量余量，滚动临近时已就绪）
+      function isNearViewport(el: Element): boolean {
+        const r = el.getBoundingClientRect();
+        return r.bottom > -120 && r.top < window.innerHeight + 120;
+      }
+
+      function applyLens(onlyVisible = false) {
         document.querySelectorAll<HTMLElement>(LENS_SELECTOR).forEach((el) => {
-          if (lensTarget(el)) applyLensTo(el);
+          if (!lensTarget(el)) return;
+          if (onlyVisible && !isNearViewport(el)) return;            // 屏外元素交给 IO 懒加载
+          applyLensTo(el);
         });
       }
 
       let resizeTimer: ReturnType<typeof setTimeout>;
       window.addEventListener('resize', () => {
         clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(applyLens, 250);
+        resizeTimer = setTimeout(() => applyLens(false), 250);
       });
-      applyLens();                                                  // DOM 就绪立即执行
-      window.addEventListener('load', applyLens);
-      setTimeout(applyLens, 600);                                   // 字体/图片加载后校准尺寸
+      applyLens(true);                                              // DOM 就绪：只处理视口附近元素
+      window.addEventListener('load', () => applyLens(true));
+      setTimeout(() => applyLens(true), 600);                       // 字体/图片加载后校准尺寸
 
       /* 入场动画结束后摘除动画类，彻底释放合成层，
          确保 backdrop-filter 能采样到页面背景（折射生效） */
@@ -348,7 +386,8 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
         }, { once: true });
       });
 
-      /* 延迟显示的元素（如导航下拉、折叠面板）首次可见时补上滤镜 */
+      /* 延迟显示的元素（如导航下拉、折叠面板）首次可见时补上滤镜；
+         rootMargin 提前 160px 触发，滚近视口时折射已就绪 */
       const lensIO = new IntersectionObserver((entries) => {
         entries.forEach((e) => {
           if (e.isIntersecting && lensTarget(e.target)) {
@@ -356,7 +395,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
             lensIO.unobserve(e.target);
           }
         });
-      }, { threshold: 0 });
+      }, { threshold: 0, rootMargin: '160px 0px' });
       document.querySelectorAll(LENS_SELECTOR).forEach((el) => {
         if (lensTarget(el)) lensIO.observe(el);
       });
@@ -409,9 +448,17 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
       // 鼠标光晕（非触控 & 未开启省流动画时）：合成器路径移动；滚动期间暂停
       const blob = document.getElementById('cursor-blob');
       if (blob && !window.matchMedia('(hover: none)').matches && !reduceMotion) {
+        // rAF 合并同一帧内的多次 mousemove，位置结果完全一致
+        let blobX = 0, blobY = 0, blobRaf = 0;
         document.addEventListener('mousemove', (e) => {
-          blob.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0) translate(-50%, -50%)`;
-        });
+          blobX = e.clientX; blobY = e.clientY;
+          if (!blobRaf) {
+            blobRaf = requestAnimationFrame(() => {
+              blobRaf = 0;
+              blob.style.transform = `translate3d(${blobX}px, ${blobY}px, 0) translate(-50%, -50%)`;
+            });
+          }
+        }, { passive: true });
         let blobTimer: ReturnType<typeof setTimeout>;
         window.addEventListener('scroll', () => {
           blob.classList.add('blob-paused');
@@ -492,6 +539,10 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     inset: 0;
     z-index: -1;
     overflow: hidden;
+    /* 常驻独立 GPU 合成层：滚动时壁纸永不重绘/重光栅化，
+       玻璃卡片的 backdrop 采样源更稳定（视觉无任何差异） */
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
   }
   #bg-layer img {
     position: absolute;
@@ -501,9 +552,8 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     object-fit: cover;
   }
 
-  /* ── 默认：桌面端显示横版，隐藏竖版 ── */
+  /* ── 默认：桌面端显示横版（picture 已按媒体查询只加载一张） ── */
   .bg-desktop { display: block; }
-  .bg-mobile  { display: none; }
 
   /* ── 近透明遮罩 — 保持原图清晰，仅留极轻底色保证文字可读 ── */
   #bg-overlay {
@@ -524,23 +574,12 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     background: rgb(17 19 28 / 0.66);
   }
 
-  /* ── 移动端（≤768px）：切换竖版壁纸 + iOS 优化 ── */
+  /* ── 移动端（≤768px）：竖版壁纸取景（GPU 合成层已全局启用） ── */
   @media (max-width: 768px) {
-    /* 隐藏桌面横版壁纸，显示移动端竖版壁纸 */
-    .bg-desktop { display: none; }
-    .bg-mobile  { display: block; }
-
     /* 竖版壁纸：cover 铺满，居中对齐 + 顶部优先，确保主体完整可见 */
-    #bg-layer img.bg-mobile {
+    #bg-layer img {
       object-fit: cover;
       object-position: center top;
-    }
-
-    /* #bg-layer 保持 position: fixed（继承自桌面端），背景永不随页面滚动 */
-    /* translateZ(0) 强制 GPU 合成层，iOS Safari 下减少背景重绘开销 */
-    #bg-layer {
-      -webkit-transform: translateZ(0);
-      transform: translateZ(0);
     }
   }
 

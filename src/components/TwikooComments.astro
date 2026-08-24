@@ -26,6 +26,8 @@ const { class: className = '' } = Astro.props;
   (function () {
     // 防止重复初始化
     if (window.__twikoo_loaded__) return;
+    var box = document.getElementById('tcomment');
+    if (!box) return;
 
     function loadTwikoo() {
       var src = 'https://cdn.jsdelivr.net/npm/twikoo@1.7.13/dist/twikoo.min.js';
@@ -95,7 +97,28 @@ const { class: className = '' } = Astro.props;
           document.head.appendChild(s);
         });
     }
-    loadTwikoo();
+
+    // 懒加载：评论区滚近视口（提前 600px）才开始拉取 SDK，避免首屏抢带宽
+    var started = false;
+    function startOnce() {
+      if (started) return;
+      started = true;
+      loadTwikoo();
+    }
+    if (!('IntersectionObserver' in window)) {
+      startOnce();
+    } else {
+      var lazyIO = new IntersectionObserver(function (entries) {
+        for (var i = 0; i < entries.length; i++) {
+          if (entries[i].isIntersecting) {
+            lazyIO.disconnect();
+            startOnce();
+            break;
+          }
+        }
+      }, { rootMargin: '600px 0px' });
+      lazyIO.observe(box);
+    }
 
     // 监听主题切换，同步更新 Twikoo 主题
     function updateTwikooTheme() {
