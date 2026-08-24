@@ -58,8 +58,9 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://img.260607.best" />
 
-    <!-- 预加载壁纸（按设备二选一，不随主题切换；media 确保只下载当前端那张） -->
-    <link rel="preload" as="image" href="https://img.260607.best/i/20260822051329_tik6.jpg" media="(min-width: 769px)" fetchpriority="high" />
+    <!-- 预加载壁纸（按设备二选一，不随主题切换；media 确保只下载当前端那张。
+         断点与 picture 的 max-width:768px 无缝衔接，缩放产生的非整数视口也不漏预载） -->
+    <link rel="preload" as="image" href="https://img.260607.best/i/20260822051329_tik6.jpg" media="(min-width: 768.01px)" fetchpriority="high" />
     <link rel="preload" as="image" href="https://img.260607.best/i/20260822082649_vwh9.jpg" media="(max-width: 768px)" fetchpriority="high" />
 
     <!-- 字体：Montserrat + 手写体 Architects Daughter + Material Symbols
@@ -225,7 +226,9 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
             其余交给 IntersectionObserver 在滚近时懒加载；
          2. 相同「尺寸×圆角」签名的元素共享同一枚 SVG 滤镜，
             网格卡片尺寸一致时只生成/解码一次，输出逐像素相同；
-         3. 仅极低配（内存≤2GB）/省流模式跳过折射走 CSS 回退。
+         3. ResizeObserver 盯住每个折射元素，内容撑开/收起
+            （评论加载、折叠面板等）时按新签名重建贴图防形变；
+         4. 仅极低配（内存≤2GB）/省流模式跳过折射走 CSS 回退。
          ============================================================ */
       const SVGNS = 'http://www.w3.org/2000/svg';
       const XLINK = 'http://www.w3.org/1999/xlink';
@@ -312,6 +315,32 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
       // 「尺寸×圆角」签名 → 滤镜 id。同签名元素共享同一枚滤镜，输出逐像素一致
       const lensCache = new Map<string, string>();
 
+      /* 尺寸变化跟踪：评论区懒加载撑开、折叠面板、图片撑高等使卡片
+         高度变化时，旧位移贴图会被拉伸到错误区域（贴图外采样到透明区
+         → 玻璃形变）。这里按新尺寸自动重建；rAF 合帧避免连续动画期间
+         反复重建。transform 类动画（hover 上浮/入场）不改 border-box，
+         不会误触发 */
+      const pendingLens = new Set<HTMLElement>();
+      let lensRoRaf = 0;
+      const lensRO =
+        typeof ResizeObserver !== 'undefined'
+          ? new ResizeObserver((entries) => {
+              for (const e of entries) pendingLens.add(e.target as HTMLElement);
+              if (lensRoRaf) return;
+              lensRoRaf = requestAnimationFrame(() => {
+                lensRoRaf = 0;
+                pendingLens.forEach((el) => applyLensTo(el));
+                pendingLens.clear();
+              });
+            })
+          : null;
+
+      function ensureLensWatch(el: HTMLElement) {
+        if (!lensRO || el.dataset.lensRo) return;
+        el.dataset.lensRo = '1';
+        lensRO.observe(el);                                            // 首次回调报告当前尺寸，签名一致直接早退
+      }
+
       function lensTarget(el: Element): el is HTMLElement {
         return el instanceof HTMLElement && !el.closest('#sidebar');   // 侧边栏保持毛玻璃
       }
@@ -322,7 +351,10 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
         if (!defs) return;
         const r = el.getBoundingClientRect();
         const w = Math.round(r.width), h = Math.round(r.height);
-        if (w < 4 || h < 4) return;                                    // 不可见/未布局，跳过
+        if (w < 4 || h < 4) {
+          ensureLensWatch(el);                                         // 塌陷/隐藏中的元素也盯住，恢复尺寸时自动重建
+          return;
+        }
         const cs = getComputedStyle(el);
         const rad = Math.max(
           parseFloat(cs.borderTopLeftRadius) || 0,
@@ -338,6 +370,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
             el.style.webkitBackdropFilter = val;
             el.style.backdropFilter = val;
           }
+          ensureLensWatch(el);
           return;
         }
         // 相同「尺寸×圆角」签名的元素共享同一枚滤镜：
@@ -352,6 +385,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
         el.dataset.lensSig = sig;
         el.style.webkitBackdropFilter = `url(#${id}) saturate(1.8) brightness(1.07)`;
         el.style.backdropFilter = `url(#${id}) saturate(1.8) brightness(1.07)`;
+        ensureLensWatch(el);
       }
 
       // 视口附近判定（含少量余量，滚动临近时已就绪）
