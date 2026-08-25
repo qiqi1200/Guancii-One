@@ -105,6 +105,7 @@
     --prose-pre-bg: 10 12 54;
     --prose-code-bg: 28 32 88;
     --prose-border: 28 32 88;
+    --radius-large: 1rem;
     --content-delay: 150ms;
     --page-width: 72rem;
     --toc-width: 14rem;
@@ -166,17 +167,12 @@
     --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);      /* iOS sheet/drawer 曲线 (from Ionic) */
     --ease-active: cubic-bezier(0.23, 1, 0.32, 1);       /* iOS 按压反馈 */
 
-    /* 圆角三档（iOS 比例：约为元素短边的 20~22%，Apple 图标经典比例 22.4%） */
-    --radius-s: 10px;                                    /* 小元件：芯片、按钮、输入框 */
-    --radius-m: 18px;                                    /* 卡片：玻璃卡、侧栏模块 */
-    --radius-l: 26px;                                    /* 大面板：评论区、弹层、hero 容器 */
-    --radius-large: var(--radius-m);                     /* 兼容旧引用 */
-
     /* 动效时长三档 */
     --dur-fast: 150ms;                                   /* 即时反馈：按压、开关、小图标 */
     --dur-mid: 250ms;                                    /* 常规过渡：卡片、浮层、显隐 */
     --dur-slow: 400ms;                                   /* 强调登场：大卡位移、阴影展开 */
 
+    --radius-large: 1rem;
     --content-delay: 150ms;                                /* iOS 交错延迟基准 150ms */
     --page-width: 72rem;
   }
@@ -296,7 +292,7 @@
      - 侧边栏 .sidebar-section 不使用本材质，保持毛玻璃不变
   */
   .liquid-glass {
-    --glass-radius: var(--radius-m);
+    --glass-radius: 14px;
 
     position: relative;
     isolation: isolate;
@@ -897,7 +893,7 @@
     -webkit-backdrop-filter: saturate(1.8) brightness(1.07);
     backdrop-filter: saturate(1.8) brightness(1.07);
     border: 1px solid rgb(255 255 255 / 0.45);
-    border-radius: var(--radius-m);
+    border-radius: var(--radius-large, 1rem);
     box-shadow:
       inset 0 1px 1px rgb(255 255 255 / 0.55),
       inset 0 -1px 1px rgb(var(--glass-border) / 0.14),
@@ -1126,7 +1122,7 @@
    ④ ::before 内部模糊黑边  ⑤ 外层 contrast 滤镜提高清晰度
 */
 .liquid-glass-pure {
-  --glass-radius: var(--radius-m);
+  --glass-radius: 14px;
   --glass-border-alpha: 0.08;
   --glass-highlight: 0.9;
 
@@ -1248,7 +1244,7 @@
     -webkit-backdrop-filter: blur(16px) saturate(1.7);
     backdrop-filter: blur(16px) saturate(1.7);
     border: 1px solid rgba(255, 255, 255, 0.38);
-    border-radius: var(--radius-m);
+    border-radius: 14px;
     padding: 20px;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
     transition:
@@ -1505,22 +1501,4 @@ html.dark .article-readable .prose h4 {
   border-color: transparent;
   box-shadow: none;
 }
-
-  /* ============= iOS 连续曲率（渐进增强） =============
-     corner-shape: superellipse —— Chrome 139+ / Safari 26+ 生效，
-     其余浏览器自动回退普通圆角。刻意不使用 clip-path：
-     clip-path 会切断 backdrop-filter 的采样边界，液态玻璃折射会失效；
-     border-radius + corner-shape 则完全兼容折射引擎
-     （引擎按「尺寸×圆角」签名生成贴图，半径变化自动重建）。 */
-  @supports (corner-shape: superellipse(4)) {
-    .liquid-glass,
-    .liquid-glass-pure,
-    .card-base,
-    .ios-surface,
-    .ios-surface-heavy,
-    .scrapbook-card,
-    .sidebar-section {
-      corner-shape: superellipse(4);
-    }
-  }
 }
