@@ -1,3 +1,4 @@
+/* 始终将流畅、美观作为本博客设计的第一原则 */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -104,7 +105,6 @@
     --prose-pre-bg: 10 12 54;
     --prose-code-bg: 28 32 88;
     --prose-border: 28 32 88;
-    --radius-large: 1rem;
     --content-delay: 150ms;
     --page-width: 72rem;
     --toc-width: 14rem;
@@ -119,6 +119,14 @@
     @apply antialiased transition-colors duration-500;
     background-color: rgb(var(--bg));
     color: rgb(var(--fg));
+    /* 日期/时长等数字等宽对齐（Montserrat 无此特性时自动无害降级） */
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* 键盘焦点统一描边（鼠标点击不触发，仅键盘导航可见） */
+  :focus-visible {
+    outline: 2px solid rgb(var(--primary-light));
+    outline-offset: 2px;
   }
 
   ::selection {
@@ -157,7 +165,18 @@
     --ease-emphasized: cubic-bezier(0.16, 1, 0.3, 1);
     --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);      /* iOS sheet/drawer 曲线 (from Ionic) */
     --ease-active: cubic-bezier(0.23, 1, 0.32, 1);       /* iOS 按压反馈 */
-    --radius-large: 1rem;
+
+    /* 圆角三档（iOS 比例：约为元素短边的 20~22%，Apple 图标经典比例 22.4%） */
+    --radius-s: 10px;                                    /* 小元件：芯片、按钮、输入框 */
+    --radius-m: 18px;                                    /* 卡片：玻璃卡、侧栏模块 */
+    --radius-l: 26px;                                    /* 大面板：评论区、弹层、hero 容器 */
+    --radius-large: var(--radius-m);                     /* 兼容旧引用 */
+
+    /* 动效时长三档 */
+    --dur-fast: 150ms;                                   /* 即时反馈：按压、开关、小图标 */
+    --dur-mid: 250ms;                                    /* 常规过渡：卡片、浮层、显隐 */
+    --dur-slow: 400ms;                                   /* 强调登场：大卡位移、阴影展开 */
+
     --content-delay: 150ms;                                /* iOS 交错延迟基准 150ms */
     --page-width: 72rem;
   }
@@ -277,7 +296,7 @@
      - 侧边栏 .sidebar-section 不使用本材质，保持毛玻璃不变
   */
   .liquid-glass {
-    --glass-radius: 14px;
+    --glass-radius: var(--radius-m);
 
     position: relative;
     isolation: isolate;
@@ -303,9 +322,9 @@
     transform: translateZ(0);
     backface-visibility: hidden;
     transition:
-      transform 0.55s var(--ease-smooth),
-      box-shadow 0.55s var(--ease-smooth),
-      border-color 0.55s var(--ease-smooth);
+      transform var(--dur-slow) var(--ease-smooth),
+      box-shadow var(--dur-slow) var(--ease-smooth),
+      border-color var(--dur-slow) var(--ease-smooth);
   }
   .dark .liquid-glass {
     background: rgb(var(--glass-bg) / 0.14);
@@ -507,7 +526,7 @@
 
   /* ============= 归档列表 hover 滑入（参考博客的 .ap-post-row） ============= */
   .archive-slide-hover {
-    transition: transform 0.2s var(--ease-standard);
+    transition: transform var(--dur-fast) var(--ease-standard);
   }
   .archive-slide-hover:hover {
     transform: translateX(6px);
@@ -516,7 +535,7 @@
   /* ============= 链接箭头动画（参考博客的 search-result-arrow） ============= */
   .link-arrow {
     display: inline-block;
-    transition: transform 0.2s var(--ease-smooth);
+    transition: transform var(--dur-fast) var(--ease-smooth);
   }
   *:hover > .link-arrow {
     transform: translateX(3px);
@@ -626,6 +645,13 @@
     transition: width 0.3s, height 0.3s;
     will-change: transform;   /* 常驻合成层：跟随鼠标走合成器路径，不触发主线程重绘 */
   }
+  /* 触屏设备（手机/平板）没有鼠标光标，光晕不渲染，
+     避免一块静止的渐变残影留在玻璃卡片后面 */
+  @media (hover: none), (pointer: coarse) {
+    .cursor-blob {
+      display: none !important;
+    }
+  }
 
   /* ============= 阅读进度条 ============= */
   .reading-progress {
@@ -676,7 +702,7 @@
     @apply inline-flex items-center gap-2 px-4 py-2 rounded-2xl
            text-sm transition-all;
     font-family: 'Montserrat', sans-serif;
-    transition-duration: 120ms;
+    transition-duration: var(--dur-fast);
     transition-timing-function: var(--ease-active);
     transition-property: transform, background, color, box-shadow;
   }
@@ -871,16 +897,16 @@
     -webkit-backdrop-filter: saturate(1.8) brightness(1.07);
     backdrop-filter: saturate(1.8) brightness(1.07);
     border: 1px solid rgb(255 255 255 / 0.45);
-    border-radius: var(--radius-large, 1rem);
+    border-radius: var(--radius-m);
     box-shadow:
       inset 0 1px 1px rgb(255 255 255 / 0.55),
       inset 0 -1px 1px rgb(var(--glass-border) / 0.14),
       0 4px 8px rgb(0 0 0 / 0.03),
       0 16px 40px -16px rgb(var(--primary) / 0.16);
     transition:
-      transform 0.55s var(--ease-smooth),
-      box-shadow 0.55s var(--ease-smooth),
-      border-color 0.55s var(--ease-smooth);
+      transform var(--dur-slow) var(--ease-smooth),
+      box-shadow var(--dur-slow) var(--ease-smooth),
+      border-color var(--dur-slow) var(--ease-smooth);
   }
   .card-base:hover {
     border-color: rgb(255 255 255 / 0.6);
@@ -1100,7 +1126,7 @@
    ④ ::before 内部模糊黑边  ⑤ 外层 contrast 滤镜提高清晰度
 */
 .liquid-glass-pure {
-  --glass-radius: 14px;
+  --glass-radius: var(--radius-m);
   --glass-border-alpha: 0.08;
   --glass-highlight: 0.9;
 
@@ -1216,25 +1242,25 @@
   filter: brightness(0.85);
 }
 
-/* ============= 侧边栏统一模块（毛玻璃 — CSS backdrop-filter） ============= */
-.sidebar-section {
-  background: rgba(255, 255, 255, 0.13);
-  -webkit-backdrop-filter: blur(26px) saturate(200%);
-  backdrop-filter: blur(26px) saturate(200%);
-  border: 1px solid rgba(255, 255, 255, 0.38);
-  border-radius: 14px;
-  padding: 20px;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
-  transition:
-    box-shadow 0.25s cubic-bezier(0.23, 1, 0.32, 1),
-    border-color 0.25s cubic-bezier(0.23, 1, 0.32, 1),
-    background 0.3s cubic-bezier(0.23, 1, 0.32, 1);
-}
-.dark .sidebar-section {
-  background: rgba(20, 25, 50, 0.20);
-  border-color: rgba(255, 255, 255, 0.20);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
-}
+  /* ============= 侧边栏统一模块（材质二档：Regular 卡片） ============= */
+  .sidebar-section {
+    background: rgba(255, 255, 255, 0.30);
+    -webkit-backdrop-filter: blur(16px) saturate(1.7);
+    backdrop-filter: blur(16px) saturate(1.7);
+    border: 1px solid rgba(255, 255, 255, 0.38);
+    border-radius: var(--radius-m);
+    padding: 20px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
+    transition:
+      box-shadow var(--dur-fast) cubic-bezier(0.23, 1, 0.32, 1),
+      border-color var(--dur-fast) cubic-bezier(0.23, 1, 0.32, 1),
+      background 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  .dark .sidebar-section {
+    background: rgba(20, 25, 50, 0.34);
+    border-color: rgba(255, 255, 255, 0.20);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  }
 .sidebar-section:hover {
   transform: translateY(-1px);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
@@ -1322,18 +1348,16 @@
   font-weight: 600;
   color: rgb(var(--primary));
   text-decoration: none;
-  transition: gap 0.2s ease;
+  transition: gap var(--dur-fast) ease;
 }
 .read-more-link:hover {
   gap: 8px;
 }
 
-/* ============= 文章页可读性（标题/正文直接落在壁纸上，加背光分离） ============= */
-/* 浅色模式：白背光，深字在亮/杂底上清晰 */
+/* ============= 文章页可读性（标题/正文落在壁纸上，单层细背光） ============= */
+/* 浅色模式：一层贴字白边即可，笔画清爽不蒙雾 */
 html:not(.dark) .article-readable header h1 {
-  text-shadow:
-    0 1px 2px rgb(255 255 255 / 0.95),
-    0 2px 8px rgb(255 255 255 / 0.8);
+  text-shadow: 0 1px 3px rgb(255 255 255 / 0.95);
 }
 html:not(.dark) .article-readable header p,
 html:not(.dark) .article-readable header div,
@@ -1342,16 +1366,11 @@ html:not(.dark) .article-readable .prose li,
 html:not(.dark) .article-readable .prose h2,
 html:not(.dark) .article-readable .prose h3,
 html:not(.dark) .article-readable .prose h4 {
-  text-shadow:
-    0 1px 2px rgb(255 255 255 / 0.95),
-    0 0 4px rgb(255 255 255 / 0.85),
-    0 2px 14px rgb(255 255 255 / 0.7);
+  text-shadow: 0 1px 2px rgb(255 255 255 / 0.9);
 }
-/* 暗色模式：深背光，浅字在亮照片上也清晰 */
+/* 暗色模式：一层深色细背光 */
 html.dark .article-readable header h1 {
-  text-shadow:
-    0 1px 2px rgb(0 0 0 / 0.85),
-    0 2px 8px rgb(0 0 0 / 0.7);
+  text-shadow: 0 1px 3px rgb(0 0 0 / 0.85);
 }
 html.dark .article-readable header p,
 html.dark .article-readable header div,
@@ -1360,56 +1379,35 @@ html.dark .article-readable .prose li,
 html.dark .article-readable .prose h2,
 html.dark .article-readable .prose h3,
 html.dark .article-readable .prose h4 {
-  text-shadow:
-    0 1px 2px rgb(0 0 0 / 0.8),
-    0 0 4px rgb(0 0 0 / 0.75),
-    0 2px 14px rgb(0 0 0 / 0.6);
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.8);
 }
 
-/* ============= 奶油风文字颜色（适配暗色模式，背部加背光分离） ============= */
+/* ============= 奶油风文字颜色（单层细背光，适配暗色模式） ============= */
 .text-cream-heading {
   color: #16224a;
-  text-shadow:
-    0 1px 2px rgb(255 255 255 / 0.9),
-    0 0 6px rgb(255 255 255 / 0.7),
-    0 2px 16px rgb(255 255 255 / 0.6);
+  text-shadow: 0 1px 2px rgb(255 255 255 / 0.9);
 }
 .dark .text-cream-heading {
   color: #eef0f8;
-  text-shadow:
-    0 1px 2px rgb(0 0 0 / 0.8),
-    0 0 6px rgb(0 0 0 / 0.7),
-    0 2px 16px rgb(0 0 0 / 0.6);
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.8);
 }
 
 .text-cream-body {
   color: #24366b;                 /* 浅色：克莱因系加深，照片上依然清晰 */
-  text-shadow:
-    0 1px 2px rgb(255 255 255 / 0.9),
-    0 0 5px rgb(255 255 255 / 0.75),
-    0 2px 14px rgb(255 255 255 / 0.65);
+  text-shadow: 0 1px 2px rgb(255 255 255 / 0.88);
 }
 .dark .text-cream-body {
   color: #a9b2d0;
-  text-shadow:
-    0 1px 2px rgb(0 0 0 / 0.8),
-    0 0 5px rgb(0 0 0 / 0.7),
-    0 2px 14px rgb(0 0 0 / 0.6);
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.78);
 }
 
 .text-cream-soft {
   color: #3f5090;                 /* 浅色：克莱因系加深，小字号可读 */
-  text-shadow:
-    0 1px 2px rgb(255 255 255 / 0.85),
-    0 0 4px rgb(255 255 255 / 0.7),
-    0 2px 12px rgb(255 255 255 / 0.6);
+  text-shadow: 0 1px 2px rgb(255 255 255 / 0.85);
 }
 .dark .text-cream-soft {
   color: #7e88ad;
-  text-shadow:
-    0 1px 2px rgb(0 0 0 / 0.75),
-    0 0 4px rgb(0 0 0 / 0.65),
-    0 2px 12px rgb(0 0 0 / 0.55);
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.72);
 }
 
 .text-cream-link {
@@ -1507,4 +1505,22 @@ html.dark .article-readable .prose h4 {
   border-color: transparent;
   box-shadow: none;
 }
+
+  /* ============= iOS 连续曲率（渐进增强） =============
+     corner-shape: superellipse —— Chrome 139+ / Safari 26+ 生效，
+     其余浏览器自动回退普通圆角。刻意不使用 clip-path：
+     clip-path 会切断 backdrop-filter 的采样边界，液态玻璃折射会失效；
+     border-radius + corner-shape 则完全兼容折射引擎
+     （引擎按「尺寸×圆角」签名生成贴图，半径变化自动重建）。 */
+  @supports (corner-shape: superellipse(4)) {
+    .liquid-glass,
+    .liquid-glass-pure,
+    .card-base,
+    .ios-surface,
+    .ios-surface-heavy,
+    .scrapbook-card,
+    .sidebar-section {
+      corner-shape: superellipse(4);
+    }
+  }
 }

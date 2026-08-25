@@ -39,7 +39,7 @@ function pageUrl(n: number): string {
 
   <!-- ═══════ Hero：不对称分栏 ═══════ -->
   {isFirstPage && (
-    <section class="relative pt-4 pb-6 md:pt-6 md:pb-6 overflow-hidden onload-animation">
+    <section class="hero-air relative pt-4 pb-6 md:pt-6 md:pb-6 overflow-hidden onload-animation">
       <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6 md:gap-12">
         <!-- 左侧：文字区 -->
         <div class="flex-1 max-w-xl">
@@ -196,20 +196,35 @@ function pageUrl(n: number): string {
 </BaseLayout>
 
 <style>
-  /* 浅色模式：hero 文字直接落在壁纸上，
-     加一圈柔和白色背光晕提升可读性（暗色模式不启用）
-     多层阴影：贴字白边做"贴纸"分离 + 外圈柔光，亮底/杂景下字依然清晰 */
+  /* Hero 呼吸感：底部渐变托底保证文字可读，顶部透出壁纸更有空气感 */
+  .hero-air::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: linear-gradient(
+      to top,
+      rgb(var(--bg) / 0.55),
+      rgb(var(--bg) / 0.15) 55%,
+      transparent
+    );
+  }
+  :global(html.dark) .hero-air::before {
+    background: linear-gradient(
+      to top,
+      rgb(17 19 28 / 0.5),
+      rgb(17 19 28 / 0.12) 55%,
+      transparent
+    );
+  }
+
+  /* 浅色模式：hero 文字直接落在壁纸上，单层贴字白边（暗色模式不启用） */
   html:not(.dark) .on-wall {
-    text-shadow:
-      0 1px 2px rgb(255 255 255 / 0.92),
-      0 2px 6px rgb(255 255 255 / 0.72),
-      0 0 14px rgb(255 255 255 / 0.62),
-      0 6px 26px rgb(255 255 255 / 0.5);
+    text-shadow: 0 1px 2px rgb(255 255 255 / 0.92);
   }
   html.dark .on-wall {
-    text-shadow:
-      0 1px 2px rgb(0 0 0 / 0.8),
-      0 2px 10px rgb(0 0 0 / 0.6);
+    text-shadow: 0 1px 2px rgb(0 0 0 / 0.8);
   }
 
   /* 打字机光标 */

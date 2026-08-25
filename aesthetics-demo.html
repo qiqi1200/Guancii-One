@@ -1,0 +1,536 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>美学与圆角优化 · 演示 — guancii 的小角落</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300..800&family=Architects+Daughter&display=swap" rel="stylesheet" />
+<style>
+/* ══════════════════════════════════════════════════
+   博客设计语言复刻 · 仅用于演示，不影响博客本体
+   ══════════════════════════════════════════════════ */
+:root {
+  --bg: 236 246 241;
+  --fg: 6 13 40;
+  --fg-soft: 17 27 66;
+  --primary-light: 1 38 150;
+  --primary: 0 26 110;
+  --glass-border: 188 214 200;
+  --ease: cubic-bezier(0.23, 1, 0.32, 1);
+  /* 提案：圆角三档 token */
+  --radius-s: 10px;
+  --radius-m: 18px;
+  --radius-l: 26px;
+  /* 提案：动效三档 */
+  --dur-fast: 150ms;
+  --dur-mid: 250ms;
+  --dur-slow: 400ms;
+  --veil: 0.12;
+}
+html.dark {
+  --bg: 0 0 38;
+  --fg: 240 240 245;
+  --fg-soft: 230 195 172;
+  --primary-light: 255 119 15;
+  --primary: 255 119 15;
+  --glass-border: 38 44 100;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: 'Montserrat', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  color: rgb(var(--fg));
+  background-color: rgb(var(--bg));
+  letter-spacing: 0.01em;
+  transition: background-color 0.5s var(--ease), color 0.5s var(--ease);
+}
+/* 壁纸层（与博客同一素材） */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background: url('https://img.260607.best/i/20260822051329_tik6.jpg') center / cover no-repeat;
+}
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: rgb(var(--bg) / var(--veil));
+  transition: background 0.4s var(--ease);
+}
+html.dark body::before {
+  filter: brightness(0.75);
+}
+
+.wrap { max-width: 60rem; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
+
+/* ── 顶栏 ── */
+.topbar {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  padding: 0.9rem 1.1rem;
+  margin-bottom: 2.5rem;
+  background: rgb(255 255 255 / 0.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.6);
+  backdrop-filter: blur(24px) saturate(1.6);
+  border: 1px solid rgb(255 255 255 / 0.45);
+  border-radius: var(--radius-m);
+  box-shadow: inset 0 1px 1px rgb(255 255 255 / 0.55), 0 8px 28px -12px rgb(1 38 150 / 0.25);
+}
+html.dark .topbar { background: rgb(14 16 62 / 0.45); border-color: rgb(255 255 255 / 0.16); }
+.brand { font-family: 'Architects Daughter', cursive; font-size: 1.05rem; color: rgb(var(--primary)); }
+
+.btn {
+  border: 1px solid rgb(255 255 255 / 0.5);
+  background: rgb(255 255 255 / 0.12);
+  -webkit-backdrop-filter: saturate(1.8) brightness(1.07);
+  backdrop-filter: saturate(1.8) brightness(1.07);
+  color: rgb(var(--fg-soft));
+  font: 600 0.82rem/1 'Montserrat', sans-serif;
+  padding: 0.55rem 0.95rem;
+  border-radius: var(--radius-s);
+  cursor: pointer;
+  box-shadow: inset 0 1px 1px rgb(255 255 255 / 0.55);
+  transition: transform var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+}
+.btn:hover { background: rgb(var(--primary) / 0.14); color: rgb(var(--primary)); }
+.btn:active { transform: scale(0.96); }
+/* 提案：统一的键盘焦点样式 */
+:focus-visible {
+  outline: 2px solid rgb(var(--primary-light));
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* ── 章节骨架 ── */
+section { margin-bottom: 3.5rem; }
+.sec-no {
+  font-family: 'Architects Daughter', cursive;
+  color: rgb(var(--primary));
+  font-size: 0.95rem;
+  margin: 0 0 0.2rem;
+}
+h2 { margin: 0 0 0.45rem; font-size: 1.35rem; letter-spacing: -0.02em; }
+.sec-desc { margin: 0 0 1.2rem; font-size: 0.88rem; line-height: 1.7; color: rgb(var(--fg-soft)); max-width: 46rem; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+@media (max-width: 720px) { .grid2 { grid-template-columns: 1fr; } }
+
+.glass {
+  background: rgb(255 255 255 / 0.08);
+  -webkit-backdrop-filter: saturate(1.8) brightness(1.07);
+  backdrop-filter: saturate(1.8) brightness(1.07);
+  border: 1px solid rgb(255 255 255 / 0.45);
+  box-shadow: inset 0 1px 1px rgb(255 255 255 / 0.55), inset 0 -1px 1px rgb(var(--glass-border) / 0.14),
+              0 4px 8px rgb(0 0 0 / 0.03), 0 16px 40px -16px rgb(var(--primary) / 0.16);
+}
+html.dark .glass {
+  background: rgb(14 16 62 / 0.14);
+  border-color: rgb(255 255 255 / 0.16);
+  box-shadow: inset 0 1px 1px rgb(255 255 255 / 0.08), 0 16px 44px -16px rgb(0 0 0 / 0.35);
+}
+.panel { border-radius: var(--radius-m); padding: 1.15rem 1.25rem; }
+.tag {
+  display: inline-block; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em;
+  padding: 0.25rem 0.6rem; border-radius: 999px; margin-bottom: 0.7rem;
+}
+.tag-now { background: rgb(138 61 61 / 0.14); color: #8a3d3d; }
+.tag-new { background: rgb(61 122 61 / 0.14); color: #3d7a3d; }
+html.dark .tag-now { background: rgb(255 119 15 / 0.16); color: rgb(var(--primary-light)); }
+html.dark .tag-new { background: rgb(177 207 167 / 0.16); color: #b1cfa7; }
+.note { font-size: 0.78rem; line-height: 1.65; color: rgb(var(--fg-soft)); margin: 0.8rem 0 0; }
+code.k {
+  font-family: ui-monospace, Consolas, monospace; font-size: 0.78em;
+  background: rgb(var(--primary) / 0.08); color: rgb(var(--primary));
+  padding: 0.12em 0.45em; border-radius: 5px;
+}
+
+/* ── S1 圆角体系 ── */
+.radius-row { display: flex; flex-wrap: wrap; gap: 0.8rem; align-items: stretch; }
+.radius-chip {
+  flex: 1 1 130px; min-height: 108px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.25rem;
+  font-size: 0.78rem; color: rgb(var(--fg-soft));
+}
+.radius-chip b { font-size: 1rem; color: rgb(var(--fg)); }
+.radius-chip small { opacity: 0.72; font-family: ui-monospace, Consolas, monospace; }
+
+/* ── S2 squircle 实验台 ── */
+.controls {
+  display: flex; flex-wrap: wrap; gap: 1.2rem 2rem; align-items: center;
+  padding: 0.9rem 1.1rem; margin-bottom: 1.1rem;
+}
+.ctrl { display: flex; align-items: center; gap: 0.6rem; font-size: 0.8rem; color: rgb(var(--fg-soft)); }
+.ctrl output { font-family: ui-monospace, Consolas, monospace; min-width: 3.2em; color: rgb(var(--primary)); font-weight: 700; }
+input[type="range"] { accent-color: rgb(var(--primary-light)); width: 11rem; }
+.badge {
+  font-size: 0.72rem; font-weight: 700; padding: 0.3rem 0.7rem; border-radius: 999px;
+}
+.badge.ok { background: rgb(61 122 61 / 0.16); color: #2f6634; }
+.badge.no { background: rgb(138 61 61 / 0.14); color: #8a3d3d; }
+.samples { display: flex; flex-wrap: wrap; gap: 1.4rem; align-items: flex-end; }
+.sample { text-align: center; }
+.tile {
+  width: 116px; height: 116px;
+  display: grid; place-items: center;
+  font-family: 'Architects Daughter', cursive; font-size: 2.6rem; color: #fff;
+  background: linear-gradient(135deg, rgb(var(--primary-light)), #2A6B54 55%, #1D5038);
+  border-radius: calc(var(--r, 26px));
+  transition: border-radius var(--dur-mid) var(--ease);
+  overflow: hidden;
+}
+html.dark .tile { background: linear-gradient(135deg, #FF770F, #562402 70%); }
+@supports (corner-shape: superellipse(4)) {
+  .tile.se { corner-shape: superellipse(var(--se, 4)); }
+  .glass.se { corner-shape: superellipse(var(--se, 4)); }
+}
+.sample figcaption { margin-top: 0.55rem; font-size: 0.74rem; color: rgb(var(--fg-soft)); }
+.glass-tile {
+  width: 150px; height: 104px;
+  display: grid; place-items: center;
+  font-size: 0.76rem; color: rgb(var(--fg-soft));
+}
+
+/* ── S3 材质三档 ── */
+.tiers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+@media (max-width: 720px) { .tiers { grid-template-columns: 1fr; } }
+.tier { padding: 1.1rem 1.15rem; }
+.tier h3 { margin: 0 0 0.35rem; font-size: 0.92rem; }
+.tier p { margin: 0; font-size: 0.76rem; line-height: 1.6; color: rgb(var(--fg-soft)); }
+.tier-nav    { background: rgb(255 255 255 / 0.55); -webkit-backdrop-filter: blur(28px) saturate(1.8); backdrop-filter: blur(28px) saturate(1.8); }
+.tier-card   { background: rgb(255 255 255 / 0.30); -webkit-backdrop-filter: blur(16px) saturate(1.7); backdrop-filter: blur(16px) saturate(1.7); }
+.tier-chip   { background: rgb(255 255 255 / 0.12); -webkit-backdrop-filter: saturate(1.8) brightness(1.07); backdrop-filter: saturate(1.8) brightness(1.07); }
+html.dark .tier-nav  { background: rgb(14 16 62 / 0.60); }
+html.dark .tier-card { background: rgb(14 16 62 / 0.34); }
+html.dark .tier-chip { background: rgb(14 16 62 / 0.16); }
+
+/* ── S4 背光对比 ── */
+.glow-a p, .glow-b p { font-size: 0.92rem; line-height: 1.85; margin: 0; color: rgb(var(--fg)); }
+.glow-a p { text-shadow: 0 1px 2px rgb(255 255 255 / 0.95), 0 0 4px rgb(255 255 255 / 0.85), 0 2px 14px rgb(255 255 255 / 0.7); }
+.glow-b p { text-shadow: 0 1px 2px rgb(255 255 255 / 0.9); }
+html.dark .glow-a p { text-shadow: 0 1px 2px rgb(0 0 0 / 0.8), 0 0 4px rgb(0 0 0 / 0.75), 0 2px 14px rgb(0 0 0 / 0.6); }
+html.dark .glow-b p { text-shadow: 0 1px 2px rgb(0 0 0 / 0.8); }
+
+/* ── S5 动效时长 ── */
+.dur-row { display: flex; flex-wrap: wrap; gap: 1rem; }
+.dur-card {
+  flex: 1 1 150px; padding: 1rem 1.1rem; cursor: pointer;
+  transition: transform var(--d, 250ms) var(--ease), box-shadow var(--d, 250ms) var(--ease);
+}
+.dur-card:hover { transform: translateY(-5px); box-shadow: 0 18px 40px -14px rgb(var(--primary) / 0.3); }
+.dur-card span { font-family: ui-monospace, Consolas, monospace; font-size: 0.78rem; color: rgb(var(--primary)); font-weight: 700; }
+.replay {
+  margin-top: 1rem;
+}
+.enter-demo { display: flex; flex-wrap: wrap; gap: 0.8rem; margin-top: 1rem; }
+.enter-dot {
+  width: 54px; height: 54px; display: grid; place-items: center;
+  font-size: 0.7rem; font-weight: 700; color: #fff;
+  background: linear-gradient(135deg, rgb(var(--primary-light)), #2A6B54);
+  border-radius: var(--radius-s);
+  opacity: 0; transform: translateY(14px);
+}
+.enter-dot.go { animation: enter var(--dd, 250ms) var(--ease) forwards; }
+@keyframes enter { to { opacity: 1; transform: translateY(0); } }
+
+/* ── S6 数字排版 ── */
+table.nums { width: 100%; border-collapse: collapse; font-size: 0.84rem; }
+table.nums td { padding: 0.42rem 0.5rem; border-bottom: 1px dashed rgb(var(--fg-soft) / 0.18); }
+table.nums .lbl { color: rgb(var(--fg-soft)); font-size: 0.78rem; }
+.tnum { font-variant-numeric: tabular-nums; }
+.mono-col { font-family: inherit; }
+
+/* ── S8 hero 呼吸感 ── */
+.heroes { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+@media (max-width: 720px) { .heroes { grid-template-columns: 1fr; } }
+.hero-mini {
+  position: relative; min-height: 168px; overflow: hidden;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 1.1rem 1.2rem;
+  background: url('https://img.260607.best/i/20260822051329_tik6.jpg') center / cover;
+}
+.hero-flat::before { content: ''; position: absolute; inset: 0; background: rgb(var(--bg) / 0.35); }
+.hero-grad::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(to top, rgb(var(--bg) / 0.72), rgb(var(--bg) / 0.18) 55%, transparent);
+}
+.hero-mini > * { position: relative; }
+.hero-mini h3 { margin: 0 0 0.3rem; font-size: 1.02rem; letter-spacing: -0.02em; }
+.hero-mini p { margin: 0; font-size: 0.78rem; color: rgb(var(--fg-soft)); }
+
+footer { text-align: center; font-size: 0.78rem; color: rgb(var(--fg-soft)); padding: 2rem 0 0; opacity: 0.85; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="topbar">
+    <span class="brand">美学与圆角优化 · 演示稿</span>
+    <div style="display:flex; gap:0.5rem; align-items:center;">
+      <label class="ctrl" title="壁纸遮罩浓度">
+        遮罩
+        <input type="range" id="veilRange" min="0" max="90" value="12" />
+      </label>
+      <button class="btn" id="themeBtn">🌙 夜间</button>
+    </div>
+  </header>
+
+  <!-- ═══ S1 圆角体系 ═══ -->
+  <section>
+    <p class="sec-no">01 · Radius System</p>
+    <h2>圆角从「散落混用」到「三档制」</h2>
+    <p class="sec-desc">
+      现状是 14 / 16 / 32px 混杂，没有体系。提案收敛为三档 token：
+      小元件 <code class="k">--radius-s 10px</code>、卡片 <code class="k">--radius-m 18px</code>、大面板 <code class="k">--radius-l 26px</code>，
+      约等于元素短边的 20~22%（Apple 图标经典比例 22.4%）。圆形按钮保持 full 不变。
+    </p>
+    <div class="grid2">
+      <div class="glass panel">
+        <span class="tag tag-now">现状 · 混搭</span>
+        <div class="radius-row">
+          <div class="glass radius-chip" style="border-radius:14px"><b>玻璃卡</b><small>14px</small></div>
+          <div class="glass radius-chip" style="border-radius:16px"><b>标准卡</b><small>16px</small></div>
+          <div class="glass radius-chip" style="border-radius:32px"><b>评论卡</b><small>32px</small></div>
+        </div>
+        <p class="note">同级元素圆角不一致，页面翻到不同板块时「手感」会漂移。</p>
+      </div>
+      <div class="glass panel">
+        <span class="tag tag-new">提案 · 三档</span>
+        <div class="radius-row">
+          <div class="glass radius-chip" style="border-radius:var(--radius-s)"><b>小元件</b><small>--s · 10px</small></div>
+          <div class="glass radius-chip" style="border-radius:var(--radius-m)"><b>卡片</b><small>--m · 18px</small></div>
+          <div class="glass radius-chip" style="border-radius:var(--radius-l)"><b>大面板</b><small>--l · 26px</small></div>
+        </div>
+        <p class="note">层级越高圆角越大，与 iOS「表面越大、越圆润」的直觉一致。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ S2 squircle ═══ -->
+  <section>
+    <p class="sec-no">02 · Continuous Corners</p>
+    <h2>iOS 连续曲率（Squircle）实验台</h2>
+    <p class="sec-desc">
+      iOS 的圆角不是圆弧，是超椭圆——过渡更饱满。CSS 已可用原生方案：
+      <code class="k">corner-shape: superellipse(n)</code>，Chrome 139+ / Safari 26 支持，其余浏览器自动回退普通圆角。
+      拖动滑杆感受曲率差异；<b>n≈4 最接近 Apple 图标质感</b>。
+    </p>
+    <div class="glass controls">
+      <span id="supportBadge" class="badge"></span>
+      <label class="ctrl">圆角半径
+        <input type="range" id="rRange" min="8" max="58" value="34" />
+        <output id="rOut">34px</output>
+      </label>
+      <label class="ctrl">曲率 n
+        <input type="range" id="nRange" min="2" max="6" step="0.5" value="4" />
+        <output id="nOut">4.0</output>
+      </label>
+    </div>
+    <div class="samples">
+      <figure class="sample">
+        <div class="tile" id="tRound" data-label="普通圆角"></div>
+        <figcaption>普通 border-radius</figcaption>
+      </figure>
+      <figure class="sample">
+        <div class="tile se" id="tSq" data-label="squircle">G</div>
+        <figcaption>superellipse(<span id="nEcho">4</span>) 连续曲率</figcaption>
+      </figure>
+      <figure class="sample">
+        <div class="tile se" style="--r:26px; --se:4;">✦</div>
+        <figcaption>图标档 · 半径 22%</figcaption>
+      </figure>
+      <figure class="sample">
+        <div class="glass glass-tile se" style="--r:var(--radius-l); --se:4;" id="tGlass">液态玻璃<br>+ squircle</div>
+        <figcaption>折射不受影响 ✓</figcaption>
+      </figure>
+    </div>
+    <p class="note">
+      注意最后一块：改圆角走的是 <code class="k">border-radius + corner-shape</code>，不引入 clip-path，
+      因此不会切断 backdrop-filter 的采样边界，液态玻璃折射完好；博客的折射引擎本就按「尺寸×圆角」签名重建贴图，切换后自动适配。
+    </p>
+  </section>
+
+  <!-- ═══ S3 材质三档 ═══ -->
+  <section>
+    <p class="sec-no">03 · Material Tiers</p>
+    <h2>材质三档：用透明度分层，而不是加模糊</h2>
+    <p class="sec-desc">
+      层级语言统一为三档：导航<b>重</b>、卡片<b>标准</b>、芯片按钮<b>轻</b>。差异主要来自背景透明度，
+      模糊只保留必要档位——每多一档模糊都是性能与浑浊度的双重代价。拖动右上角「遮罩」滑杆改变壁纸浓度，观察三档在不同底色下的表现。
+    </p>
+    <div class="tiers">
+      <div class="glass tier tier-nav" style="border-radius:var(--radius-l)">
+        <h3>导航 · Heavy</h3><p>白 55% · blur 28px<br>悬浮结构面，压得住复杂背景</p>
+      </div>
+      <div class="glass tier tier-card" style="border-radius:var(--radius-m)">
+        <h3>卡片 · Regular</h3><p>白 30% · blur 16px<br>内容容器，通透但成组</p>
+      </div>
+      <div class="glass tier tier-chip" style="border-radius:var(--radius-s)">
+        <h3>芯片按钮 · Light</h3><p>白 12% · 无模糊<br>点缀件，让壁纸透进来</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ S4 背光对比 ═══ -->
+  <section>
+    <p class="sec-no">04 · Text Legibility</p>
+    <h2>文字背光：三层减到一层细边</h2>
+    <p class="sec-desc">
+      现状正文叠了三层白色辉光，字像蒙了雾；遮盖提到 85% 后背景已足够稳，
+      一层贴字细光即可保证可读性，笔画反而更清爽。<b>切到夜间模式可看暗色版对比。</b>
+    </p>
+    <div class="grid2">
+      <div class="glass panel glow-a">
+        <span class="tag tag-now">现状 · 三层辉光</span>
+        <p>把日子过成自己喜欢的样子。凡是过往，皆为序章；人生如逆旅，我亦是行人。</p>
+      </div>
+      <div class="glass panel glow-b">
+        <span class="tag tag-new">提案 · 单层细边</span>
+        <p>把日子过成自己喜欢的样子。凡是过往，皆为序章；人生如逆旅，我亦是行人。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ S5 动效时长 ═══ -->
+  <section>
+    <p class="sec-no">05 · Motion Scale</p>
+    <h2>动效时长收敛为 150 / 250 / 400ms</h2>
+    <p class="sec-desc">
+      现在站内过渡从 0.2s 到 0.55s 各处不一。收敛为快/中/慢三档后，微交互跟手、入场从容，整体节奏统一。
+      悬停下面三张卡片感受差异；点「重播入场」看三档时长的交错序列。
+    </p>
+    <div class="dur-row">
+      <div class="glass dur-card panel" style="--d:150ms"><span>--dur-fast 150ms</span><br />悬停我 · 即时反馈类（按压/开关）</div>
+      <div class="glass dur-card panel" style="--d:250ms"><span>--dur-mid 250ms</span><br />悬停我 · 常规过渡类（卡片/浮层）</div>
+      <div class="glass dur-card panel" style="--d:400ms"><span>--dur-slow 400ms</span><br />悬停我 · 强调登场类（弹窗/大卡）</div>
+    </div>
+    <button class="btn replay" id="replayBtn">↺ 重播入场序列</button>
+    <div class="enter-demo" id="enterDemo">
+      <div class="enter-dot" style="--dd:150ms">150</div>
+      <div class="enter-dot" style="--dd:250ms">250</div>
+      <div class="enter-dot" style="--dd:400ms">400</div>
+      <div class="enter-dot" style="--dd:250ms">250</div>
+      <div class="enter-dot" style="--dd:150ms">150</div>
+    </div>
+  </section>
+
+  <!-- ═══ S6 数字排版 ═══ -->
+  <section>
+    <p class="sec-no">06 · Numeric Alignment</p>
+    <h2>日期与数字：<code class="k">tabular-nums</code> 等宽对齐</h2>
+    <p class="sec-desc">
+      左列表格是默认比例数字，位数不同时纵向错位；右列开启等宽数字，归档、阅读时长立刻整齐利落。
+    </p>
+    <div class="grid2">
+      <div class="glass panel">
+        <span class="tag tag-now">默认</span>
+        <table class="nums">
+          <tr><td class="lbl">2026-08-24 · 阅读</td><td style="text-align:right">3 分钟</td></tr>
+          <tr><td class="lbl">2026-08-19 · 阅读</td><td style="text-align:right">11 分钟</td></tr>
+          <tr><td class="lbl">2026-08-07 · 阅读</td><td style="text-align:right">128 分钟</td></tr>
+        </table>
+      </div>
+      <div class="glass panel">
+        <span class="tag tag-new">tabular-nums</span>
+        <table class="nums tnum">
+          <tr><td class="lbl">2026-08-24 · 阅读</td><td style="text-align:right">3 分钟</td></tr>
+          <tr><td class="lbl">2026-08-19 · 阅读</td><td style="text-align:right">11 分钟</td></tr>
+          <tr><td class="lbl">2026-08-07 · 阅读</td><td style="text-align:right">128 分钟</td></tr>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ S7 焦点 ═══ -->
+  <section>
+    <p class="sec-no">07 · Focus Visible</p>
+    <h2>键盘焦点：克莱因蓝统一描边</h2>
+    <p class="sec-desc">用 <kbd>Tab</kbd> 键在下面的按钮间移动，焦点环全站一致，可达性细节也是质感的一部分。</p>
+    <div class="dur-row">
+      <button class="btn">首页</button>
+      <button class="btn">归档</button>
+      <button class="btn">友链</button>
+      <button class="btn">说说</button>
+      <button class="btn">相册</button>
+    </div>
+  </section>
+
+  <!-- ═══ S8 Hero 呼吸感 ═══ -->
+  <section>
+    <p class="sec-no">08 · Hero Breathing</p>
+    <h2>标题区渐变遮罩：给壁纸留出空气感</h2>
+    <p class="sec-desc">
+      平遮罩整块压暗缺乏层次；改为「底部深、顶部透明」的渐变，标题可读性不变，
+      壁纸上半部分透出来，hero 更透气。右图即提案效果。
+    </p>
+    <div class="heroes">
+      <div class="hero-mini hero-flat" style="border-radius:var(--radius-m)">
+        <h3>现状 · 平遮罩</h3><p>整块 35%，壁纸被均匀压住</p>
+      </div>
+      <div class="hero-mini hero-grad" style="border-radius:var(--radius-m)">
+        <h3>提案 · 渐变遮罩</h3><p>顶部透出壁纸，底部保住文字</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    本页为独立演示稿，未改动博客任何源码 · 确认想要的项之后告诉我编号，我来落到博客里
+  </footer>
+</div>
+
+<script>
+(function () {
+  // 主题
+  var btn = document.getElementById('themeBtn');
+  btn.addEventListener('click', function () {
+    var dark = document.documentElement.classList.toggle('dark');
+    btn.textContent = dark ? '☀️ 日间' : '🌙 夜间';
+  });
+
+  // 遮罩浓度
+  var veil = document.getElementById('veilRange');
+  veil.addEventListener('input', function () {
+    document.documentElement.style.setProperty('--veil', (veil.value / 100).toFixed(2));
+  });
+
+  // squircle 支持检测
+  var ok = window.CSS && CSS.supports && CSS.supports('corner-shape', 'superellipse(4)');
+  var badge = document.getElementById('supportBadge');
+  badge.textContent = ok ? '✓ 当前浏览器支持 corner-shape' : '✗ 此浏览器不支持 · 全部回退普通圆角';
+  badge.className = 'badge ' + (ok ? 'ok' : 'no');
+
+  // 实验台联动
+  var r = document.getElementById('rRange'), n = document.getElementById('nRange');
+  function sync() {
+    var rv = r.value + 'px', nv = parseFloat(n.value).toFixed(1);
+    document.getElementById('tRound').style.setProperty('--r', rv);
+    document.getElementById('tSq').style.setProperty('--r', rv);
+    document.getElementById('tSq').style.setProperty('--se', nv);
+    document.getElementById('rOut').textContent = rv;
+    document.getElementById('nOut').textContent = nv;
+    document.getElementById('nEcho').textContent = nv;
+  }
+  r.addEventListener('input', sync);
+  n.addEventListener('input', sync);
+  sync();
+
+  // 入场重播
+  var rp = document.getElementById('replayBtn');
+  rp.addEventListener('click', function () {
+    var dots = document.querySelectorAll('.enter-dot');
+    dots.forEach(function (d) { d.classList.remove('go'); });
+    void document.body.offsetWidth; // 重置动画
+    dots.forEach(function (d, i) {
+      setTimeout(function () { d.classList.add('go'); }, i * 90);
+    });
+  });
+  rp.click();
+})();
+</script>
+</body>
+</html>
