@@ -3,13 +3,12 @@
     "name": "傥师妹TangShiMei的小空间",
     "url": "https://blog.224418.xyz",
     "avatar": "https://blog.224418.xyz/img/favicon/avatar.png",
-    "description": "中航大交通工程专业的 25 级大学生，写校园生活、日记和碎碎念",
+    "description": "想和你重新认识一次，从你叫什么开始",
     "feed": "https://blog.224418.xyz/rss2.xml"
   },
   {
     "name": "示例 · 可删除",
     "url": "https://example.com",
-    "avatar": "",
     "description": "编辑 src/data/friends.json 添加或删除友链；填 feed 字段（RSS 地址）可参与下方朋友圈聚合"
   }
 ]
