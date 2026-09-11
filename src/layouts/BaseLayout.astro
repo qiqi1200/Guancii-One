@@ -310,7 +310,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
       }
 
       const LENS_SELECTOR =
-        '.liquid-glass, .card-base, .ios-surface, .scrapbook-card, .liquid-glass-vibe, .liquid-glass-pure, [data-lens]';
+        '.liquid-glass, .card-base, .ios-surface, .scrapbook-card, .liquid-glass-vibe, .liquid-glass-pure, .tag-chip-cream, .tag-filter-cream, [data-lens]';
       let lensSeq = 0;
       // 「尺寸×圆角」签名 → 滤镜 id。同签名元素共享同一枚滤镜，输出逐像素一致
       const lensCache = new Map<string, string>();

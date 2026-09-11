@@ -75,7 +75,11 @@ const allPosts = (await getCollection('posts')).filter(p => !p.data.draft);
           <p class="font-handwritten text-[rgb(var(--secondary))] mb-2">{level}</p>
           <div class="flex flex-wrap gap-2">
             {items.map(s => (
-              <span class="postit-tag" style="background: rgba(var(--primary-light), 0.12); color: rgb(var(--primary));">
+              <span
+                class="postit-tag"
+                data-lens
+                style="background: rgba(var(--primary-light), 0.12); color: rgb(var(--primary));"
+              >
                 {s}
               </span>
             ))}
