@@ -6,6 +6,7 @@ import Sidebar from '../../components/Sidebar.astro';
 import TwikooComments from '../../components/TwikooComments.astro';
 import { getReadingTime } from '../../utils/readingTime';
 import site from '../../site.json';
+import { createHash } from 'node:crypto';
 const SITE = site;
 
 export const getStaticPaths: GetStaticPaths = async () => {
@@ -37,6 +38,12 @@ const { data, slug } = post;
 
 // 按中文字数+英文词数精确估算阅读时间
 const readTime = getReadingTime(post.body);
+
+// 点赞系统的 article_id：接口只接受 A-Za-z0-9_- ，
+// 中文 slug（如「暑假少有的丰富经历」）用 sha256 前 16 位兜底，保证 ASCII 且稳定。
+const likeId = /^[A-Za-z0-9_-]{1,180}$/.test(slug)
+  ? slug
+  : 'p-' + createHash('sha256').update(slug, 'utf8').digest('hex').slice(0, 16);
 // 正文字数（去空白）
 const wordCount = (post.body || '').replace(/\s/g, '').length;
 const wordCountText = wordCount >= 10000 ? `${(wordCount / 1000).toFixed(1)}k` : String(wordCount);
@@ -309,6 +316,17 @@ const similarPosts = allPosts
             </div>
           </section>
         )}
+
+        <!-- 点赞：组件与脚本静态资源托管本站在 Vercel，接口跨域走虚拟主机（CORS 白名单已放行 blog.260607.best） -->
+        <section class="no-print mt-12" aria-label="文章点赞">
+          <div class="like-widget" data-article-id={likeId}></div>
+          <link rel="stylesheet" href="/assets/likes/likes.css?v=1.7.3" />
+          <script
+            is:inline
+            src="/assets/likes/likes.js?v=1.7.3"
+            data-api="https://qvp.cc.cd/blog-likes/api/likes.php"
+          ></script>
+        </section>
 
         <!-- 评论 -->
         <section class="no-print mt-12">
