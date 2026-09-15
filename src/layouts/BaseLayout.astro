@@ -61,7 +61,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <!-- 预加载壁纸（按设备二选一，不随主题切换；media 确保只下载当前端那张。
          断点与 picture 的 max-width:768px 无缝衔接，缩放产生的非整数视口也不漏预载） -->
     <link rel="preload" as="image" href="https://img.260607.best/i/20260822051329_tik6.jpg" media="(min-width: 768.01px)" fetchpriority="high" />
-    <link rel="preload" as="image" href="https://img.260607.best/i/20260915135513_znu8.jpg" media="(max-width: 768px)" fetchpriority="high" />
+    <link rel="preload" as="image" href="https://img.260607.best/i/20260915142150_9krd.jpg" media="(max-width: 768px)" fetchpriority="high" />
 
     <!-- 字体：Montserrat + 手写体 Architects Daughter + Material Symbols
          图标字体轴收窄为实际使用的值（opsz 24 / wght 400 / GRAD 0），
@@ -113,7 +113,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
          picture+source：桌面端/移动端各只下载一张壁纸 -->
     <div id="bg-layer" aria-hidden="true">
       <picture>
-        <source srcset="https://img.260607.best/i/20260915135513_znu8.jpg" media="(max-width: 768px)" />
+        <source srcset="https://img.260607.best/i/20260915142150_9krd.jpg" media="(max-width: 768px)" />
         <img
           class="bg-desktop"
           src="https://img.260607.best/i/20260822051329_tik6.jpg"
