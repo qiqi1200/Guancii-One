@@ -455,6 +455,39 @@
     #mtab-url label { display: block; font-size: .8rem; font-weight: 600; margin: 12px 0 4px; }
     #btn-insert-url { margin-top: 16px; width: 100%; justify-content: center; }
 
+    /* ---------- 图注：插入后逐张补说明 ---------- */
+    .cap-panel {
+      margin-top: 14px; padding: 14px; border-radius: var(--radius-lg);
+      background: var(--cream); border: 1px solid var(--border);
+    }
+    .cap-panel[hidden] { display: none; }
+    .cap-head {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 10px; margin-bottom: 4px;
+    }
+    .cap-head strong { font-size: .88rem; font-weight: 600; }
+    .cap-hint { font-size: .76rem; color: var(--gray-light); margin: 0 0 12px; line-height: 1.6; }
+    .cap-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 0; border-top: 1px dashed var(--border);
+    }
+    .cap-item:first-of-type { border-top: none; }
+    .cap-thumb {
+      width: 52px; height: 40px; flex-shrink: 0;
+      object-fit: cover; border-radius: 6px; border: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .cap-fields { flex: 1; min-width: 0; }
+    .cap-fields .input { font-size: .8rem; padding: 6px 10px; }
+    .cap-fields .cap-alt { margin-bottom: 6px; }
+    .cap-fields .cap-text { font-family: var(--mono, monospace); }
+    .cap-actions { display: flex; gap: 8px; margin-top: 12px; }
+    .cap-actions .btn { flex: 1; justify-content: center; }
+    .cap-lock { font-size: .74rem; color: var(--gray-light); white-space: nowrap; }
+
+    /* 编辑器内选中 figure 时的视觉提示 */
+    .CodeMirror .cm-figure-active { background: rgba(120, 200, 160, .16); }
+
     .storage-row { display: flex; align-items: center; gap: 14px; margin-bottom: 10px; flex-wrap: wrap; }
     .storage-label { font-size: .8rem; font-weight: 600; color: var(--gray); }
     .storage-opt { display: inline-flex; align-items: center; gap: 5px; font-size: .84rem; cursor: pointer; color: var(--fg, inherit); }
@@ -676,17 +709,38 @@
           点击选择图片（可多选），或把图片拖到这里<br>
           <small>支持 JPG / PNG / WebP / GIF，单张 ≤ 20MB · 也可以直接在编辑器里 Ctrl+V 粘贴截图 · 图床模式一次批量上传，按顺序插入光标处</small>
         </div>
-        <input type="file" id="img-file-input" accept="image/*" multiple hidden>
-        <div id="upload-progress"></div>
+<div class="hint" style="margin-top:14px;">
+        图片先以 <code>![说明](地址)</code> 占位插入，紧接着会弹出「补图注」面板，
+        填完自动升级成 <code>&lt;figure&gt;</code> 图注块（图片下方的说明文字）。
       </div>
+      <input type="file" id="img-file-input" accept="image/*" multiple hidden>
+      <div id="upload-progress"></div>
+    </div>
 
-      <div id="mtab-url" style="display:none;">
-        <label for="media-url">图片地址</label>
-        <input type="text" class="input" id="media-url" placeholder="https://...">
-        <label for="media-alt">描述 alt（可选）</label>
-        <input type="text" class="input" id="media-alt" placeholder="图片说明">
-        <button class="btn btn-primary" id="btn-insert-url">插入到光标处</button>
+    <div id="mtab-url" style="display:none;">
+      <label for="media-url">图片地址</label>
+      <input type="text" class="input" id="media-url" placeholder="https://...">
+      <label for="media-alt">描述 alt（可选）</label>
+      <input type="text" class="input" id="media-alt" placeholder="图片说明">
+      <button class="btn btn-primary" id="btn-insert-url">插入到光标处</button>
+    </div>
+
+    <!-- 插入后逐张补图注 -->
+    <div class="cap-panel" id="cap-panel" hidden>
+      <div class="cap-head">
+        <strong>✍️ 补图注（图片下方的说明）</strong>
+        <span class="cap-lock" id="cap-count"></span>
       </div>
+      <p class="cap-hint">
+        上方填的是无障碍描述（图片没加载时读），下方填的是给人看的图注。
+        两行都填 → 输出 figure 图注块；只填 alt → 保持普通图片语法。
+      </p>
+      <div id="cap-list"></div>
+      <div class="cap-actions">
+        <button class="btn btn-primary" id="cap-apply">写入正文</button>
+        <button class="btn btn-ghost" id="cap-skip">稍后再写</button>
+      </div>
+    </div>
 
       <div class="modal-actions" style="margin-top:16px;">
         <button class="btn btn-ghost" id="media-close">关闭</button>
@@ -1335,6 +1389,12 @@
               action: () => openMediaModal(),
               className: 'fa fa-picture-o',
               title: '插入图片（上传 / 链接，可粘贴截图）'
+            },
+            {
+              name: 'insert-figure',
+              action: () => openCaptionForSelection(),
+              className: 'fa fa-picture-o',
+              title: '给这一张图加图注（先选中图片那一行）'
             },
             'link', '|', 'preview', 'side-by-side', 'fullscreen', '|', 'guide'],
           renderingConfig: { codeSyntaxHighlighting: true },
@@ -2230,6 +2290,7 @@
       });
 
       try {
+        const staged = [];
         if (imageTarget() === 'imgbed') {
           // ☁️ 个人图床：一次请求批量上传全部，按原顺序逐张插入光标处
           const results = await uploadToImgBed(list);
@@ -2237,7 +2298,8 @@
             const r = (results || [])[i] || {};
             const { uid, label } = rows[i];
             if (r.url) {
-              insertAtCursor(`![${altFromName(label) || '图片'}](${r.url})\n`);
+              const token = insertImagePlaceholder(r.url, label);
+              staged.push({ uid, label, url: r.url, alt: altFromName(label), token });
               progressRow(uid, label, 'ok', r.url);
             } else {
               progressRow(uid, label, 'err', r.error || '上传失败');
@@ -2249,13 +2311,16 @@
             try {
               const r = await uploadOneImageToRepo(file);
               touchedRepo = true;
-              insertAtCursor(`![${altFromName(label) || '图片'}](${r})\n`);
+              const token = insertImagePlaceholder(r, label);
+              staged.push({ uid, label, url: r, alt: altFromName(label), token });
               progressRow(uid, label, 'ok', r);
             } catch (err) {
               progressRow(uid, label, 'err', err.message);
             }
           }
         }
+        // 上传完立刻问图注，不想写就点「稍后再写」，占位符会保留成普通图片语法
+        if (staged.length) openCaptionPanel(staged);
       } catch (err) {
         // 整批失败（网络/密钥错误等）：所有行标记错误
         rows.forEach(({ uid, label }) => progressRow(uid, label, 'err', err.message));
@@ -2308,6 +2373,131 @@
       }
     }
 
+    // ---------- 图注：占位图 → figure 块 ----------
+    // 上传成功的图片先以占位标记记在 pendingCaptions 里，
+    // 由图注面板收集 alt / 图注文本后统一改写正文，用户不写图注也能照常用。
+    let pendingCaptions = [];
+    let capPlaceholderSeq = 0;
+    const CAP_MARK = '\u200bCAP';
+
+    function openCaptionPanel(items) {
+      pendingCaptions = items;
+      const wrap = $('cap-list');
+      wrap.innerHTML = '';
+      items.forEach((it, i) => {
+        const row = document.createElement('div');
+        row.className = 'cap-item';
+        row.innerHTML =
+          '<img class="cap-thumb" alt="" src="' + escAttr(it.url) + '">' +
+          '<div class="cap-fields">' +
+            '<input class="input cap-alt" placeholder="alt：无障碍描述（图片加载失败时显示）" value="' + escAttr(it.alt || '') + '">' +
+            '<input class="input cap-text" placeholder="图注：图片下方显示的说明文字">' +
+          '</div>';
+        wrap.appendChild(row);
+      });
+      $('cap-count').textContent = items.length + ' 张';
+      $('cap-panel').hidden = false;
+      const first = wrap.querySelector('.cap-text');
+      if (first) setTimeout(() => first.focus(), 60);
+      // 面板内回车 = 跳到下一张的图注，不用鼠标
+      wrap.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter') return;
+        e.preventDefault();
+        const all = [...wrap.querySelectorAll('.cap-text')];
+        const next = all[all.indexOf(e.target) + 1];
+        if (next) next.focus(); else applyCaptions();
+      });
+    }
+
+    // figure 内的图注是原始 HTML，Astro 不会解析其中的 markdown，
+    // 所以这里写入前先把 **强调** / `代码` 转成对应标签。
+    function inlineMdToHtml(text) {
+      return escHtml(String(text))
+        .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+        .replace(/(^|[^*])\*([^*\n]+)\*/g, '$1<em>$2</em>')
+        .replace(/`([^`]+)`/g, '<code>$1</code>');
+    }
+
+    // 把 figure HTML 折叠成单行可编辑文本，便于在 CodeMirror 里阅读与回改
+    function figureToText(url, alt, caption) {
+      const a = (alt || caption || '图片').replace(/"/g, '&quot;');
+      const c = inlineMdToHtml(String(caption).replace(/\s*\n\s*/g, ' '));
+      return '<figure class="post-figure">' +
+        '<img src="' + url + '" alt="' + a + '" loading="lazy" />' +
+        '<figcaption>' + c + '</figcaption></figure>';
+    }
+
+    // ---------- 给已有图片补图注 ----------
+    // 光标落在某张 ![alt](url) 上（或选中了这行）时调用，
+    // 直接把该行升级成 figure，img.src 不变，只是包一层 + 补 figcaption。
+    const MD_IMG_RE = /^!\[([^\]]*)\]\(([^)\s]+)\)$/;
+
+    function openCaptionForSelection() {
+      if (!easyMDE) return;
+      const cm = easyMDE.codemirror;
+      const sel = cm.getSelection();
+      // 优先用选区整行；没选中就用光标所在行
+      let from = cm.getCursor('from'), to = cm.getCursor('to');
+      if (!sel) {
+        from = { line: from.line, ch: 0 };
+        to = { line: to.line, ch: cm.getLine(to.line).length };
+      }
+      const text = cm.getRange(from, to);
+      const m = text.match(MD_IMG_RE);
+      if (!m) {
+        toast('把光标放到一行图片（![说明](地址)）上再点这个按钮', 'error');
+        return;
+      }
+      const url = m[2], alt = m[1];
+      // 先把原行清掉，重建成 figure 占位
+      const token = 'SEL' + (++capPlaceholderSeq);
+      cm.replaceRange(CAP_MARK + token + '\n', from, to);
+      setTimeout(() => {
+        openCaptionPanel([{ uid: url, label: url.split('/').pop() || url, url, alt, token }]);
+        const row = $('cap-list').querySelector('.cap-item');
+        if (row) {
+          row.querySelector('.cap-text').value = '';
+          row.scrollIntoView({ block: 'nearest' });
+        }
+      }, 30);
+    }
+
+    function applyCaptions() {
+      const rows = [...$('cap-list').querySelectorAll('.cap-item')];
+      let md = easyMDE.value();
+      let changed = 0;
+      rows.forEach((row, i) => {
+        const it = pendingCaptions[i];
+        if (!it) return;
+        const alt = row.querySelector('.cap-alt').value.trim();
+        const cap = row.querySelector('.cap-text').value.trim();
+        const marker = CAP_MARK + it.token;
+        if (!md.includes(marker)) return; // 已被手动改动，跳过避免破坏
+        const plain = '![' + (alt || '图片') + '](' + it.url + ')';
+        md = md.replace(marker, cap ? figureToText(it.url, alt, cap) : plain);
+        changed++;
+      });
+      if (changed) {
+        easyMDE.value(md);
+        toast(changed + ' 处图片已' + (rows.some(r => r.querySelector('.cap-text').value.trim()) ? '写入图注' : '整理完成'), 'success');
+      }
+      closeCaptionPanel();
+    }
+
+    function closeCaptionPanel() {
+      $('cap-panel').hidden = true;
+      $('cap-list').innerHTML = '';
+      pendingCaptions = [];
+    }
+
+    // 立即写入一张图占位（不含图注），返回 token
+    function insertImagePlaceholder(url, alt) {
+      if (!easyMDE) return null;
+      const token = String(++capPlaceholderSeq);
+      insertAtCursor(CAP_MARK + token + ' ' + altFromName(alt) + '\n');
+      return token;
+    }
+
     function altFromName(name) {
       return String(name || '').replace(/\.[^.]+$/, '').replace(/[-_]+/g, ' ').trim().slice(0, 60);
     }
@@ -2331,9 +2521,27 @@
     $('btn-insert-url').addEventListener('click', () => {
       const url = $('media-url').value.trim();
       if (!url) { toast('请填写图片地址', 'error'); return; }
-      insertAtCursor(`![${$('media-alt').value.trim() || '图片'}](${url})\n`);
+      const alt = $('media-alt').value.trim();
+      const token = insertImagePlaceholder(url, alt);
       $('media-url').value = ''; $('media-alt').value = '';
       closeMediaModal();
+      if (token) openCaptionPanel([{ uid: url, label: url.split('/').pop() || url, url, alt, token }]);
+    });
+
+    // 图注面板按钮
+    $('cap-apply').addEventListener('click', applyCaptions);
+    $('cap-skip').addEventListener('click', () => {
+      // 不写图注也要把占位符还原成普通图片语法，不能留脏标记
+      let md = easyMDE.value();
+      let n = 0;
+      pendingCaptions.forEach(it => {
+        const marker = CAP_MARK + it.token;
+        if (!md.includes(marker)) return;
+        md = md.replace(marker, '![' + (it.alt || '图片') + '](' + it.url + ')');
+        n++;
+      });
+      if (n) easyMDE.value(md);
+      closeCaptionPanel();
     });
 
     // 切换面板时重置懒加载缓存（登出/重新登录用）

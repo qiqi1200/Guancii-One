@@ -801,6 +801,47 @@
     visibility: hidden;
   }
 
+  /* ============= 配图与图下说明 ============= */
+  /* 后台「插入图片 → 补图注」输出 <figure class="post-figure">，
+     Astro 的 markdown 原生渲染内嵌 HTML，无需 remark 插件。
+     figcaption 承担「图下说明」；图片本体仍可被 Fancybox 放大。 */
+  .prose figure.post-figure {
+    margin: 1.75rem 0;
+    text-align: center;
+  }
+  .prose figure.post-figure img {
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+    /* 极轻的描边，把白底照片和纸感背景分开 */
+    box-shadow: 0 0 0 1px rgb(var(--prose-border) / .55);
+  }
+  .prose figure.post-figure figcaption {
+    margin-top: .6rem;
+    font-size: .82rem;
+    line-height: 1.65;
+    color: rgb(var(--prose-soft) / .82);
+    font-style: normal;
+    letter-spacing: .01em;
+  }
+  /* 图注里的行内强调不该被 prose 放大字号 */
+  .prose figure.post-figure figcaption strong { color: rgb(var(--prose-fg)); }
+  .prose figure.post-figure figcaption code {
+    font-size: .92em;
+    padding: .1em .35em;
+  }
+  /* 图注前的小分隔符，纯装饰，不抢注意力 */
+  .prose figure.post-figure figcaption::before {
+    content: '';
+    display: block;
+    width: 2rem;
+    height: 1px;
+    margin: 0 auto .55rem;
+    background: rgb(var(--prose-soft) / .3);
+  }
+
   /* ============= 代码块复制按钮 ============= */
 .prose pre {
   position: relative;
