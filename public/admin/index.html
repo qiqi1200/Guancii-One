@@ -2430,33 +2430,92 @@
     // ---------- 给已有图片补图注 ----------
     // 光标落在某张 ![alt](url) 上（或选中了这行）时调用，
     // 直接把该行升级成 figure，img.src 不变，只是包一层 + 补 figcaption。
-    const MD_IMG_RE = /^!\[([^\]]*)\]\(([^)\s]+)\)$/;
+    const MD_IMG_RE = /^!\[([^\]]*)\]\(([^)\s]+)(?:\s+"[^"]*")?\)$/;
+    const FIGURE_RE = /^<figure\b[^>]*>\s*<img\b([^>]*)\/?>(?:\s*<figcaption>([\s\S]*?)<\/figcaption>)?\s*<\/figure>$/i;
+
+    function parseFigureHtml(text) {
+      const m = String(text || '').trim().match(FIGURE_RE);
+      if (!m) return null;
+      const attrs = m[1] || '';
+      const srcM = attrs.match(/\bsrc=["']([^"']+)["']/i);
+      const altM = attrs.match(/\balt=["']([^"']*)["']/i);
+      if (!srcM) return null;
+      let caption = (m[2] || '').trim();
+      if (caption) {
+        const tmp = document.createElement('div');
+        tmp.innerHTML = caption;
+        caption = (tmp.textContent || '').trim();
+      }
+      return { url: srcM[1], alt: altM ? altM[1] : '', caption };
+    }
 
     function openCaptionForSelection() {
       if (!easyMDE) return;
       const cm = easyMDE.codemirror;
       const sel = cm.getSelection();
-      // 优先用选区整行；没选中就用光标所在行
       let from = cm.getCursor('from'), to = cm.getCursor('to');
+      let text = sel;
       if (!sel) {
-        from = { line: from.line, ch: 0 };
-        to = { line: to.line, ch: cm.getLine(to.line).length };
+        const line = cm.getLine(from.line) || '';
+        const trimmed = line.trim();
+        const findFigureRange = () => {
+          let start = -1, end = -1;
+          for (let i = from.line; i >= 0; i--) {
+            const l = cm.getLine(i) || '';
+            if (/<\/figure>/i.test(l) && i < from.line) break;
+            if (/<figure\b/i.test(l)) { start = i; break; }
+          }
+          if (start < 0) return null;
+          for (let i = start; i < cm.lineCount(); i++) {
+            if (/<\/figure>/i.test(cm.getLine(i) || '')) { end = i; break; }
+          }
+          if (end < 0 || from.line > end) return null;
+          return { start, end };
+        };
+
+        if (/^<figure\b/i.test(trimmed)) {
+          let endLine = from.line;
+          for (let i = from.line; i < cm.lineCount(); i++) {
+            if (/<\/figure>/i.test(cm.getLine(i) || '')) { endLine = i; break; }
+          }
+          from = { line: from.line, ch: 0 };
+          to = { line: endLine, ch: (cm.getLine(endLine) || '').length };
+          text = cm.getRange(from, to).trim();
+        } else {
+          const figRange = findFigureRange();
+          if (figRange) {
+            from = { line: figRange.start, ch: 0 };
+            to = { line: figRange.end, ch: (cm.getLine(figRange.end) || '').length };
+            text = cm.getRange(from, to).trim();
+          } else {
+            from = { line: from.line, ch: 0 };
+            to = { line: from.line, ch: line.length };
+            text = line;
+          }
+        }
       }
-      const text = cm.getRange(from, to);
-      const m = text.match(MD_IMG_RE);
-      if (!m) {
-        toast('把光标放到一行图片（![说明](地址)）上再点这个按钮', 'error');
-        return;
+
+      let url = '', alt = '', caption = '';
+      const fig = parseFigureHtml(String(text || '').trim());
+      if (fig) {
+        url = fig.url; alt = fig.alt; caption = fig.caption;
+      } else {
+        const m = String(text || '').trim().match(MD_IMG_RE);
+        if (!m) {
+          toast('请将光标放在图片行（Markdown 图片或 figure 图注块）上，再点击加图注', 'error');
+          return;
+        }
+        url = m[2]; alt = m[1];
       }
-      const url = m[2], alt = m[1];
-      // 先把原行清掉，重建成 figure 占位
+
       const token = 'SEL' + (++capPlaceholderSeq);
       cm.replaceRange(CAP_MARK + token + '\n', from, to);
       setTimeout(() => {
         openCaptionPanel([{ uid: url, label: url.split('/').pop() || url, url, alt, token }]);
         const row = $('cap-list').querySelector('.cap-item');
         if (row) {
-          row.querySelector('.cap-text').value = '';
+          if (caption) row.querySelector('.cap-text').value = caption;
+          row.querySelector('.cap-text').focus();
           row.scrollIntoView({ block: 'nearest' });
         }
       }, 30);
@@ -2494,7 +2553,7 @@
     function insertImagePlaceholder(url, alt) {
       if (!easyMDE) return null;
       const token = String(++capPlaceholderSeq);
-      insertAtCursor(CAP_MARK + token + ' ' + altFromName(alt) + '\n');
+      insertAtCursor(CAP_MARK + token + '\n');
       return token;
     }
 
